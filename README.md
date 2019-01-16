@@ -1,6 +1,8 @@
 # mollie-oxid
 Mollie Payments for OXID eSales
 
+**This module is still in developement**
+
 ## Manual Installation
 1. Create the folders "mollie/molliepayment" in the "source/modules" folder of the Oxid 6 installation
 2. Copy the content of this Git repository in this newly created molliepayment folder.
