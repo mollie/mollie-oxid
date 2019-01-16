@@ -14,8 +14,9 @@ Mollie Payments for OXID eSales
     }
   },
 ```
-4. Connect to the webserver with a console, navigate to the shop base folder and execute the following command:
+4. Connect to the webserver with a console, navigate to the shop base folder and execute the following commands to install the Mollie php API and regenerate the autoloader files:
 ```
+composer require mollie/mollie-api-php:^2.0
 composer dump-autoload
 ```
 5. Login into the shop admin area and enable and configure the module
