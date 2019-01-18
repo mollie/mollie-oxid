@@ -41,8 +41,6 @@ class Events
      */
     public static function onActivate()
     {
-        error_log('blob');
-
         self::addDatabaseStructure();
         self::addPaymentMethods();
         self::regenerateViews();
@@ -56,8 +54,6 @@ class Events
      */
     public static function onDeactivate()
     {
-        error_log('blimmel');
-
         #self::deactivePaymentMethods();
         self::clearTmp();
     }

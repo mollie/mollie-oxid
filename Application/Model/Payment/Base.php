@@ -4,7 +4,7 @@ namespace Mollie\Payment\Application\Model\Payment;
 
 use Mollie\Payment\Application\Model\PaymentConfig;
 
-class Base
+abstract class Base
 {
     /**
      * Payment id in the oxid shop

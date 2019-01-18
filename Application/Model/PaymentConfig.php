@@ -100,8 +100,10 @@ class PaymentConfig
         $sQuery = "SELECT * FROM ".self::$sTableName." WHERE OXID = ".$oDb->quote($sPaymentId)." LIMIT 1";
         $aResult = $oDb->getRow($sQuery);
 
-        $aReturn = array_merge(array('api' => $aResult['API']), $this->decodeCustomConfig($aResult['CONFIG']));
-
+        $aReturn = [];
+        if (!empty($aResult)) {
+            $aReturn = array_merge(array('api' => $aResult['API']), $this->decodeCustomConfig($aResult['CONFIG']));
+        }
         return $aReturn;
     }
 }
