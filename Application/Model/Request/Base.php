@@ -2,9 +2,8 @@
 
 namespace Mollie\Payment\Application\Model\Request;
 
-use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
+use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Application\Model\Order as CoreOrder;
-use OxidEsales\EshopCommunity\Setup\Core;
 use OxidEsales\Eshop\Core\Registry;
 
 abstract class Base
@@ -251,7 +250,31 @@ abstract class Base
     public function sendRequest(CoreOrder $oOrder, $dAmount)
     {
         $this->addRequestParameters($oOrder, $dAmount);
-        
-        return $this->getApiEndpoint()->create($this->getParameters());
+        $oResponse = $this->getApiEndpoint()->create($this->getParameters());
+
+        $requestLogger = oxNew(RequestLog::class);
+        $requestLogger->logRequest($this->getParameters(), $oResponse);
+
+        return $oResponse;
+    }
+
+    /**
+     * Logs an error response from a request, coming in form of an exception
+     *
+     * @param string $sCode
+     * @param string $sMessage
+     * @param string $method
+     */
+    public function logExceptionResponse($sCode, $sMessage, $method = '')
+    {
+        $requestLogger = oxNew(RequestLog::class);
+        $aResponse = [
+            'resource' => $method,
+            'status' => 'ERROR',
+            'code' => $sCode,
+            'customMessage' => $sMessage
+        ];
+
+        $requestLogger->logRequest($this->getParameters(), (object) $aResponse);
     }
 }
