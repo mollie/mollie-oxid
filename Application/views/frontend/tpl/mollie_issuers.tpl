@@ -1,0 +1,6 @@
+[{assign var="sListType" value=$oPaymentModel->getConfigParam('issuer_list_type')}]
+[{if $sListType == "dropdown"}]
+    [{include file="mollie_issuers_dropdown.tpl"}]
+[{elseif $sListType == "radio"}]
+    [{include file="mollie_issuers_radio.tpl"}]
+[{/if}]

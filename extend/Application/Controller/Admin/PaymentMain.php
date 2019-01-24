@@ -2,8 +2,8 @@
 
 namespace Mollie\Payment\extend\Application\Controller\Admin;
 
+use Mollie\Payment\Application\Helper\Payment;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
 use Mollie\Payment\Application\Model\PaymentConfig;
 
 class PaymentMain extends PaymentMain_parent
@@ -17,9 +17,19 @@ class PaymentMain extends PaymentMain_parent
     {
         parent::save();
 
-        $aMollieParams = Registry::get(Request::class)->getRequestParameter("mollie");
+        $aMollieParams = Registry::getRequest()->getRequestParameter("mollie");
 
         $oPaymentConfig = oxNew(PaymentConfig::class);
         $oPaymentConfig->savePaymentConfig($this->getEditObjectId(), $aMollieParams);
+    }
+
+    /**
+     * Return order status array
+     *
+     * @return array
+     */
+    public function mollieGetOrderFolders()
+    {
+        return Registry::getConfig()->getConfigParam('aOrderfolder');
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Mollie\Payment\Application\Model\Payment;
 
+use OxidEsales\Eshop\Application\Model\Order;
+
 class Banktransfer extends Base
 {
     /**
@@ -23,5 +25,33 @@ class Banktransfer extends Base
      *
      * @var string|bool
      */
-    protected $sCustomConfigTemplate = 'molliebanktransfer.tpl';
+    protected $sCustomConfigTemplate = 'mollie_config_banktransfer.tpl';
+
+    /**
+     * Generate due date
+     *
+     * @return string
+     */
+    protected function getDueDate()
+    {
+        $iDueDays = $this->getConfigParam('due_days');
+        if (is_numeric($iDueDays)) {
+            return date('Y-m-d', time() + (60 * 60 * 24 * $iDueDays));
+        }
+        return '';
+    }
+
+    /**
+     * Return parameters specific to the given payment type, if existing
+     *
+     * @param Order $oOrder
+     * @return array
+     */
+    public function getPaymentSpecificParameters(Order $oOrder)
+    {
+        return [
+            'billingEmail' => $oOrder->oxorder__oxbillemail->value,
+            'dueDate' => $this->getDueDate(),
+        ];
+    }
 }

@@ -8,27 +8,17 @@ use OxidEsales\Eshop\Application\Model\Order as CoreOrder;
 class Payment extends Base
 {
     /**
-     * Returns order API endpoint
-     *
-     * @return \Mollie\Api\Endpoints\EndpointAbstract
-     */
-    protected function getApiEndpoint()
-    {
-        return PaymentHelper::getInstance()->loadMollieApi()->payments;
-    }
-
-    /**
      * Add needed parameters to the API request
      *
      * @param CoreOrder $oOrder
      * @param double $dAmount
+     * @param string $sReturnUrl
      * @return void
      */
-    protected function addRequestParameters(CoreOrder $oOrder, $dAmount)
+    protected function addRequestParameters(CoreOrder $oOrder, $dAmount, $sReturnUrl)
     {
-        parent::addRequestParameters($oOrder, $dAmount);
+        parent::addRequestParameters($oOrder, $dAmount, $sReturnUrl);
 
         $this->addParameter('description', 'OrderNr: '.$oOrder->oxorder__oxordernr->value);
-        $this->addParameter('issuer', ''); // what is this field for?
     }
 }

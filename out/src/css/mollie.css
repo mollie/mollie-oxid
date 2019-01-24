@@ -1,0 +1,25 @@
+.issuers-radio .payment-icon {
+    width: 35px;
+    max-height: 30px;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.mollie-payment-icon {
+    width: 25px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.issuers-radio .control-label {
+    padding-top: 0!important;
+}
+
+.issuers-radio .issuer-title {
+    vertical-align: middle;
+}
+
+.issuers-radio .issuer-radiobutton {
+    margin: 2px 5px 0 0;
+}

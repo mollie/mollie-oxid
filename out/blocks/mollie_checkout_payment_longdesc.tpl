@@ -1,0 +1,7 @@
+[{if method_exists($paymentmethod, 'isMolliePaymentMethod') && $paymentmethod->isMolliePaymentMethod() === true}]
+    [{assign var="paymentModel" value=$paymentmethod->getMolliePaymentModel()}]
+    [{if $paymentModel && $paymentModel->getCustomFrontendTemplate() !== false}]
+        [{include file=$paymentModel->getCustomFrontendTemplate()}]
+    [{/if}]
+[{/if}]
+[{$smarty.block.parent}]

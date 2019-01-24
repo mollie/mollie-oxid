@@ -10,6 +10,18 @@ use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
 
 class PaymentGateway extends PaymentGateway_parent
 {
+    /**
+     * OXID URL parameters to copy from initial order execute request
+     *
+     * @var array
+     */
+    protected $aMollieUrlCopyParameters = [
+        'stoken',
+        'sDeliveryAddressMD5',
+        'oxdownloadableproductsagreement',
+        'oxserviceproductsagreement',
+        'ord_agb',
+    ];
 
     /**
      * Overrides standard oxid finalizeOrder method if the used payment method belongs to PAYONE.
@@ -35,6 +47,48 @@ class PaymentGateway extends PaymentGateway_parent
     }
 
     /**
+     * Collect parameters from the current order execute call and add them to the return URL
+     * Also add parameters needed for the return process
+     *
+     * @return string
+     */
+    protected function mollieGetAdditionalParameters()
+    {
+        $oRequest = Registry::getRequest();
+        $oSession = Registry::getSession();
+
+        $sAddParams = '';
+
+        foreach ($this->aMollieUrlCopyParameters as $sParamName) {
+            $sValue = $oRequest->getRequestEscapedParameter($sParamName);
+            if (!empty($sValue)) {
+                $sAddParams .= '&'.$sParamName.'='.$sValue;
+            }
+        }
+
+        $sSid = $oSession->sid(true);
+        if ($sSid != '') {
+            $sAddParams .= '&'.$sSid;
+        }
+
+        $sAddParams .= '&rtoken='.$oSession->getRemoteAccessToken();
+
+        return $sAddParams;
+    }
+
+    /**
+     * Generate a return url with all necessary return flags
+     *
+     * @return string
+     */
+    protected function getRedirectUrl()
+    {
+        $sBaseUrl = Registry::getConfig()->getCurrentShopUrl().'index.php?cl=order&fnc=handleMollieReturn';
+
+        return $sBaseUrl.$this->mollieGetAdditionalParameters();
+    }
+
+    /**
      * Execute Mollie API request and redirect to Mollie for payment
      *
      * @param CoreOrder $oOrder
@@ -53,7 +107,7 @@ class PaymentGateway extends PaymentGateway_parent
                 $oApiRequest = oxNew(\Mollie\Payment\Application\Model\Request\Order::class);
             }
 
-            $oResponse = $oApiRequest->sendRequest($oOrder, $dAmount);
+            $oResponse = $oApiRequest->sendRequest($oOrder, $dAmount, $this->getRedirectUrl());
 
             $sPaymentUrl = $oResponse->getCheckoutUrl();
 
