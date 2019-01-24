@@ -23,8 +23,7 @@ class PaymentGateway extends PaymentGateway_parent
     ];
 
     /**
-     * Overrides standard oxid finalizeOrder method if the used payment method belongs to PAYONE.
-     * Return parent's return if payment method is no PAYONE method
+     * Initiate Mollie payment functionality for Mollie payment types
      *
      * Executes payment, returns true on success.
      *
@@ -88,6 +87,22 @@ class PaymentGateway extends PaymentGateway_parent
     }
 
     /**
+     * Return request model based in the configured api method
+     *
+     * @param CoreOrder $oOrder
+     * @return \Mollie\Payment\Application\Model\Request\Base
+     */
+    protected function getApiRequestModel(CoreOrder $oOrder)
+    {
+        if ($oOrder->mollieGetPaymentModel()->getApiMethod() == 'payment') {
+            $oApiRequest = oxNew(\Mollie\Payment\Application\Model\Request\Payment::class);
+        } else {
+            $oApiRequest = oxNew(\Mollie\Payment\Application\Model\Request\Order::class);
+        }
+        return $oApiRequest;
+    }
+
+    /**
      * Execute Mollie API request and redirect to Mollie for payment
      *
      * @param CoreOrder $oOrder
@@ -97,36 +112,18 @@ class PaymentGateway extends PaymentGateway_parent
     protected function handleMolliePayment(CoreOrder &$oOrder, $dAmount)
     {
         $oOrder->mollieSetOrderNumber();
-        
+
         try {
-            $sApiMethod = $oOrder->mollieGetPaymentModel()->getApiMethod();
-            if ($sApiMethod == 'payment') {
-                $oApiRequest = oxNew(\Mollie\Payment\Application\Model\Request\Payment::class);
-            } else {
-                $oApiRequest = oxNew(\Mollie\Payment\Application\Model\Request\Order::class);
-            }
-
-            $oResponse = $oApiRequest->sendRequest($oOrder, $dAmount, $this->getRedirectUrl());
-
-            $sPaymentUrl = $oResponse->getCheckoutUrl();
-
+            $oResponse = $this->getApiRequestModel($oOrder)->sendRequest($oOrder, $dAmount, $this->getRedirectUrl());
             $oOrder->mollieSetTransactionId($oResponse->id);
 
+            $sPaymentUrl = $oResponse->getCheckoutUrl();
             if (!empty($sPaymentUrl)) {
                 Registry::getUtils()->redirect($sPaymentUrl);
             }
         } catch(ApiException $exc) {
             $this->_iLastErrorNo = $exc->getCode();
             $this->_sLastError = $exc->getMessage();
-
-            $sApiMethod = $oOrder->mollieGetPaymentModel()->getApiMethod();
-            if($oApiRequest) {
-                $oApiRequest->logExceptionResponse(
-                    $exc->getCode(),
-                    $exc->getMessage(),
-                    !empty($sApiMethod) ? $sApiMethod : ''
-                );
-            }
         }
 
         return true;

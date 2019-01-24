@@ -5,6 +5,7 @@ namespace Mollie\Payment\Application\Model\Request;
 use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Application\Model\Order as CoreOrder;
 use OxidEsales\Eshop\Core\Registry;
+use Mollie\Api\Exceptions\ApiException;
 
 abstract class Base
 {
@@ -213,35 +214,22 @@ abstract class Base
      * @param double $dAmount
      * @param string $sReturnUrl
      * @return \Mollie\Api\Resources\Payment
+     * @throws ApiException
      */
     public function sendRequest(CoreOrder $oOrder, $dAmount, $sReturnUrl)
     {
         $this->addRequestParameters($oOrder, $dAmount, $sReturnUrl);
-        $oResponse = $oOrder->mollieGetPaymentModel()->getApiEndpoint()->create($this->getParameters());
 
-        $requestLogger = oxNew(RequestLog::class);
-        $requestLogger->logRequest($this->getParameters(), $oResponse);
+        $oRequestLog = oxNew(RequestLog::class);
+        try {
+            $oResponse = $oOrder->mollieGetPaymentModel()->getApiEndpoint()->create($this->getParameters());
+
+            $oRequestLog->logRequest($this->getParameters(), $oResponse);
+        } catch (ApiException $exc) {
+            $oRequestLog->logExceptionResponse($this->getParameters(), $exc->getCode(), $exc->getMessage(), $oOrder->mollieGetPaymentModel()->getApiMethod());
+            throw $exc;
+        }
 
         return $oResponse;
-    }
-
-    /**
-     * Logs an error response from a request, coming in form of an exception
-     *
-     * @param string $sCode
-     * @param string $sMessage
-     * @param string $method
-     */
-    public function logExceptionResponse($sCode, $sMessage, $method = '')
-    {
-        $requestLogger = oxNew(RequestLog::class);
-        $aResponse = [
-            'resource' => $method,
-            'status' => 'ERROR',
-            'code' => $sCode,
-            'customMessage' => $sMessage
-        ];
-
-        $requestLogger->logRequest($this->getParameters(), (object) $aResponse);
     }
 }

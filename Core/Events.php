@@ -99,7 +99,7 @@ class Events
     }
 
     /**
-     * Adding mollie payments.
+     * Adding Mollie payments.
      *
      * @return void
      */
@@ -209,7 +209,7 @@ class Events
     }
 
     /**
-     * Deactivates payone paymethods on module deactivation.
+     * Deactivates Mollie paymethods on module deactivation.
      *
      * @return void
      */
