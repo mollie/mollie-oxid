@@ -2,7 +2,6 @@
 
 namespace Mollie\Payment\extend\Application\Model;
 
-use Mollie\Payment\Application\Model\PaymentConfig;
 use Mollie\Api\Exceptions\ApiException;
 use OxidEsales\Eshop\Application\Model\Order as CoreOrder;
 use OxidEsales\Eshop\Core\Registry;
@@ -119,6 +118,15 @@ class PaymentGateway extends PaymentGateway_parent
         } catch(ApiException $exc) {
             $this->_iLastErrorNo = $exc->getCode();
             $this->_sLastError = $exc->getMessage();
+
+            $sApiMethod = $oOrder->mollieGetPaymentModel()->getApiMethod();
+            if($oApiRequest) {
+                $oApiRequest->logExceptionResponse(
+                    $exc->getCode(),
+                    $exc->getMessage(),
+                    !empty($sApiMethod) ? $sApiMethod : ''
+                );
+            }
         }
 
         return true;

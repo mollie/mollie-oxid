@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Core;
 
+use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use Mollie\Payment\Application\Helper\Payment;
@@ -98,7 +99,7 @@ class Events
     }
 
     /**
-     * Adding payone payments.
+     * Adding mollie payments.
      *
      * @return void
      */
@@ -139,6 +140,7 @@ class Events
     {
         //CREATE NEW TABLES
         self::addTableIfNotExists(PaymentConfig::$sTableName, PaymentConfig::getTableCreateQuery());
+        self::addTableIfNotExists(RequestLog::$sTableName, RequestLog::getTableCreateQuery());
     }
 
     /**
