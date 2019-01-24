@@ -16,16 +16,6 @@ class Order extends Base
     protected $blNeedsExtendedAddress = true;
 
     /**
-     * Returns order API endpoint
-     *
-     * @return \Mollie\Api\Endpoints\EndpointAbstract
-     */
-    protected function getApiEndpoint()
-    {
-        return PaymentHelper::getInstance()->loadMollieApi()->orders;
-    }
-
-    /**
      * Format prices to always have 2 decimal places
      *
      * @param double $dPrice
@@ -179,11 +169,12 @@ class Order extends Base
      *
      * @param CoreOrder $oOrder
      * @param double $dAmount
+     * @param string $sReturnUrl
      * @return void
      */
-    protected function addRequestParameters(CoreOrder $oOrder, $dAmount)
+    protected function addRequestParameters(CoreOrder $oOrder, $dAmount, $sReturnUrl)
     {
-        parent::addRequestParameters($oOrder, $dAmount);
+        parent::addRequestParameters($oOrder, $dAmount, $sReturnUrl);
 
         $this->addParameter('orderNumber', (string)$oOrder->oxorder__oxordernr->value);
         $this->addParameter('lines', $this->getBasketItems($oOrder));

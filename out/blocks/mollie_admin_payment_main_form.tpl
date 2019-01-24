@@ -8,6 +8,13 @@
             [{/if}]
         </td>
     </tr>
+    [{if $paymentModel->isMolliePaymentActive() === false}]
+        <tr>
+            <td class="edittext" colspan="2">
+                <b style="color: red;">[{oxmultilang ident="MOLLIE_IS_METHOD_ACTIVATED"}]</b>
+            </td>
+        </tr>
+    [{/if}]
     [{if $paymentModel->isOnlyOrderApiSupported() === false}]
         <tr>
             <td class="edittext" width="70">

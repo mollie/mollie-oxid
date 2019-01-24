@@ -13,6 +13,13 @@ class Payment
     protected static $oInstance = null;
 
     /**
+     * Array with information about all enabled Mollie payment types
+     *
+     * @var array|null
+     */
+    protected $aPaymentInfo = null;
+
+    /**
      * List of all available Mollie payment methods
      *
      * @var array
@@ -105,6 +112,38 @@ class Payment
             return Registry::getConfig()->getShopConfVar('sMollieLiveToken');
         }
         return Registry::getConfig()->getShopConfVar('sMollieTestToken');
+    }
+
+    /**
+     * Collect information about all activated Mollie payment types
+     *
+     * @param double|bool $dAmount
+     * @param string|bool $sCurrency
+     * @return array
+     */
+    public function getMolliePaymentInfo($dAmount = false, $sCurrency = false)
+    {
+        if ($this->aPaymentInfo === null || ($dAmount !== false && $sCurrency !== false)) {
+            $aParams = ['resource' => 'orders'];
+            if ($dAmount !== false && $sCurrency !== false) {
+                $aParams['amount[value]'] = number_format($dAmount, 2, '.', '');
+                $aParams['amount[currency]'] = $sCurrency;
+            }
+            $aPaymentInfo = [];
+            try {
+                $aMollieInfo = $this->loadMollieApi()->methods->all($aParams);
+                foreach ($aMollieInfo as $oItem) {
+                    $aPaymentInfo[$oItem->id] = [
+                        'title' => $oItem->description,
+                        'pic' => $oItem->image->size2x,
+                    ];
+                }
+            } catch (\Exception $exc) {
+                error_log($exc->getMessage());
+            }
+            $this->aPaymentInfo = $aPaymentInfo;
+        }
+        return $this->aPaymentInfo;
     }
 
     /**

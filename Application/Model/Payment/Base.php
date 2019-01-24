@@ -3,6 +3,9 @@
 namespace Mollie\Payment\Application\Model\Payment;
 
 use Mollie\Payment\Application\Model\PaymentConfig;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Application\Model\Order;
+use Mollie\Payment\Application\Helper\Payment;
 
 abstract class Base
 {
@@ -49,6 +52,13 @@ abstract class Base
     protected $sCustomConfigTemplate = false;
 
     /**
+     * Determines custom frontend template if existing, otherwise false
+     *
+     * @var string|bool
+     */
+    protected $sCustomFrontendTemplate = false;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -89,6 +99,16 @@ abstract class Base
     }
 
     /**
+     * Returns custom frontend template or false if not existing
+     *
+     * @return bool|string
+     */
+    public function getCustomFrontendTemplate()
+    {
+        return $this->sCustomFrontendTemplate;
+    }
+
+    /**
      * Loads payment config if not loaded, otherwise returns preloaded config
      *
      * @return array
@@ -100,6 +120,19 @@ abstract class Base
             $this->aPaymentConfig = $oPaymentConfig->getPaymentConfig($this->getOxidPaymentId());
         }
         return $this->aPaymentConfig;
+    }
+
+    /**
+     * Returns order API endpoint
+     *
+     * @return \Mollie\Api\Endpoints\EndpointAbstract
+     */
+    public function getApiEndpoint()
+    {
+        if ($this->getApiMethod() == 'order') {
+            return Payment::getInstance()->loadMollieApi()->orders;
+        }
+        return Payment::getInstance()->loadMollieApi()->payments;
     }
 
     /**
@@ -117,6 +150,101 @@ abstract class Base
             }
         }
         return $sApiMethod;
+    }
+
+    /**
+     * Gather issuer info from Mollie API
+     *
+     * @param array $aDynValue
+     * @param string $sInputName
+     * @return array
+     */
+    public function getIssuers($aDynValue, $sInputName)
+    {
+        $aReturn = [];
+
+        if (!isset($aDynValue[$sInputName]) && $this->getConfigParam('issuer_list_type') == 'dropdown') {
+            $aReturn[''] = ['title' => Registry::getLang()->translateString('MOLLIE_PLEASE_SELECT'), 'pic' => ''];
+        }
+
+        try {
+            $aIssuersList = Payment::getInstance()->loadMollieApi()->methods->get($this->sMolliePaymentCode, ["include" => "issuers"])->issuers;
+        } catch (\Exception $exc) { // Mollie API returned an exception like "The payment method is not active in your website profile."
+            return [];
+        }
+
+        foreach ($aIssuersList as $oIssuer) {
+            $aReturn[$oIssuer->id] = ['title' => $oIssuer->name, 'pic' => $oIssuer->image->size2x];
+        }
+        return $aReturn;
+    }
+
+    /**
+     * Get dynvalue parameters from session or request
+     *
+     * @return mixed|null
+     */
+    protected function getDynValueParameters()
+    {
+        $aDynvalue = Registry::getSession()->getVariable('dynvalue');
+        if (empty($aDynvalue)) {
+            $aDynvalue = Registry::getRequest()->getRequestParameter('dynvalue');
+        }
+        return $aDynvalue;
+    }
+
+    /**
+     * Return dynvalue parameter
+     *
+     * @param string $sParam
+     * @return string|false
+     */
+    protected function getDynValueParameter($sParam)
+    {
+        $aDynValue = $this->getDynValueParameters();
+        if (isset($aDynValue[$sParam])) {
+            return $aDynValue[$sParam];
+        }
+        return false;
+    }
+
+    /**
+     * Determines if payment method is activated for this Mollie account
+     *
+     * @return bool
+     */
+    public function isMolliePaymentActive()
+    {
+        $aInfo = Payment::getInstance()->getMolliePaymentInfo();
+        if (isset($aInfo[$this->sMolliePaymentCode])) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns URL of the payment method picture
+     *
+     * @return string|bool
+     */
+    public function getMolliePaymentMethodPic()
+    {
+        $aInfo = Payment::getInstance()->getMolliePaymentInfo();
+        if (isset($aInfo[$this->sMolliePaymentCode])) {
+            return $aInfo[$this->sMolliePaymentCode]['pic'];
+        }
+        return false;
+    }
+
+    /**
+     * Return parameters specific to the given payment type, if existing
+     *
+     * @param Order $oOrder
+     * @return array
+     */
+    public function getPaymentSpecificParameters(Order $oOrder)
+    {
+        return [];
     }
 
     /**

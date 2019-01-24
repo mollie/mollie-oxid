@@ -152,51 +152,12 @@ abstract class Base
     }
 
     /**
-     * Generate a return url with all necessary return flags
-     *
-     * @return string
-     */
-    protected function getRedirectUrl()
-    {
-        $oConfig = Registry::getConfig();
-        $oRequest = Registry::getRequest();
-        $oSession = Registry::getSession();
-
-        $sSid = $oSession->sid(true);
-        if ($sSid != '') {
-            $sSid = '&' . $sSid;
-        }
-
-        $sAddParams = '&fnc=execute&rtoken='.$oSession->getRemoteAccessToken();
-
-        if ($oRequest->getRequestEscapedParameter('sDeliveryAddressMD5')) {
-            $sAddParams .= '&sDeliveryAddressMD5='.$oRequest->getRequestEscapedParameter('sDeliveryAddressMD5');
-        }
-
-        /*
-        $blDownloadableProductsAgreement = $oRequest->getRequestEscapedParameter('oxdownloadableproductsagreement');
-        if ($blDownloadableProductsAgreement) {
-            $sAddParams .= '&oxdownloadableproductsagreement=1';
-        }
-
-        $blServiceProductsAgreement = $oRequest->getRequestEscapedParameter('oxserviceproductsagreement');
-        if ($blServiceProductsAgreement) {
-            $sAddParams .= '&oxserviceproductsagreement=1'; // rewrite for oxserviceproductsagreement-param because of length-restriction
-        }
-        */
-        $sSuccessUrl = $oConfig->getCurrentShopUrl().'index.php?cl=order&ord_agb=1&stoken='.$oRequest->getRequestEscapedParameter('stoken').$sSid.$sAddParams;
-
-        return $sSuccessUrl;
-    }
-
-    /**
      * Return the Mollie webhook url
      *
      * @return string
      */
     protected function getWebhookUrl()
     {
-        return 'https://robert.demoshop.fatchip.de/webhook.php';///@TODO Take this out
         return Registry::getConfig()->getCurrentShopUrl().'index.php?cl=mollieWebhook';
     }
 
@@ -220,14 +181,17 @@ abstract class Base
      *
      * @param CoreOrder $oOrder
      * @param double $dAmount
+     * @param string $sReturnUrl
      * @return void
      */
-    protected function addRequestParameters(CoreOrder $oOrder, $dAmount)
+    protected function addRequestParameters(CoreOrder $oOrder, $dAmount, $sReturnUrl)
     {
-        $this->addParameter('method', $oOrder->mollieGetPaymentModel()->getMolliePaymentCode());
+        $oPaymentModel = $oOrder->mollieGetPaymentModel();
+
+        $this->addParameter('method', $oPaymentModel->getMolliePaymentCode());
         $this->addParameter('amount', $this->getAmountParameters($oOrder, $dAmount));
 
-        $this->addParameter('redirectUrl', $this->getRedirectUrl());
+        $this->addParameter('redirectUrl', $sReturnUrl);
         $this->addParameter('webhookUrl', $this->getWebhookUrl());
 
         $this->addParameter('metadata', $this->getMetadataParameters($oOrder));
@@ -238,6 +202,8 @@ abstract class Base
         }
 
         $this->addParameter('locale', $this->getLocale());
+
+        $this->aParameters = array_merge($this->aParameters, $oPaymentModel->getPaymentSpecificParameters($oOrder));
     }
 
     /**
@@ -245,12 +211,13 @@ abstract class Base
      *
      * @param CoreOrder $oOrder
      * @param double $dAmount
+     * @param string $sReturnUrl
      * @return \Mollie\Api\Resources\Payment
      */
-    public function sendRequest(CoreOrder $oOrder, $dAmount)
+    public function sendRequest(CoreOrder $oOrder, $dAmount, $sReturnUrl)
     {
-        $this->addRequestParameters($oOrder, $dAmount);
-        $oResponse = $this->getApiEndpoint()->create($this->getParameters());
+        $this->addRequestParameters($oOrder, $dAmount, $sReturnUrl);
+        $oResponse = $oOrder->mollieGetPaymentModel()->getApiEndpoint()->create($this->getParameters());
 
         $requestLogger = oxNew(RequestLog::class);
         $requestLogger->logRequest($this->getParameters(), $oResponse);

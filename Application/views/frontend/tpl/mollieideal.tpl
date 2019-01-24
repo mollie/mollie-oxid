@@ -1,0 +1,1 @@
+[{include file="mollie_issuers.tpl" oPaymentModel=$paymentmethod->getMolliePaymentModel() sInputName="mollie_ideal_issuer" sSavedValue=$dynvalue.mollie_ideal_issuer sLabel="MOLLIE_SELECT_BANK"|oxmultilangassign}]

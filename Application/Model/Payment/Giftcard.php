@@ -2,6 +2,8 @@
 
 namespace Mollie\Payment\Application\Model\Payment;
 
+use OxidEsales\Eshop\Application\Model\Order;
+
 class Giftcard extends Base
 {
     /**
@@ -23,5 +25,27 @@ class Giftcard extends Base
      *
      * @var string|bool
      */
-    protected $sCustomConfigTemplate = 'molliegiftcard.tpl';
+    protected $sCustomConfigTemplate = 'mollie_config_giftcard.tpl';
+
+    /**
+     * Determines custom frontend template if existing, otherwise false
+     *
+     * @var string|bool
+     */
+    protected $sCustomFrontendTemplate = 'molliegiftcard.tpl';
+
+    /**
+     * Return parameters specific to the given payment type, if existing
+     *
+     * @param Order $oOrder
+     * @return array
+     */
+    public function getPaymentSpecificParameters(Order $oOrder)
+    {
+        $sIssuer = $this->getDynValueParameter('mollie_giftcard_issuer');
+        if (!empty($sIssuer)) {
+            return ['issuer' => $sIssuer];
+        }
+        return parent::getPaymentSpecificParameters($oOrder);
+    }
 }
