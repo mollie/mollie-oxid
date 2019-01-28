@@ -20,13 +20,16 @@ $aLang = array(
     'SHOP_MODULE_sMollieStatusPending'                  => 'Status Ausstehend',
     'SHOP_MODULE_sMollieStatusProcessing'               => 'Status in Bearbeitung',
 
+    'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Zahlungs-Icons beim Bezahlen Anzeigen',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Log-Datei zu finden unter SHOPROOT/log/MollieTransactions.log',
     'HELP_SHOP_MODULE_blMollieRemoveDeactivatedMethods' => 'Entfernt in der Zahlart-Auswahl im Frontend die Zahlarten, die im Mollie Dashboard nicht aktiviert wurden und somit zu einem Fehler f&uuml;hren w&uuml;rden.',
+    'HELP_SHOP_MODULE_sMollieStatusPending'             => 'Legen Sie den Bestell-Status fest, bevor der Kunde zum Zahlungs-Gateway umgeleitet wird',
+    'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Legen Sie den Bestell-Status für Abgeschlossene Zahlungen fest',
 
     'MOLLIE_YES'                                        => 'Ja',
     'MOLLIE_NO'                                         => 'Nein',
     'MOLLIE_IS_MOLLIE'                                  => 'Dies ist eine Mollie Zahlungsart',
-    'MOLLIE_IS_METHOD_ACTIVATED'                        => 'Diese Zahlungsart ist nicht aktiviert in Ihrem Mollie Account!',
+    'MOLLIE_IS_METHOD_ACTIVATED'                        => 'Diese Zahlungsart ist in Ihrem Mollie Account nicht aktiviert!',
     'MOLLIE_CONFIG_METHOD'                              => 'API Methode',
     'MOLLIE_DUE_DATE'                                   => 'F&auml;lligkeitstage',
     'MOLLIE_BANKTRANSFER_PENDING'                       => 'Status Ausstehend',

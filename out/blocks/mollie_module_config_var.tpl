@@ -6,6 +6,7 @@
                     <option value="[{$sFolder}]" [{if $confselects.$module_var == $sFolder}]selected[{/if}]>[{ oxmultilang ident=$sFolder noerror=true }]</option>
                 [{/foreach}]
             </select>
+            [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`"}]
         </dt>
         <dd>
             [{oxmultilang ident="SHOP_MODULE_`$module_var`"}]

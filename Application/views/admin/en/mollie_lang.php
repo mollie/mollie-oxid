@@ -20,8 +20,11 @@ $aLang = array(
     'SHOP_MODULE_sMollieStatusPending'                  => 'Status Pending',
     'SHOP_MODULE_sMollieStatusProcessing'               => 'Status Processing',
 
+    'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Show Payment Icons on Checkout',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Log file to be found here: SHOPROOT/log/MollieTransactions.log',
     'HELP_SHOP_MODULE_blMollieRemoveDeactivatedMethods' => 'Removes the payment types from the frontend payment selection which are not activated in the Mollie Dashboard and thus would result in an error.',
+    'HELP_SHOP_MODULE_sMollieStatusPending'             => 'Set the order status before the customer is redirected to Payment Gateway',
+    'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Set the order status for Completed Payments',
 
     'MOLLIE_YES'                                        => 'Yes',
     'MOLLIE_NO'                                         => 'No',

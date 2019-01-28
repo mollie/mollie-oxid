@@ -61,7 +61,7 @@ class Order extends Order_parent
         $sQuery = "UPDATE oxorder SET oxpaid = ? WHERE oxid = ?";
         DatabaseProvider::getDb()->Execute($sQuery, array($sDate, $this->getId()));
 
-        $this->oxorder__oxpaid = new \OxidEsales\Eshop\Core\Field($sDate);
+        $this->oxorder__oxpaid = new Field($sDate);
     }
 
     /**
@@ -75,7 +75,7 @@ class Order extends Order_parent
         $sQuery = "UPDATE oxorder SET oxfolder = ? WHERE oxid = ?";
         DatabaseProvider::getDb()->Execute($sQuery, array($sFolder, $this->getId()));
 
-        $this->oxorder__oxfolder = new \OxidEsales\Eshop\Core\Field($sFolder);
+        $this->oxorder__oxfolder = new Field($sFolder);
     }
 
     /**
@@ -161,6 +161,20 @@ class Order extends Order_parent
             return parent::_executePayment($oBasket, $oUserpayment);
         }
         return true;
+    }
+
+    /**
+     * Extension: Set pending folder for Mollie orders
+     *
+     * @return void
+     */
+    protected function _setFolder()
+    {
+        if (PaymentHelper::getInstance()->isMolliePaymentMethod(Registry::getSession()->getBasket()->getPaymentId()) === false || $this->blMollieFinalizeReturnMode === true) {
+            return parent::_setFolder();
+        }
+
+        $this->oxorder__oxfolder = new Field(Registry::getConfig()->getShopConfVar('sMollieStatusPending'), Field::T_RAW);
     }
 
     /**
