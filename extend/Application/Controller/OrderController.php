@@ -34,7 +34,7 @@ class OrderController extends OrderController_parent
      */
     protected function redirectWithError($sErrorLangIdent)
     {
-        Registry::getSession()->setVariable('payerror', -20);
+        Registry::getSession()->setVariable('payerror', -50);
         Registry::getSession()->setVariable('payerrortext', Registry::getLang()->translateString($sErrorLangIdent));
         Registry::getUtils()->redirect(Registry::getConfig()->getCurrentShopUrl().'index.php?cl=payment');
     }

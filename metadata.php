@@ -61,6 +61,7 @@ $aModule = [
         ['template' => 'page/checkout/inc/payment_other.tpl',   'block' => 'checkout_payment_longdesc', 'file' => 'mollie_checkout_payment_longdesc.tpl'],
         ['template' => 'mollie_payment_showicons.tpl',          'block' => 'checkout_payment_longdesc', 'file' => 'mollie_checkout_payment_longdesc.tpl'],
         ['template' => 'page/checkout/payment.tpl',             'block' => 'select_payment',            'file' => 'mollie_select_payment.tpl'],
+        ['template' => 'page/checkout/payment.tpl',             'block' => 'checkout_payment_errors',   'file' => 'mollie_checkout_payment_errors.tpl'],
     ],
     'settings'      => [
         ['group' => 'MOLLIE_GENERAL',   'name' => 'sMollieMode',                        'type' => 'select',     'value' => 'test',      'position' => 10, 'constrains' => 'live|test'],
