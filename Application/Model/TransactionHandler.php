@@ -80,7 +80,7 @@ class TransactionHandler
             $blSuccess = true;
         }
 
-        if (($oTransaction->isCanceled() || $oTransaction->isExpired()) && $sType == 'webhook') {
+        if (($oTransaction->isCanceled() || $oTransaction->isExpired())) {
             $oOrder->cancelOrder();
         }
 
@@ -135,7 +135,7 @@ class TransactionHandler
             $blSuccess = true;
         }
 
-        if (($oTransaction->isCanceled() || $oTransaction->isExpired() || $oTransaction->isExpired()) && $sType == 'webhook') {
+        if (($oTransaction->isCanceled() || $oTransaction->isExpired() || $oTransaction->isExpired())) {
             $oOrder->cancelOrder();
         }
 

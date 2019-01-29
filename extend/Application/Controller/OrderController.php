@@ -60,6 +60,8 @@ class OrderController extends OrderController_parent
             $aResult = $oTransactionHandler->processTransaction($oOrder, 'success');
 
             if ($aResult['success'] === false) {
+                Registry::getSession()->deleteVariable('sess_challenge');
+
                 $sErrorIdent = 'MOLLIE_ERROR_SOMETHING_WENT_WRONG';
                 if ($aResult['status'] == 'canceled') {
                     $sErrorIdent = 'MOLLIE_ERROR_ORDER_CANCELED';
