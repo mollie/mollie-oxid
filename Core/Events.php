@@ -55,7 +55,7 @@ class Events
      */
     public static function onDeactivate()
     {
-        #self::deactivePaymentMethods();
+        self::deactivePaymentMethods();
         self::clearTmp();
     }
 

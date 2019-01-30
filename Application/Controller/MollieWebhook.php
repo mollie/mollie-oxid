@@ -49,7 +49,7 @@ class MollieWebhook extends FrontendController
         if (!empty($sTransactionId)) {
             $oOrder = $this->getOrderByTransactionId($sTransactionId);
             if ($oOrder) {
-                $oOrder->mollieGetPaymentModel()->getTransactionHandler()->processTransaction($oOrder, 'success');
+                $oOrder->mollieGetPaymentModel()->getTransactionHandler()->processTransaction($oOrder);
             }
         }
 
