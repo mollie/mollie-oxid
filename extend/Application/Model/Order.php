@@ -37,6 +37,24 @@ class Order extends Order_parent
     }
 
     /**
+     * Remove cancellation of the order
+     *
+     * @return void
+     */
+    public function mollieUncancelOrder()
+    {
+        if ($this->oxorder__oxstorno->value == 1) {
+            $this->oxorder__oxstorno = new \OxidEsales\Eshop\Core\Field(0);
+            if ($this->save()) {
+                // canceling ordered products
+                foreach ($this->getOrderArticles() as $oOrderArticle) {
+                    $oOrderArticle->mollieUncancelOrderArticle();
+                }
+            }
+        }
+    }
+
+    /**
      * Returns if the order is marked as paid, since OXID doesnt have a proper flag
      *
      * @return bool

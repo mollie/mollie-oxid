@@ -87,22 +87,6 @@ class PaymentGateway extends PaymentGateway_parent
     }
 
     /**
-     * Return request model based in the configured api method
-     *
-     * @param CoreOrder $oOrder
-     * @return \Mollie\Payment\Application\Model\Request\Base
-     */
-    protected function getApiRequestModel(CoreOrder $oOrder)
-    {
-        if ($oOrder->mollieGetPaymentModel()->getApiMethod() == 'payment') {
-            $oApiRequest = oxNew(\Mollie\Payment\Application\Model\Request\Payment::class);
-        } else {
-            $oApiRequest = oxNew(\Mollie\Payment\Application\Model\Request\Order::class);
-        }
-        return $oApiRequest;
-    }
-
-    /**
      * Execute Mollie API request and redirect to Mollie for payment
      *
      * @param CoreOrder $oOrder
@@ -114,7 +98,7 @@ class PaymentGateway extends PaymentGateway_parent
         $oOrder->mollieSetOrderNumber();
 
         try {
-            $oResponse = $this->getApiRequestModel($oOrder)->sendRequest($oOrder, $dAmount, $this->getRedirectUrl());
+            $oResponse = $oOrder->mollieGetPaymentModel()->getApiRequestModel()->sendRequest($oOrder, $dAmount, $this->getRedirectUrl());
             $oOrder->mollieSetTransactionId($oResponse->id);
 
             $sPaymentUrl = $oResponse->getCheckoutUrl();

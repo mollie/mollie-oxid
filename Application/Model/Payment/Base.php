@@ -136,6 +136,32 @@ abstract class Base
     }
 
     /**
+     * Return request model based in the configured api method
+     *
+     * @return \Mollie\Payment\Application\Model\Request\Base
+     */
+    public function getApiRequestModel()
+    {
+        if ($this->getApiMethod() == 'order') {
+            return oxNew(\Mollie\Payment\Application\Model\Request\Order::class);
+        }
+        return oxNew(\Mollie\Payment\Application\Model\Request\Payment::class);
+    }
+
+    /**
+     * Return request model based in the configured api method
+     *
+     * @return \Mollie\Payment\Application\Model\TransactionHandler\Base
+     */
+    public function getTransactionHandler()
+    {
+        if ($this->getApiMethod() == 'order') {
+            return oxNew(\Mollie\Payment\Application\Model\TransactionHandler\Order::class);
+        }
+        return oxNew(\Mollie\Payment\Application\Model\TransactionHandler\Payment::class);
+    }
+
+    /**
      * Return configured api method or default value if not yet configured
      *
      * @return string
