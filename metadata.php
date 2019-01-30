@@ -18,11 +18,11 @@ $aModule = [
         'de' => '',
         'en' => '',
     ],
-    #'thumbnail'    => 'INSERT_PIC_HERE.png',
+    'thumbnail'    => 'mollie_logo.png',
     'version'       => '1.0.0',
-    'author'        => 'TODO!',
-    'email'         => 'TODO!',
-    'url'          => 'https://www.mollie.com/en/',
+    'author'        => 'Fatchip GmbH',
+    'email'         => 'info@mollie.com',
+    'url'          => 'https://www.mollie.com/',
     'extend'        => [
         \OxidEsales\Eshop\Application\Model\PaymentGateway::class => Mollie\Payment\extend\Application\Model\PaymentGateway::class,
         \OxidEsales\Eshop\Application\Model\Order::class => Mollie\Payment\extend\Application\Model\Order::class,
@@ -33,9 +33,6 @@ $aModule = [
         \OxidEsales\Eshop\Application\Controller\PaymentController::class => Mollie\Payment\extend\Application\Controller\PaymentController::class,
         \OxidEsales\Eshop\Application\Controller\OrderController::class => Mollie\Payment\extend\Application\Controller\OrderController::class,
         \OxidEsales\Eshop\Core\ViewConfig::class => Mollie\Payment\extend\Core\ViewConfig::class,
-    ],
-    'files'         => [
-        'MollieWebhook' => 'mollie/molliepayment/Application/Controller/MollieWebhook.php',
     ],
     'controllers'   => [
         'MollieWebhook' => Mollie\Payment\Application\Controller\MollieWebhook::class,
