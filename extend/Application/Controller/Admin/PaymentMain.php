@@ -32,4 +32,17 @@ class PaymentMain extends PaymentMain_parent
     {
         return Registry::getConfig()->getConfigParam('aOrderfolder');
     }
+
+    /**
+     * Check if the token was correctly configured
+     *
+     * @return bool
+     */
+    public function mollieIsTokenConfigured()
+    {
+        if (!Payment::getInstance()->getMollieToken()) {
+            return false;
+        }
+        return true;
+    }
 }

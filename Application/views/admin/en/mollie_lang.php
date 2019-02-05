@@ -30,6 +30,7 @@ $aLang = array(
     'MOLLIE_NO'                                         => 'No',
     'MOLLIE_IS_MOLLIE'                                  => 'This is a Mollie payment type',
     'MOLLIE_IS_METHOD_ACTIVATED'                        => 'This payment type is not activated in your Mollie account!',
+    'MOLLIE_TOKEN_NOT_CONFIGURED'                       => 'Your Mollie token was not configured yet!',
     'MOLLIE_CONFIG_METHOD'                              => 'API method',
     'MOLLIE_DUE_DATE'                                   => 'Due days',
     'MOLLIE_BANKTRANSFER_PENDING'                       => 'Status Pending',

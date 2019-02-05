@@ -106,7 +106,7 @@ class Payment
      *
      * @return string
      */
-    protected function getMollieToken()
+    public function getMollieToken()
     {
         if (Registry::getConfig()->getShopConfVar('sMollieMode') == 'live') {
             return Registry::getConfig()->getShopConfVar('sMollieLiveToken');
@@ -150,10 +150,14 @@ class Payment
      * Instantiate MollieApiClient
      *
      * @return \Mollie\Api\MollieApiClient
+     * @throws \Exception
      */
     public function loadMollieApi()
     {
         try {
+            if (!$this->getMollieToken()) {
+                throw new \Exception('Mollie API token is not configured');
+            }
             if (class_exists('Mollie\Api\MollieApiClient')) {
                 $mollieApi = new \Mollie\Api\MollieApiClient();
                 $mollieApi->setApiKey($this->getMollieToken());
@@ -163,7 +167,7 @@ class Payment
             }
         } catch(\Exception $e) {
             error_log($e->getMessage());
-            return null;
+            throw $e;
         }
     }
 }
