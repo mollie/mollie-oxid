@@ -5,7 +5,7 @@ Download the [Mollie](https://www.mollie.com/) module for OXID eShop. Mollie is 
 Receive payments from European customers with ease. Mollie provides payment methods at higly competitive rates. Only pay per transaction and no hidden fees.
 
 Choose the best payment provider available for your online OXID eShop. Create your merchant account at [Mollie.com](https://www.mollie.com/). 
-Download and install the Mollie PrestaShop payment module and start receiving online payments now!
+Download and install the Mollie OXID eShop payment module and start receiving online payments now!
 
 ## Manual Installation
 1. Create the folder "mollie" in the "source/modules" folder of the Oxid 6 installation
