@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="./.github/Mollie-OXID.png" width="128" height="128"/>
+</p>
 <h1 align="center">Mollie for OXID eShop</h1>
 
 Download the [Mollie](https://www.mollie.com/) module for OXID eShop. Mollie is a payment service provider (PSP) which provides your online store with the most popular online payment methods. 
