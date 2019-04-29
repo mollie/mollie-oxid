@@ -28,7 +28,6 @@ class Payment
         'molliebancontact'      => array('title' => 'Bancontact',       'model' => \Mollie\Payment\Application\Model\Payment\Bancontact::class),
         'molliebanktransfer'    => array('title' => 'Banktransfer',     'model' => \Mollie\Payment\Application\Model\Payment\Banktransfer::class),
         'molliebelfius'         => array('title' => 'Belfius',          'model' => \Mollie\Payment\Application\Model\Payment\Belfius::class),
-        'molliebitcoin'         => array('title' => 'Bitcoin',          'model' => \Mollie\Payment\Application\Model\Payment\Bitcoin::class),
         'molliecreditcard'      => array('title' => 'Credit Card',      'model' => \Mollie\Payment\Application\Model\Payment\Creditcard::class),
         'mollieeps'             => array('title' => 'EPS Österreich',   'model' => \Mollie\Payment\Application\Model\Payment\Eps::class),
         'molliegiftcard'        => array('title' => 'Giftcard',         'model' => \Mollie\Payment\Application\Model\Payment\Giftcard::class),
