@@ -36,6 +36,15 @@ class Events
     );
 
     /**
+     * List of all removed payment methods
+     *
+     * @var array
+     */
+    public static $aRemovedPaymentMethods = array(
+        'molliebitcoin'
+    );
+
+    /**
      * Execute action on activate event.
      *
      * @return void
@@ -44,6 +53,7 @@ class Events
     {
         self::addDatabaseStructure();
         self::addPaymentMethods();
+        self::deleteRemovedPaymentMethods();
         self::regenerateViews();
         self::clearTmp();
     }
@@ -129,6 +139,30 @@ class Events
 
             self::insertRowIfNotExists('oxobject2payment', array('OXPAYMENTID' => $sPaymentId, 'OXTYPE' => 'oxdelset'), "INSERT INTO oxobject2payment(OXID,OXPAYMENTID,OXOBJECTID,OXTYPE) values (REPLACE(UUID(),'-',''), '{$sPaymentId}', 'oxidstandard', 'oxdelset');");
         }
+    }
+
+    /**
+     * Deletes removed payment methods
+     *
+     * @return void
+     */
+    protected static function deleteRemovedPaymentMethods()
+    {
+        foreach (self::$aRemovedPaymentMethods as $sPaymentId) {
+            self::deletePaymentMethod($sPaymentId);
+        }
+    }
+
+    /**
+     * Deletes payment method from the database
+     *
+     * @param  string $sPaymentId
+     * @return void
+     */
+    protected static function deletePaymentMethod($sPaymentId)
+    {
+        DatabaseProvider::getDb()->Execute("DELETE FROM oxpayments WHERE oxid = '".$sPaymentId."'");
+        DatabaseProvider::getDb()->Execute("DELETE FROM ".PaymentConfig::$sTableName." WHERE oxid = '".$sPaymentId."'");
     }
 
     /**
