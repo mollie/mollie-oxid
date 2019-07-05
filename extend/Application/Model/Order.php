@@ -196,6 +196,19 @@ class Order extends Order_parent
     }
 
     /**
+     * Extension: Order already existing because order was created before the user was redirected to mollie,
+     * therefore no stock validation needed. Otherwise an exception would be thrown on return when last product in stock was bought
+     *
+     * @param object $oBasket basket object
+     */
+    public function validateStock($oBasket)
+    {
+        if ($this->blMollieFinalizeReturnMode === false) {
+            return parent::validateStock($oBasket);
+        }
+    }
+
+    /**
      * This overloaded method sets the return mode flag so that the behaviour of some methods is changed when the customer
      * returns after successful payment from Mollie
      *
