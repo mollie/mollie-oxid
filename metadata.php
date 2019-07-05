@@ -19,7 +19,7 @@ $aModule = [
         'en' => '',
     ],
     'thumbnail'    => 'mollie_logo.png',
-    'version'       => '1.0.1',
+    'version'       => '1.0.2',
     'author'        => 'Fatchip GmbH',
     'email'         => 'info@mollie.com',
     'url'          => 'https://www.mollie.com/',
