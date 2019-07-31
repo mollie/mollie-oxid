@@ -1,7 +1,7 @@
 {
   "name": "mollie/mollie-oxid",
   "description": "Mollie Payment Module for Oxid 6",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "oxideshop-module",
   "license": [
     "OSL-3.0",

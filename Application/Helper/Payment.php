@@ -40,6 +40,7 @@ class Payment
         'molliepaypal'          => array('title' => 'Paypal',           'model' => \Mollie\Payment\Application\Model\Payment\PayPal::class),
         'molliepaysafecard'     => array('title' => 'Paysafecard',      'model' => \Mollie\Payment\Application\Model\Payment\Paysafecard::class),
         'molliesofort'          => array('title' => 'Sofort',           'model' => \Mollie\Payment\Application\Model\Payment\Sofort::class),
+        'mollieapplepay'        => array('title' => 'Apple Pay',        'model' => \Mollie\Payment\Application\Model\Payment\ApplePay::class),
     );
 
     /**
@@ -123,7 +124,7 @@ class Payment
     public function getMolliePaymentInfo($dAmount = false, $sCurrency = false)
     {
         if ($this->aPaymentInfo === null || ($dAmount !== false && $sCurrency !== false)) {
-            $aParams = ['resource' => 'orders'];
+            $aParams = ['resource' => 'orders', 'includeWallets' => 'applepay'];
             if ($dAmount !== false && $sCurrency !== false) {
                 $aParams['amount[value]'] = number_format($dAmount, 2, '.', '');
                 $aParams['amount[currency]'] = $sCurrency;

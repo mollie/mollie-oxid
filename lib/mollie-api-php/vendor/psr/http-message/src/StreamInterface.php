@@ -1,6 +1,6 @@
 <?php
 
-namespace _PhpScoper5c46f59d284a1\Psr\Http\Message;
+namespace _PhpScoper5ce26f1fe2920\Psr\Http\Message;
 
 /**
  * Describes a data stream.

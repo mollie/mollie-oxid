@@ -106,3 +106,6 @@ KBC focuses on Flanders and CBC on Wallonia.
 Smartcards that allow the giver to charge them with a desired amount.
 
 Mollie allows you to quickly and easily accepts payments through [gift cards](https://www.mollie.com/en/payments/gift-cards) from the most used suppliers. It only takes 10 minutes to start receiving payments and there are no hidden fees involved, you only pay for successful transactions.
+
+### Apple Pay
+[Apple Pay](https://www.mollie.com/en/payments/apple-pay) is a digital wallet service by Apple Inc. that allows shoppers to make purchases with credit or debit cards stored on their Apple devices.

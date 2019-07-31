@@ -59,6 +59,13 @@ abstract class Base
     protected $sCustomFrontendTemplate = false;
 
     /**
+     * Determines if the payment method is hidden at first when payment list is displayed
+     *
+     * @var bool
+     */
+    protected $blIsMethodHiddenInitially = false;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -106,6 +113,16 @@ abstract class Base
     public function getCustomFrontendTemplate()
     {
         return $this->sCustomFrontendTemplate;
+    }
+
+    /**
+     * Returns if the payment methods has to be hidden initially
+     *
+     * @return bool
+     */
+    public function isMollieMethodHiddenInitially()
+    {
+        return $this->blIsMethodHiddenInitially;
     }
 
     /**
