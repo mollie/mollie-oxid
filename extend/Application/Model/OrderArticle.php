@@ -18,4 +18,30 @@ class OrderArticle extends OrderArticle_parent
             }
         }
     }
+
+    /**
+     * Calculate the quantity that is still refundable for this orderarticle
+     *
+     * @return int
+     */
+    public function mollieGetRefundableQuantity()
+    {
+        if ($this->oxorderarticles__mollieamountrefunded->value == $this->oxorderarticles__oxbrutprice->value) {
+            return 0;
+        }
+        return ($this->oxorderarticles__oxamount->value - $this->oxorderarticles__molliequantityrefunded->value);
+    }
+
+    /**
+     * Calculate the amount that is still refundable for this orderarticle
+     *
+     * @return double
+     */
+    public function mollieGetRefundableAmount()
+    {
+        if ($this->oxorderarticles__molliequantityrefunded->value == $this->oxorderarticles__oxamount->value) {
+            return 0;
+        }
+        return ($this->oxorderarticles__oxbrutprice->value - $this->oxorderarticles__mollieamountrefunded->value);
+    }
 }

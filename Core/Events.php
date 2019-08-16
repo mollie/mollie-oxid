@@ -175,6 +175,16 @@ class Events
         //CREATE NEW TABLES
         self::addTableIfNotExists(PaymentConfig::$sTableName, PaymentConfig::getTableCreateQuery());
         self::addTableIfNotExists(RequestLog::$sTableName, RequestLog::getTableCreateQuery());
+
+        //ADD NEW COLUMNS
+        self::addColumnIfNotExists('oxorder', 'MOLLIEDELCOSTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEDELCOSTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
+        self::addColumnIfNotExists('oxorder', 'MOLLIEPAYCOSTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEPAYCOSTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
+        self::addColumnIfNotExists('oxorder', 'MOLLIEWRAPCOSTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEWRAPCOSTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
+        self::addColumnIfNotExists('oxorder', 'MOLLIEGIFTCARDREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEGIFTCARDREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
+        self::addColumnIfNotExists('oxorder', 'MOLLIEVOUCHERDISCOUNTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEVOUCHERDISCOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
+        self::addColumnIfNotExists('oxorder', 'MOLLIEDISCOUNTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEDISCOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
+        self::addColumnIfNotExists('oxorderarticles', 'MOLLIEQUANTITYREFUNDED', "ALTER TABLE `oxorderarticles` ADD COLUMN `MOLLIEQUANTITYREFUNDED` INT(11) NOT NULL DEFAULT '0';");
+        self::addColumnIfNotExists('oxorderarticles', 'MOLLIEAMOUNTREFUNDED', "ALTER TABLE `oxorderarticles` ADD COLUMN `MOLLIEAMOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
     }
 
     /**

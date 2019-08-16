@@ -19,7 +19,7 @@ $aModule = [
         'en' => '',
     ],
     'thumbnail'    => 'mollie_logo.png',
-    'version'       => '1.0.3',
+    'version'       => '1.0.4',
     'author'        => 'Fatchip GmbH',
     'email'         => 'info@mollie.com',
     'url'          => 'https://www.mollie.com/',
@@ -36,6 +36,7 @@ $aModule = [
     ],
     'controllers'   => [
         'MollieWebhook' => Mollie\Payment\Application\Controller\MollieWebhook::class,
+        'mollie_order_refund' => Mollie\Payment\Application\Controller\Admin\OrderRefund::class,
     ],
     'templates'     => [
         'molliewebhook.tpl' => 'mollie/molliepayment/Application/views/hook/tpl/molliewebhook.tpl',
@@ -49,6 +50,7 @@ $aModule = [
         'mollieideal.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/mollieideal.tpl',
         'molliegiftcard.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/molliegiftcard.tpl',
         'mollieapplepay.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/mollieapplepay.tpl',
+        'mollie_order_refund.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/mollie_order_refund.tpl',
     ],
     'events'        => [
         'onActivate' => \Mollie\Payment\Core\Events::class.'::onActivate',

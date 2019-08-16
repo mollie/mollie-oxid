@@ -53,12 +53,15 @@ class RequestLog
     /**
      * Logs an error response from a request, coming in form of an exception
      *
-     * @param array $aRequest
-     * @param string $sCode
-     * @param string $sMessage
-     * @param string $sMethod
+     * @param  array $aRequest
+     * @param  string $sCode
+     * @param  string $sMessage
+     * @param  string $sMethod
+     * @param  string $sOrderId
+     * @param  string $sStoreId
+     * @return void
      */
-    public function logExceptionResponse($aRequest, $sCode, $sMessage, $sMethod)
+    public function logExceptionResponse($aRequest, $sCode, $sMessage, $sMethod, $sOrderId = null, $sStoreId = null)
     {
         $aResponse = [
             'resource' => $sMethod,
@@ -67,7 +70,7 @@ class RequestLog
             'customMessage' => $sMessage
         ];
 
-        $this->logRequest($aRequest, (object)$aResponse);
+        $this->logRequest($aRequest, (object)$aResponse, $sOrderId, $sStoreId);
     }
 
     /**
@@ -88,30 +91,36 @@ class RequestLog
     /**
      * Parse data and write the request and response in one DB entry
      *
-     * @param array $aRequest
+     * @param array       $aRequest
+     * @param string|null $sOrderId
+     * @param string|null $sStoreId
      * @param $oResponse
      */
-    public function logRequest($aRequest, $oResponse)
+    public function logRequest($aRequest, $oResponse, $sOrderId = null, $sStoreId = null)
     {
         $oDb = DatabaseProvider::getDb();
 
-        $sOrderId = $oDb->quote(isset($aRequest['metadata']['order_id']) ? $aRequest['metadata']['order_id'] : '');
-        $sStoreId = $oDb->quote(isset($aRequest['metadata']['store_id']) ? $aRequest['metadata']['store_id'] : '');
-        $sRequestType = $oDb->quote(!is_null($oResponse->resource) ? $oResponse->resource : '');
-        $sResponseStatus = $oDb->quote(!is_null($oResponse->status) ? $oResponse->status : '');
+        if ($sOrderId === null) {
+            $sOrderId = isset($aRequest['metadata']['order_id']) ? $aRequest['metadata']['order_id'] : '';
+        }
+        if ($sStoreId === null) {
+            $sStoreId = isset($aRequest['metadata']['store_id']) ? $aRequest['metadata']['store_id'] : '';
+        }
+        $sRequestType = !is_null($oResponse->resource) ? $oResponse->resource : '';
+        $sResponseStatus = !is_null($oResponse->status) ? $oResponse->status : '';
 
-        $sSavedRequest = $oDb->quote($this->encodeData($aRequest));
-        $sSavedResponse = $oDb->quote($this->encodeData($this->formatResponse($oResponse)));
+        $sSavedRequest = $this->encodeData($aRequest);
+        $sSavedResponse = $this->encodeData($this->formatResponse($oResponse));
 
         $sQuery = " INSERT INTO `".self::$sTableName."` (
                         ORDERID, STOREID, REQUESTTYPE, RESPONSESTATUS, REQUEST, RESPONSE
                     ) VALUES (
-                        $sOrderId,
-                        $sStoreId,
-                        $sRequestType,
-                        $sResponseStatus,
-                        $sSavedRequest,
-                        $sSavedResponse
+                        {$oDb->quote($sOrderId)},
+                        {$oDb->quote($sStoreId)},
+                        {$oDb->quote($sRequestType)},
+                        {$oDb->quote($sResponseStatus)},
+                        {$oDb->quote($sSavedRequest)},
+                        {$oDb->quote($sSavedResponse)}
                     )";
         $oDb->Execute($sQuery);
     }
