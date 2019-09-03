@@ -188,11 +188,13 @@ class Order extends Order_parent
      */
     protected function _setFolder()
     {
-        if (PaymentHelper::getInstance()->isMolliePaymentMethod(Registry::getSession()->getBasket()->getPaymentId()) === false || $this->blMollieFinalizeReturnMode === true) {
+        if (PaymentHelper::getInstance()->isMolliePaymentMethod(Registry::getSession()->getBasket()->getPaymentId()) === false) {
             return parent::_setFolder();
         }
 
-        $this->oxorder__oxfolder = new Field(Registry::getConfig()->getShopConfVar('sMollieStatusPending'), Field::T_RAW);
+        if ($this->blMollieFinalizeReturnMode === false) { // Mollie module has it's own folder management, so order should not be set to status NEW by oxid core
+            $this->oxorder__oxfolder = new Field(Registry::getConfig()->getShopConfVar('sMollieStatusPending'), Field::T_RAW);
+        }
     }
 
     /**
