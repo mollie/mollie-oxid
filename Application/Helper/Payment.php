@@ -4,6 +4,7 @@ namespace Mollie\Payment\Application\Helper;
 
 use Mollie\Payment\Application\Model\Payment\Base;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\Module\Module;
 
 class Payment
 {
@@ -102,13 +103,23 @@ class Payment
     }
 
     /**
+     * Returns configured mode of mollie
+     *
+     * @return string
+     */
+    public function getMollieMode()
+    {
+        return Registry::getConfig()->getShopConfVar('sMollieMode');
+    }
+
+    /**
      * Return Mollie token depending on configured mode
      *
      * @return string
      */
     public function getMollieToken()
     {
-        if (Registry::getConfig()->getShopConfVar('sMollieMode') == 'live') {
+        if ($this->getMollieMode() == 'live') {
             return Registry::getConfig()->getShopConfVar('sMollieLiveToken');
         }
         return Registry::getConfig()->getShopConfVar('sMollieTestToken');
@@ -147,6 +158,28 @@ class Payment
     }
 
     /**
+     * Return Mollie module version
+     *
+     * @return string
+     */
+    protected function getModuleVersion()
+    {
+        $module = oxNew(Module::class);
+        $module->load('molliepayment');
+        return $module->getInfo('version');
+    }
+
+    /**
+     * Returns oxid shop version
+     *
+     * @return string
+     */
+    protected function getShopVersion()
+    {
+        return Registry::getConfig()->getActiveShop()->oxshops__oxversion->value;
+    }
+
+    /**
      * Instantiate MollieApiClient
      *
      * @return \Mollie\Api\MollieApiClient
@@ -161,6 +194,9 @@ class Payment
             if (class_exists('Mollie\Api\MollieApiClient')) {
                 $mollieApi = new \Mollie\Api\MollieApiClient();
                 $mollieApi->setApiKey($this->getMollieToken());
+
+                $mollieApi->addVersionString("MollieOxid/".$this->getModuleVersion());
+                $mollieApi->addVersionString("Oxid/".$this->getShopVersion());
                 return $mollieApi;
             } else {
                 throw new \Exception('Class Mollie\Api\MollieApiClient does not exist');
@@ -169,5 +205,32 @@ class Payment
             error_log($e->getMessage());
             throw $e;
         }
+    }
+
+    /**
+     * Returns current Mollie profileId
+     *
+     * @return string
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function getProfileId()
+    {
+        $mollieApi = $this->loadMollieApi();
+        return $mollieApi->profiles->getCurrent()->id;
+    }
+
+    /**
+     * Generates locale string
+     * Oxid doesnt have a locale logic, so solving it with by using the language files
+     *
+     * @return string
+     */
+    public function getLocale()
+    {
+        $sLocale = Registry::getLang()->translateString('MOLLIE_LOCALE');
+        if (Registry::getLang()->isTranslated() === false) {
+            $sLocale = 'en_US'; // default
+        }
+        return $sLocale;
     }
 }

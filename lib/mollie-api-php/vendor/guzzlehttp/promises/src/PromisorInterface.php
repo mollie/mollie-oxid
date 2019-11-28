@@ -1,6 +1,6 @@
 <?php
 
-namespace _PhpScoper5ce26f1fe2920\GuzzleHttp\Promise;
+namespace _PhpScoper5d8cb17438769\GuzzleHttp\Promise;
 
 /**
  * Interface used with classes that return a promise.

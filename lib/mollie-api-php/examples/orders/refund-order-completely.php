@@ -1,6 +1,6 @@
 <?php
 
-namespace _PhpScoper5ce26f1fe2920;
+namespace _PhpScoper5d8cb17438769;
 
 /*
  * Refund all eligible items for an order using the Mollie API.

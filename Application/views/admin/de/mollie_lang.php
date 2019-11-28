@@ -67,4 +67,7 @@ $aLang = array(
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'Diese Bestellung wurde bereits vollst&auml;ndig erstattet.',
     'MOLLIE_REFUND_REMAINING'                           => 'Verbliebene Summe erstatten',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'Achtung - Diese Bestellung enth&auml;lt Gutscheine oder Rabatte. Diese können nicht teilerstattet werden, sondern m&uuml;ssen &uuml;ber die vollst&auml;ndige oder die Rest-R&uuml;ckerstattung abgewickelt werden.',
+    'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Kreditkarten-Daten',
+    'MOLLIE_CC_HOSTED_CHECKOUT'                         => 'Eingabe auf externer Mollie-Webseite',
+    'MOLLIE_CC_CHECKOUT_INTEGRATION'                    => 'Eingabe im Checkout &uuml;ber Iframe Formular-Felder',
 );

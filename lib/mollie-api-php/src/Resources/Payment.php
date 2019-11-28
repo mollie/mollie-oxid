@@ -28,20 +28,20 @@ class Payment extends \Mollie\Api\Resources\BaseResource
     /**
      * Amount object containing the value and currency
      *
-     * @var object
+     * @var \stdClass
      */
     public $amount;
     /**
      * The amount that has been settled containing the value and currency
      *
-     * @var object
+     * @var \stdClass
      */
     public $settlementAmount;
     /**
      * The amount of the payment that has been refunded to the consumer, in EURO with
      * 2 decimals. This field will be null if the payment can not be refunded.
      *
-     * @var object|null
+     * @var \stdClass|null
      */
     public $amountRefunded;
     /**
@@ -52,7 +52,7 @@ class Payment extends \Mollie\Api\Resources\BaseResource
      * This is possible to reimburse the costs for a return shipment to your customer
      * for example.
      *
-     * @var object|null
+     * @var \stdClass|null
      */
     public $amountRemaining;
     /**
@@ -172,22 +172,22 @@ class Payment extends \Mollie\Api\Resources\BaseResource
      * During creation of the payment you can set custom metadata that is stored with
      * the payment, and given back whenever you retrieve that payment.
      *
-     * @var object|mixed|null
+     * @var \stdClass|mixed|null
      */
     public $metadata;
     /**
      * Details of a successfully paid payment are set here. For example, the iDEAL
      * payment method will set $details->consumerName and $details->consumerAccount.
      *
-     * @var object
+     * @var \stdClass
      */
     public $details;
     /**
-     * @var object[]
+     * @var \stdClass
      */
     public $_links;
     /**
-     * @var object[]
+     * @var \stdClass[]
      */
     public $_embedded;
     /**
@@ -445,5 +445,14 @@ class Payment extends \Mollie\Api\Resources\BaseResource
         }
         $result = $this->client->performHttpCall(\Mollie\Api\MollieApiClient::HTTP_POST, $resource, $body);
         return \Mollie\Api\Resources\ResourceFactory::createFromApiResult($result, new \Mollie\Api\Resources\Refund($this->client));
+    }
+    public function update()
+    {
+        if (!isset($this->_links->self->href)) {
+            return $this;
+        }
+        $body = \json_encode(["description" => $this->description, "redirectUrl" => $this->redirectUrl, "webhookUrl" => $this->webhookUrl, "metadata" => $this->metadata]);
+        $result = $this->client->performHttpCallToFullUrl(\Mollie\Api\MollieApiClient::HTTP_PATCH, $this->_links->self->href, $body);
+        return \Mollie\Api\Resources\ResourceFactory::createFromApiResult($result, new \Mollie\Api\Resources\Payment($this->client));
     }
 }

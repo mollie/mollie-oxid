@@ -39,9 +39,9 @@ class PaymentGateway extends PaymentGateway_parent
             return parent::executePayment($dAmount, $oOrder);
         }
 
-        $this->handleMolliePayment($oOrder, $dAmount);
+        $blSuccess = $this->handleMolliePayment($oOrder, $dAmount);
 
-        return false; // return false for for trying faster
+        return $blSuccess;
     }
 
     /**
@@ -108,6 +108,8 @@ class PaymentGateway extends PaymentGateway_parent
         } catch(ApiException $exc) {
             $this->_iLastErrorNo = $exc->getCode();
             $this->_sLastError = $exc->getMessage();
+
+            return false;
         }
 
         return true;

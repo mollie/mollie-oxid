@@ -1,6 +1,6 @@
 <?php
 
-namespace _PhpScoper5ce26f1fe2920;
+namespace _PhpScoper5d8cb17438769;
 
 /*
  * Using OAuth access token to list settlements of an account.

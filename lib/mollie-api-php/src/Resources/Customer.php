@@ -34,7 +34,7 @@ class Customer extends \Mollie\Api\Resources\BaseResource
      */
     public $locale;
     /**
-     * @var object|mixed|null
+     * @var \stdClass|mixed|null
      */
     public $metadata;
     /**
@@ -46,7 +46,7 @@ class Customer extends \Mollie\Api\Resources\BaseResource
      */
     public $createdAt;
     /**
-     * @var object[]
+     * @var \stdClass
      */
     public $_links;
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace _PhpScoper5ce26f1fe2920;
+namespace _PhpScoper5d8cb17438769;
 
 /*
  * List orders using the Mollie API.
@@ -18,9 +18,9 @@ try {
      */
     echo '<ul>';
     $latestOrders = $mollie->orders->page();
-    \_PhpScoper5ce26f1fe2920\printOrders($latestOrders);
+    \_PhpScoper5d8cb17438769\printOrders($latestOrders);
     $previousOrders = $latestOrders->next();
-    \_PhpScoper5ce26f1fe2920\printOrders($previousOrders);
+    \_PhpScoper5d8cb17438769\printOrders($previousOrders);
     echo '</ul>';
 } catch (\Mollie\Api\Exceptions\ApiException $e) {
     echo "API call failed: " . \htmlspecialchars($e->getMessage());

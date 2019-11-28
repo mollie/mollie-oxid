@@ -6,6 +6,7 @@ use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Application\Model\Order as CoreOrder;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
 
 abstract class Base
 {
@@ -160,21 +161,6 @@ abstract class Base
     protected function getWebhookUrl()
     {
         return Registry::getConfig()->getCurrentShopUrl().'index.php?cl=mollieWebhook';
-    }
-
-    /**
-     * Generates locale string
-     * Oxid doesnt have a locale logic, so solving it with by using the language files
-     *
-     * @return string
-     */
-    protected function getLocale()
-    {
-        $sLocale = Registry::getLang()->translateString('MOLLIE_LOCALE');
-        if (Registry::getLang()->isTranslated() === false) {
-            $sLocale = 'en_US'; // default
-        }
-        return $sLocale;
     }
 
     /**
@@ -351,7 +337,7 @@ abstract class Base
             $this->addParameter('shippingAddress', $this->getShippingAddressParameters($oOrder));
         }
 
-        $this->addParameter('locale', $this->getLocale());
+        $this->addParameter('locale', PaymentHelper::getInstance()->getLocale());
 
         $this->aParameters = array_merge($this->aParameters, $oPaymentModel->getPaymentSpecificParameters($oOrder));
     }

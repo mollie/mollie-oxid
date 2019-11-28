@@ -26,7 +26,7 @@ class ShipmentEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
      * endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param object[] $_links
+     * @param \stdClass $_links
      *
      * @return ShipmentCollection
      */

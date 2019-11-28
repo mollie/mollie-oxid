@@ -1,6 +1,6 @@
 <?php
 
-namespace _PhpScoper5ce26f1fe2920;
+namespace _PhpScoper5d8cb17438769;
 
 /*
  * Example 10 -  Using OAuth access token to prepare a new payment.
@@ -36,7 +36,7 @@ try {
     /*
      * In this example we store the order with its payment status in a database.
      */
-    \_PhpScoper5ce26f1fe2920\database_write($orderId, $payment->status);
+    \_PhpScoper5d8cb17438769\database_write($orderId, $payment->status);
     /*
      * Send the customer off to complete the payment.
      * This request should always be a GET, thus we enforce 303 http response code

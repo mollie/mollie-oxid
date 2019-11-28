@@ -162,7 +162,7 @@ abstract class EndpointAbstract
             return null;
         }
         try {
-            $encoded = \_PhpScoper5ce26f1fe2920\GuzzleHttp\json_encode($body);
+            $encoded = \_PhpScoper5d8cb17438769\GuzzleHttp\json_encode($body);
         } catch (\InvalidArgumentException $e) {
             throw new \Mollie\Api\Exceptions\ApiException("Error encoding parameters into JSON: '" . $e->getMessage() . "'.");
         }

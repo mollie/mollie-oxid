@@ -23,7 +23,7 @@ class PermissionEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstrac
      * endpoint uses one type of collection object.
      *
      * @param int $count
-     * @param object[] $_links
+     * @param \stdClass $_links
      *
      * @return PermissionCollection
      */

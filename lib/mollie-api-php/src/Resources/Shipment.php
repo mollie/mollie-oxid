@@ -37,12 +37,12 @@ class Shipment extends \Mollie\Api\Resources\BaseResource
     public $lines;
     /**
      * An object containing tracking details for the shipment, if available.
-     * @var object|null
+     * @var \stdClass|null
      */
     public $tracking;
     /**
      * An object with several URL objects relevant to the customer. Every URL object will contain an href and a type field.
-     * @var object[]
+     * @var \stdClass
      */
     public $_links;
     /**

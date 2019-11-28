@@ -33,19 +33,19 @@ class Order extends \Mollie\Api\Resources\BaseResource
     /**
      * Amount object containing the value and currency
      *
-     * @var object
+     * @var \stdClass
      */
     public $amount;
     /**
      * The total amount captured, thus far.
      *
-     * @var object
+     * @var \stdClass
      */
     public $amountCaptured;
     /**
      * The total amount refunded, thus far.
      *
-     * @var object
+     * @var \stdClass
      */
     public $amountRefunded;
     /**
@@ -57,7 +57,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
     /**
      * The person and the address the order is billed to.
      *
-     * @var object
+     * @var \stdClass
      */
     public $billingAddress;
     /**
@@ -75,7 +75,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
     /**
      * The person and the address the order is billed to.
      *
-     * @var object
+     * @var \stdClass
      */
     public $shippingAddress;
     /**
@@ -95,7 +95,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * During creation of the order you can set custom metadata that is stored with
      * the order, and given back whenever you retrieve that order.
      *
-     * @var object|mixed|null
+     * @var \stdClass|mixed|null
      */
     public $metadata;
     /**
@@ -132,7 +132,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
     /**
      * An object with several URL objects relevant to the customer. Every URL object will contain an href and a type field.
      *
-     * @var object[]
+     * @var \stdClass
      */
     public $_links;
     /**
@@ -372,7 +372,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
         if (!isset($this->_links->self->href)) {
             return $this;
         }
-        $body = \json_encode(array("billingAddress" => $this->billingAddress, "shippingAddress" => $this->shippingAddress));
+        $body = \json_encode(array("billingAddress" => $this->billingAddress, "shippingAddress" => $this->shippingAddress, "orderNumber" => $this->orderNumber));
         $result = $this->client->performHttpCallToFullUrl(\Mollie\Api\MollieApiClient::HTTP_PATCH, $this->_links->self->href, $body);
         return \Mollie\Api\Resources\ResourceFactory::createFromApiResult($result, new \Mollie\Api\Resources\Order($this->client));
     }

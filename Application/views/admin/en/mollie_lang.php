@@ -67,4 +67,7 @@ $aLang = array(
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'This order has been refunded completely already.',
     'MOLLIE_REFUND_REMAINING'                           => 'Refund remaining sum',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'This order includes vouchers or discount. These cant be refunded partially, they must be handled with the full or remaining refund.',
+    'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Creditcard data',
+    'MOLLIE_CC_HOSTED_CHECKOUT'                         => 'Input on external Mollie website',
+    'MOLLIE_CC_CHECKOUT_INTEGRATION'                    => 'Input in shop checkout with iframe form inputs',
 );
