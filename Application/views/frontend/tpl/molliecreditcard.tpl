@@ -56,19 +56,21 @@
 
         var paymentForm = document.getElementById('payment');
         paymentForm.addEventListener('submit', async e => {
-            e.preventDefault();
+            if (paymentForm.elements['payment_molliecreditcard'].checked === true) {
+                e.preventDefault();
 
-            const { token, error } = await mollie.createToken();
+                const { token, error } = await mollie.createToken();
 
-            if(error !== undefined) {
-                document.getElementById('mollieCreditcardError').innerHTML = error.message;
-                document.getElementById('mollieCreditcardErrorbox').style.display = '';
-            } else {
-                document.getElementById('mollieCreditcardError').innerHTML = '';
-                document.getElementById('mollieCreditcardErrorbox').style.display = 'none';
-                document.getElementById("mollieCCToken").value = token;
+                if(error !== undefined) {
+                    document.getElementById('mollieCreditcardError').innerHTML = error.message;
+                    document.getElementById('mollieCreditcardErrorbox').style.display = '';
+                } else {
+                    document.getElementById('mollieCreditcardError').innerHTML = '';
+                    document.getElementById('mollieCreditcardErrorbox').style.display = 'none';
+                    document.getElementById("mollieCCToken").value = token;
 
-                paymentForm.submit();
+                    paymentForm.submit();
+                }
             }
         });
     [{/capture}]
