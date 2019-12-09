@@ -365,6 +365,12 @@ abstract class Base
             throw $exc;
         }
 
+        if (isset($oResponse->details->failureMessage)) {
+            throw new ApiException($oResponse->details->failureMessage);
+        } elseif (isset($oResponse->extra->failureMessage)) {
+            throw new ApiException($oResponse->extra->failureMessage);
+        }
+
         return $oResponse;
     }
 }
