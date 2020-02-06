@@ -103,6 +103,7 @@ class PaymentGateway extends PaymentGateway_parent
 
             $sPaymentUrl = $oResponse->getCheckoutUrl();
             if (!empty($sPaymentUrl)) {
+                Registry::getSession()->setVariable('mollieIsRedirected', true);
                 Registry::getUtils()->redirect($sPaymentUrl);
             }
         } catch(ApiException $exc) {

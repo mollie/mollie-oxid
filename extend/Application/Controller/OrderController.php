@@ -2,12 +2,26 @@
 
 namespace Mollie\Payment\extend\Application\Controller;
 
-use Mollie\Payment\Application\Model\TransactionHandler;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
+use Mollie\Payment\Application\Helper\Order as OrderHelper;
 
 class OrderController extends OrderController_parent
 {
+    /**
+     * Delete sess_challenge from session to trigger the creation of a new order when needed
+     */
+    public function render()
+    {
+        $sSessChallenge = Registry::getSession()->getVariable('sess_challenge');
+        $blMollieIsRedirected = Registry::getSession()->getVariable('mollieIsRedirected');
+        if (!empty($sSessChallenge) && $blMollieIsRedirected === true) {
+            OrderHelper::getInstance()->cancelCurrentOrder();
+        }
+        Registry::getSession()->deleteVariable('mollieIsRedirected');
+        return parent::render();
+    }
+
     /**
      * Load previously created order
      *
@@ -46,6 +60,8 @@ class OrderController extends OrderController_parent
     public function handleMollieReturn()
     {
         if ($this->getPayment()->isMolliePaymentMethod()) {
+            Registry::getSession()->deleteVariable('mollieIsRedirected');
+
             $oOrder = $this->mollieGetOrder();
             if (!$oOrder) {
                 $this->redirectWithError('MOLLIE_ERROR_ORDER_NOT_FOUND');

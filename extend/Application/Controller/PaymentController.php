@@ -3,9 +3,24 @@
 namespace Mollie\Payment\extend\Application\Controller;
 
 use OxidEsales\Eshop\Core\Registry;
+use Mollie\Payment\Application\Helper\Order as OrderHelper;
 
 class PaymentController extends PaymentController_parent
 {
+    /**
+     * Delete sess_challenge from session to trigger the creation of a new order when needed
+     */
+    public function init()
+    {
+        $sSessChallenge = Registry::getSession()->getVariable('sess_challenge');
+        $blMollieIsRedirected = Registry::getSession()->getVariable('mollieIsRedirected');
+        if (!empty($sSessChallenge) && $blMollieIsRedirected === true) {
+            OrderHelper::getInstance()->cancelCurrentOrder();
+        }
+        Registry::getSession()->deleteVariable('mollieIsRedirected');
+        parent::init();
+    }
+
     /**
      * Removes Mollie payment methods which are not activated in the Mollie account from the payment list
      *
