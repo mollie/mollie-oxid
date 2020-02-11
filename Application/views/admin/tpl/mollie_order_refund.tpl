@@ -73,55 +73,56 @@
     <input type="hidden" name="oxid" value="[{$oxid}]">
     <input type="hidden" name="cl" value="mollie_order_refund">
 </form>
+[{if $oView->isMollieOrder() === true}]
+    [{if $oView->wasRefundSuccessful() == true}]
+        <fieldset class="refundSuccess message">
+            [{oxmultilang ident="MOLLIE_REFUND_SUCCESSFUL"}]
+        </fieldset>
+    [{/if}]
 
-[{if $oView->wasRefundSuccessful() == true}]
-    <fieldset class="refundSuccess message">
-        [{oxmultilang ident="MOLLIE_REFUND_SUCCESSFUL"}]
-    </fieldset>
-[{/if}]
+    [{if $oView->getErrorMessage() != false}]
+        <fieldset class="refundError message">
+            <strong>Error</strong>
+            [{$oView->getErrorMessage()}]
+        </fieldset>
+    [{/if}]
 
-[{if $oView->getErrorMessage() != false}]
-    <fieldset class="refundError message">
-        <strong>Error</strong>
-        [{$oView->getErrorMessage()}]
-    </fieldset>
-[{/if}]
+    [{assign var="blIsOrderRefundable" value=$oView->isOrderRefundable()}]
+    [{if $blIsOrderRefundable == false}]
+        <fieldset class="refundNotice message">
+            <strong>[{oxmultilang ident="MOLLIE_NOTICE"}]</strong>
+            [{oxmultilang ident="MOLLIE_ORDER_NOT_REFUNDABLE"}]
+        </fieldset>
+    [{/if}]
 
-[{assign var="blIsOrderRefundable" value=$oView->isOrderRefundable()}]
-[{if $blIsOrderRefundable == false}]
-    <fieldset class="refundNotice message">
-        <strong>[{oxmultilang ident="MOLLIE_NOTICE"}]</strong>
-        [{oxmultilang ident="MOLLIE_ORDER_NOT_REFUNDABLE"}]
-    </fieldset>
-[{/if}]
+    [{if $oView->hasOrderVoucher() == true}]
+        <fieldset class="refundNotice message">
+            <strong>[{oxmultilang ident="MOLLIE_NOTICE"}]</strong>
+            [{oxmultilang ident="MOLLIE_VOUCHERS_EXISTING"}]
+        </fieldset>
+    [{/if}]
 
-[{if $oView->hasOrderVoucher() == true}]
-    <fieldset class="refundNotice message">
-        <strong>[{oxmultilang ident="MOLLIE_NOTICE"}]</strong>
-        [{oxmultilang ident="MOLLIE_VOUCHERS_EXISTING"}]
-    </fieldset>
-[{/if}]
-
-[{if $blIsOrderRefundable == true}]
-    <fieldset class="fullRefund">
-        <legend>[{oxmultilang ident="MOLLIE_FULL_REFUND"}]</legend>
-        <form name="search" id="search" action="[{$oViewConf->getSelfLink()}]" method="post">
-            [{$oViewConf->getHiddenSid()}]
-            <input type="hidden" name="cl" value="mollie_order_refund">
-            <input type="hidden" name="oxid" value="[{$oxid}]">
-            <input type="hidden" name="fnc" value="fullRefund">
-            [{assign var="blIsFullRefundAvailable" value=$oView->isFullRefundAvailable()}]
-            [{if $blIsFullRefundAvailable == true}]
-                <span>[{oxmultilang ident="MOLLIE_FULL_REFUND_TEXT"}]: [{$oView->getFormatedPrice($edit->oxorder__oxtotalordersum->value)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span><br><br>
-            [{else}]
-                <input type="hidden" name="refundRemaining" value="1">
-                <span>[{oxmultilang ident="MOLLIE_REFUND_REMAINING"}]:: [{$oView->getFormatedPrice($oView->getRemainingRefundableAmount())}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span><br><br>
-            [{/if}]
-            <span><label for="refund_description">[{oxmultilang ident="MOLLIE_REFUND_DESCRIPTION"}]:</label></span>
-            <input type="text" name="refund_description" value="" placeholder="[{oxmultilang ident="MOLLIE_REFUND_DESCRIPTION_PLACEHOLDER"}]" maxlength="140" size="120"><br>
-            <input type="submit" value="[{oxmultilang ident="MOLLIE_REFUND_SUBMIT"}]" class="refundSubmit">
-        </form>
-    </fieldset>
+    [{if $blIsOrderRefundable == true}]
+        <fieldset class="fullRefund">
+            <legend>[{oxmultilang ident="MOLLIE_FULL_REFUND"}]</legend>
+            <form name="search" id="search" action="[{$oViewConf->getSelfLink()}]" method="post">
+                [{$oViewConf->getHiddenSid()}]
+                <input type="hidden" name="cl" value="mollie_order_refund">
+                <input type="hidden" name="oxid" value="[{$oxid}]">
+                <input type="hidden" name="fnc" value="fullRefund">
+                [{assign var="blIsFullRefundAvailable" value=$oView->isFullRefundAvailable()}]
+                [{if $blIsFullRefundAvailable == true}]
+                    <span>[{oxmultilang ident="MOLLIE_FULL_REFUND_TEXT"}]: [{$oView->getFormatedPrice($edit->oxorder__oxtotalordersum->value)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span><br><br>
+                [{else}]
+                    <input type="hidden" name="refundRemaining" value="1">
+                    <span>[{oxmultilang ident="MOLLIE_REFUND_REMAINING"}]:: [{$oView->getFormatedPrice($oView->getRemainingRefundableAmount())}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span><br><br>
+                [{/if}]
+                <span><label for="refund_description">[{oxmultilang ident="MOLLIE_REFUND_DESCRIPTION"}]:</label></span>
+                <input type="text" name="refund_description" value="" placeholder="[{oxmultilang ident="MOLLIE_REFUND_DESCRIPTION_PLACEHOLDER"}]" maxlength="140" size="120"><br>
+                <input type="submit" value="[{oxmultilang ident="MOLLIE_REFUND_SUBMIT"}]" class="refundSubmit">
+            </form>
+        </fieldset>
+    [{/if}]
 [{/if}]
 
 <fieldset>

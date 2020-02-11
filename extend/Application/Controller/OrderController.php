@@ -80,6 +80,8 @@ class OrderController extends OrderController_parent
                 $sErrorIdent = 'MOLLIE_ERROR_SOMETHING_WENT_WRONG';
                 if ($aResult['status'] == 'canceled') {
                     $sErrorIdent = 'MOLLIE_ERROR_ORDER_CANCELED';
+                } elseif ($aResult['status'] == 'failed') {
+                    $sErrorIdent = 'MOLLIE_ERROR_ORDER_FAILED';
                 }
                 $this->redirectWithError($sErrorIdent);
             }

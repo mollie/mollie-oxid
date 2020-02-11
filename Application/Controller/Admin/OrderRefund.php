@@ -227,7 +227,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function getRemainingRefundableAmount()
     {
-        $oMollieApiOrder = $this->getMollieApiOrder();
+        $oMollieApiOrder = $this->getMollieApiOrder(true);
 
         return ($oMollieApiOrder->amount->value - $oMollieApiOrder->amountRefunded->value);
     }
@@ -456,11 +456,12 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Return Mollie api order
      *
+     * @param bool $blRefresh
      * @return \Mollie\Api\Resources\Order|\Mollie\Api\Resources\Payment
      */
-    protected function getMollieApiOrder()
+    protected function getMollieApiOrder($blRefresh = false)
     {
-        if ($this->_oMollieApiOrder === null) {
+        if ($this->_oMollieApiOrder === null || $blRefresh === true) {
             $this->_oMollieApiOrder = $this->getMollieApiRequestModel()->get($this->getOrder()->oxorder__oxtransid->value);
         }
         return $this->_oMollieApiOrder;
