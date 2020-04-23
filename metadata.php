@@ -28,6 +28,7 @@ $aModule = [
         \OxidEsales\Eshop\Application\Model\Order::class => Mollie\Payment\extend\Application\Model\Order::class,
         \OxidEsales\Eshop\Application\Model\OrderArticle::class => Mollie\Payment\extend\Application\Model\OrderArticle::class,
         \OxidEsales\Eshop\Application\Model\Payment::class => Mollie\Payment\extend\Application\Model\Payment::class,
+        \OxidEsales\Eshop\Application\Model\User::class => Mollie\Payment\extend\Application\Model\User::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => Mollie\Payment\extend\Application\Controller\Admin\ModuleConfiguration::class,
         \OxidEsales\Eshop\Application\Controller\Admin\PaymentMain::class => Mollie\Payment\extend\Application\Controller\Admin\PaymentMain::class,
         \OxidEsales\Eshop\Application\Controller\PaymentController::class => Mollie\Payment\extend\Application\Controller\PaymentController::class,
@@ -36,6 +37,7 @@ $aModule = [
     ],
     'controllers'   => [
         'MollieWebhook' => Mollie\Payment\Application\Controller\MollieWebhook::class,
+        'MollieApplePay' => Mollie\Payment\Application\Controller\MollieApplePay::class,
         'mollie_order_refund' => Mollie\Payment\Application\Controller\Admin\OrderRefund::class,
     ],
     'templates'     => [
@@ -44,6 +46,7 @@ $aModule = [
         'mollie_config_giftcard.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/paymentconfig/mollie_config_giftcard.tpl',
         'mollie_config_ideal.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/paymentconfig/mollie_config_ideal.tpl',
         'mollie_config_creditcard.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/paymentconfig/mollie_config_creditcard.tpl',
+        'mollie_config_applepay.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/paymentconfig/mollie_config_applepay.tpl',
         'mollie_issuers.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/mollie_issuers.tpl',
         'mollie_issuers_dropdown.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/mollie_issuers_dropdown.tpl',
         'mollie_issuers_radio.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/mollie_issuers_radio.tpl',
@@ -52,6 +55,7 @@ $aModule = [
         'molliegiftcard.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/molliegiftcard.tpl',
         'mollieapplepay.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/mollieapplepay.tpl',
         'molliecreditcard.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/molliecreditcard.tpl',
+        'mollieapplepaybutton.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/mollieapplepaybutton.tpl',
         'mollie_order_refund.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/mollie_order_refund.tpl',
     ],
     'events'        => [
@@ -59,12 +63,15 @@ $aModule = [
         'onDeactivate' => \Mollie\Payment\Core\Events::class.'::onDeactivate',
     ],
     'blocks'        => [
-        ['template' => 'module_config.tpl',                     'block' => 'admin_module_config_var',   'file' => 'mollie_module_config_var.tpl'],
-        ['template' => 'payment_main.tpl',                      'block' => 'admin_payment_main_form',   'file' => 'mollie_admin_payment_main_form.tpl'],
-        ['template' => 'page/checkout/inc/payment_other.tpl',   'block' => 'checkout_payment_longdesc', 'file' => 'mollie_checkout_payment_longdesc.tpl'],
-        ['template' => 'mollie_payment_showicons.tpl',          'block' => 'checkout_payment_longdesc', 'file' => 'mollie_checkout_payment_longdesc.tpl'],
-        ['template' => 'page/checkout/payment.tpl',             'block' => 'select_payment',            'file' => 'mollie_select_payment.tpl'],
-        ['template' => 'page/checkout/payment.tpl',             'block' => 'checkout_payment_errors',   'file' => 'mollie_checkout_payment_errors.tpl'],
+        ['template' => 'module_config.tpl',                     'block' => 'admin_module_config_var',       'file' => 'mollie_module_config_var.tpl'],
+        ['template' => 'payment_main.tpl',                      'block' => 'admin_payment_main_form',       'file' => 'mollie_admin_payment_main_form.tpl'],
+        ['template' => 'page/checkout/inc/payment_other.tpl',   'block' => 'checkout_payment_longdesc',     'file' => 'mollie_checkout_payment_longdesc.tpl'],
+        ['template' => 'mollie_payment_showicons.tpl',          'block' => 'checkout_payment_longdesc',     'file' => 'mollie_checkout_payment_longdesc.tpl'],
+        ['template' => 'page/checkout/payment.tpl',             'block' => 'select_payment',                'file' => 'mollie_select_payment.tpl'],
+        ['template' => 'page/checkout/payment.tpl',             'block' => 'checkout_payment_errors',       'file' => 'mollie_checkout_payment_errors.tpl'],
+        ['template' => 'page/details/inc/productmain.tpl',      'block' => 'details_productmain_tobasket',  'file' => 'mollie_details_productmain_tobasket.tpl'],
+        ['template' => 'page/checkout/basket.tpl',              'block' => 'basket_btn_next_top',           'file' => 'mollie_basket_btn_next_top.tpl'],
+        ['template' => 'page/checkout/basket.tpl',              'block' => 'basket_btn_next_bottom',        'file' => 'mollie_basket_btn_next_bottom.tpl'],
     ],
     'settings'      => [
         ['group' => 'MOLLIE_GENERAL',   'name' => 'sMollieMode',                        'type' => 'select',     'value' => 'test',      'position' => 10, 'constrains' => 'live|test'],

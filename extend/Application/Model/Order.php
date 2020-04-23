@@ -6,6 +6,8 @@ use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Application\Model\Country;
+use Mollie\Payment\Application\Helper\User as UserHelper;
 
 class Order extends Order_parent
 {
@@ -15,6 +17,13 @@ class Order extends Order_parent
      * @var bool
      */
     protected $blMollieFinalizeReturnMode = false;
+
+    /**
+     * Toggles certain behaviours in finalizeOrder for when user ordered with apple pay button
+     *
+     * @var bool
+     */
+    protected $blMollieIsApplePayButtonMode = false;
 
     /**
      * Used to trigger the _setNumber() method before the payment-process during finalizeOrder to have the order-number there already
@@ -27,6 +36,17 @@ class Order extends Order_parent
     }
 
     /**
+     * Setter for apple pay button mode
+     *
+     * @param  bool $blActive
+     * @return void
+     */
+    public function mollieSetApplePayButtonMode($blActive)
+    {
+        $this->blMollieIsApplePayButtonMode = $blActive;
+    }
+
+    /**
      * Generate Mollie payment model from paymentId
      *
      * @return \Mollie\Payment\Application\Model\Payment\Base
@@ -34,6 +54,16 @@ class Order extends Order_parent
     public function mollieGetPaymentModel()
     {
         return PaymentHelper::getInstance()->getMolliePaymentModel($this->oxorder__oxpaymenttype->value);
+    }
+
+    /**
+     * Getter for blMollieIsApplePayButtonMode property
+     *
+     * @return bool
+     */
+    public function mollieIsApplePayButtonMode()
+    {
+        return $this->blMollieIsApplePayButtonMode;
     }
 
     /**
@@ -225,5 +255,83 @@ class Order extends Order_parent
             $this->blMollieFinalizeReturnMode = true;
         }
         return parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
+    }
+
+    /**
+     * Assigns to new oxorder object customer delivery and shipping info
+     *
+     * @param object $oUser user object
+     */
+    protected function _setUser($oUser)
+    {
+        if ($this->blMollieIsApplePayButtonMode === false) {
+            return parent::_setUser($oUser);
+        }
+
+        $oRequest = Registry::getRequest();
+        $aBillingContact = $oRequest->getRequestEscapedParameter('billingContact');
+        $aShippingContact = $oRequest->getRequestEscapedParameter('shippingContact');
+
+        if (empty($aBillingContact) || empty($aShippingContact)) {
+            throw new \Exception('Address information is missing');
+        }
+
+        $oCountry = oxNew(Country::class);
+
+        $this->oxorder__oxuserid = new Field($oUser->getId());
+
+        // bill address
+        $this->oxorder__oxbillemail = new Field($aShippingContact['emailAddress']);
+        $this->oxorder__oxbillfname = new Field($aBillingContact['givenName']);
+        $this->oxorder__oxbilllname = new Field($aBillingContact['familyName']);
+
+        $aBillingStreetSplitInfo = UserHelper::getInstance()->splitStreet($aBillingContact['addressLines']);
+        $this->oxorder__oxbillstreet = new Field($aBillingStreetSplitInfo['street']);
+        $this->oxorder__oxbillstreetnr = new Field($aBillingStreetSplitInfo['number']);
+        $this->oxorder__oxbilladdinfo = new Field($aBillingStreetSplitInfo['addinfo']);
+        $this->oxorder__oxbillcity = new Field($aBillingContact['locality']);
+        $this->oxorder__oxbillcountryid = new Field($oCountry->getIdByCode($aBillingContact['countryCode']));
+        $this->oxorder__oxbillstateid = new Field(UserHelper::getInstance()->getStateFromAdministrativeArea($aBillingContact['administrativeArea']));
+        $this->oxorder__oxbillzip = new Field($aBillingContact['postalCode']);
+        $this->oxorder__oxbillsal = new Field(UserHelper::getInstance()->getSalByFirstname($aBillingContact['givenName']));
+
+        $this->oxorder__oxbillcompany = new Field("");
+        $this->oxorder__oxbillustid = new Field("");
+        $this->oxorder__oxbillfon = new Field("");
+        $this->oxorder__oxbillfax = new Field("");
+
+        // set delivery address
+        $this->oxorder__oxdelfname = new Field($aShippingContact['givenName']);
+        $this->oxorder__oxdellname = new Field($aShippingContact['familyName']);
+
+        $aShippingStreetSplitInfo = UserHelper::getInstance()->splitStreet($aShippingContact['addressLines']);
+        $this->oxorder__oxdelstreet = new Field($aShippingStreetSplitInfo['street']);
+        $this->oxorder__oxdelstreetnr = new Field($aShippingStreetSplitInfo['number']);
+        $this->oxorder__oxdeladdinfo = new Field($aShippingStreetSplitInfo['addinfo']);
+        $this->oxorder__oxdelcity = new Field($aShippingContact['locality']);
+        $this->oxorder__oxdelcountryid = new Field($oCountry->getIdByCode($aShippingContact['countryCode']));
+        $this->oxorder__oxdelstateid = new Field(UserHelper::getInstance()->getStateFromAdministrativeArea($aShippingContact['administrativeArea']));
+        $this->oxorder__oxdelzip = new Field($aShippingContact['postalCode']);
+        $this->oxorder__oxdelsal = new Field(UserHelper::getInstance()->getSalByFirstname($aShippingContact['givenName']));
+
+        $this->oxorder__oxdelcompany = new Field("");
+        $this->oxorder__oxdelfon = new Field("");
+        $this->oxorder__oxdelfax = new Field("");
+    }
+
+    /**
+     * Checks if delivery address (billing or shipping) was not changed during checkout
+     * Throws exception if not available
+     *
+     * @param \OxidEsales\Eshop\Application\Model\User $oUser user object
+     *
+     * @return int
+     */
+    public function validateDeliveryAddress($oUser)
+    {
+        if ($this->blMollieIsApplePayButtonMode === false) {
+            return parent::validateDeliveryAddress($oUser);
+        }
+        return 0;
     }
 }

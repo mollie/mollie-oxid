@@ -38,6 +38,13 @@ abstract class Base
     protected $blIsOnlyOrderApiSupported = false;
 
     /**
+     * Determines if the payment methods has to add a redirect url to the request
+     *
+     * @var bool
+     */
+    protected $blIsRedirectUrlNeeded = true;
+
+    /**
      * Determines the default API to be used when not configured differently
      *
      * @var string
@@ -93,6 +100,17 @@ abstract class Base
     public function isOnlyOrderApiSupported()
     {
         return $this->blIsOnlyOrderApiSupported;
+    }
+
+    /**
+     * Returns if the payment methods needs to add the redirect url
+     *
+     * @param  Order $oOrder
+     * @return bool
+     */
+    public function isRedirectUrlNeeded(Order $oOrder)
+    {
+        return $this->blIsRedirectUrlNeeded;
     }
 
     /**

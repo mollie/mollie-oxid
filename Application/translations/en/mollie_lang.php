@@ -24,4 +24,5 @@ $aLang = [
     'MOLLIE_ERROR_SOMETHING_WENT_WRONG'         => 'An unknown error occured',
     'MOLLIE_ERROR_ORDER_CANCELED'               => 'Payment was canceled, please try again',
     'MOLLIE_ERROR_ORDER_FAILED'                 => 'Payment failed, please try again',
+    'MOLLIE_BILLING_APPLE_PAY_NOT_AVAILABLE'    => 'Apple Pay is not available for this billing address',
 ];

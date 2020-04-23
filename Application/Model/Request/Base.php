@@ -327,7 +327,9 @@ abstract class Base
         $this->addParameter('method', $oPaymentModel->getMolliePaymentCode());
         $this->addParameter('amount', $this->getAmountParameters($oOrder, $dAmount));
 
-        $this->addParameter('redirectUrl', $sReturnUrl);
+        if ($oPaymentModel->isRedirectUrlNeeded($oOrder) === true) {
+            $this->addParameter('redirectUrl', $sReturnUrl);
+        }
         $this->addParameter('webhookUrl', $this->getWebhookUrl());
 
         $this->addParameter('metadata', $this->getMetadataParameters($oOrder));
