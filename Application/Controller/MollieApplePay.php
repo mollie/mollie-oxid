@@ -84,10 +84,7 @@ class MollieApplePay extends FrontendController
         // performing special actions after user finishes order (assignment to special user groups)
         $oUser->onOrderExecute($oBasket, $iSuccess);
 
-        if (in_array($iSuccess, array(
-            \OxidEsales\Eshop\Application\Model\Order::ORDER_STATE_OK,
-            \OxidEsales\Eshop\Application\Model\Order::ORDER_STATE_MAILINGERROR
-        ))) {
+        if ($iSuccess ===\OxidEsales\Eshop\Application\Model\Order::ORDER_STATE_OK || $iSuccess === \OxidEsales\Eshop\Application\Model\Order::ORDER_STATE_MAILINGERROR) {
             \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('sess_challenge', $oOrder->getId());
             return $oOrder;
         }
