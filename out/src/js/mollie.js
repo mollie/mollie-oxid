@@ -133,9 +133,9 @@ function mollieInitApplePay(countryCode, currencyCode, shopName, price, detailsP
                         session.completePayment({status: 'STATUS_FAILURE', errors: [new ApplePayError(response.error.code, response.error.contactField, response.error.message)]});
                     } else {
                         if (response.errormessage !== undefined) {
-                            console.log('Apple Pay: An error occured: ' + response.errormessage);
+                            alert('Apple Pay payment was not successful. An error occured: ' + response.errormessage);
                         } else {
-                            console.log('Apple Pay: An error occured.');
+                            alert('Apple Pay payment was not successful.');
                         }
                         session.abort();
                     }
