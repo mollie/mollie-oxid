@@ -109,3 +109,13 @@ Mollie allows you to quickly and easily accepts payments through [gift cards](ht
 
 ### Apple Pay
 [Apple Pay](https://www.mollie.com/en/payments/apple-pay) is a digital wallet service by Apple Inc. that allows shoppers to make purchases with credit or debit cards stored on their Apple devices.
+
+## Server preparation for Apple Pay button usage
+Your checkout **must** be served over HTTPS. Up to date TLS ciphers are required. For more information, see Apple’s documentation on [setting up your server](https://developer.apple.com/documentation/apple_pay_on_the_web/setting_up_your_server).
+
+Apple Pay requires you to place a **domain validation file** on the domain you want to use the Apple Pay JS APIs on. The presence and validity of this file will be validated by Apple.
+
+Download the [domain validation file](http://www.mollie.com/.well-known/apple-developer-merchantid-domain-association) and place it on your server at 
+```
+https://[domain]/.well-known/apple-developer-merchantid-domain-association
+```
