@@ -74,7 +74,7 @@ $aModule = [
         ['template' => 'page/checkout/basket.tpl',              'block' => 'basket_btn_next_bottom',        'file' => 'mollie_basket_btn_next_bottom.tpl'],
     ],
     'settings'      => [
-        ['group' => 'MOLLIE_GENERAL',   'name' => 'sMollieMode',                        'type' => 'select',     'value' => 'test',      'position' => 10, 'constrains' => 'live|test'],
+        ['group' => 'MOLLIE_GENERAL',   'name' => 'sMollieMode',                        'type' => 'select',     'value' => 'test',      'position' => 10, 'constraints' => 'live|test'],
         ['group' => 'MOLLIE_GENERAL',   'name' => 'sMollieTestToken',                   'type' => 'str',        'value' => '',          'position' => 20],
         ['group' => 'MOLLIE_GENERAL',   'name' => 'sMollieLiveToken',                   'type' => 'str',        'value' => '',          'position' => 30],
         ['group' => 'MOLLIE_GENERAL',   'name' => 'blMollieLogTransactionInfo',         'type' => 'bool',       'value' => '1',         'position' => 33],
