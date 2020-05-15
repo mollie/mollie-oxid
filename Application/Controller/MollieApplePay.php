@@ -71,12 +71,14 @@ class MollieApplePay extends FrontendController
         $sApplePayShipSet = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('sApplePayShipSet');
         \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable('sApplePayShipSet');
 
-        $oBasket = $this->getApplePayBasket();
-        $oBasket->setShipping($sApplePayShipSet);
-
         $oUser = UserHelper::getInstance()->getApplePayUser();
 
         Registry::getConfig()->getActiveView()->setUser($oUser);
+
+        $oBasket = $this->getApplePayBasket();
+        $oBasket->setBasketUser($oUser);
+        $oBasket->setShipping($sApplePayShipSet);
+        $oBasket->calculateBasket(true);
 
         //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
         $iSuccess = $oOrder->finalizeOrder($oBasket, $oUser);
