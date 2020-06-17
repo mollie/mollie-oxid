@@ -1,6 +1,5 @@
 [{$smarty.block.parent}]
 
-[{oxscript include="js/libs/jquery.min.js"}]
 [{oxscript include=$oViewConf->getModuleUrl('molliepayment','out/src/js/mollie.js')}]
 [{oxstyle include=$oViewConf->getModuleUrl('molliepayment','out/src/css/mollie.css')}]
 
