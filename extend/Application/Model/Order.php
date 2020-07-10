@@ -3,6 +3,7 @@
 namespace Mollie\Payment\extend\Application\Model;
 
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
+use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -64,6 +65,68 @@ class Order extends Order_parent
     public function mollieIsApplePayButtonMode()
     {
         return $this->blMollieIsApplePayButtonMode;
+    }
+
+    /**
+     * Returns if order was payed with a Mollie payment type
+     *
+     * @return bool
+     */
+    public function mollieIsMolliePaymentUsed()
+    {
+        if(PaymentHelper::getInstance()->isMolliePaymentMethod($this->oxorder__oxpaymenttype->value)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Marks order as shipped in Mollie API
+     *
+     * @return void
+     */
+    public function mollieMarkOrderAsShipped()
+    {
+        $oRequestLog = oxNew(RequestLog::class);
+
+        try {
+            $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpoint();
+            $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value);
+            if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order) {
+                $aOptions = [];
+                if ($this->oxorder__oxtrackcode->value != '') {
+                    $aOptions['tracking'] = ['carrier' => 'N/A', 'code' => $this->oxorder__oxtrackcode->value];
+                }
+                $oResponse = $oMollieApiOrder->shipAll($aOptions);
+                $oRequestLog->logRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
+            }
+        } catch (\Exception $exc) {
+            $oRequestLog->logExceptionResponse([], $exc->getCode(), $exc->getMessage(), 'shipAll', $this->getId(), $this->getConfig()->getShopId());
+        }
+    }
+
+    /**
+     * Update tracking code of shipping entity
+     *
+     * @param  string $sTrackingCode
+     * @return void
+     */
+    public function mollieUpdateShippingTrackingCode($sTrackingCode)
+    {
+        try {
+            $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpoint();
+            $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value);
+            if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order) {
+                $oResponse = $oMollieApiOrder->shipments();
+                if (count($oResponse) > 0) {
+                    $oResponse[0]->tracking = ['carrier' => 'N/A', 'code' => $sTrackingCode];
+                    $oResponse[0]->update();
+                }
+            }
+        } catch (\Exception $exc) {
+            $oRequestLog = oxNew(RequestLog::class);
+            $oRequestLog->logExceptionResponse([], $exc->getCode(), $exc->getMessage(), 'shipAll', $this->getId(), $this->getConfig()->getShopId());
+        }
     }
 
     /**
