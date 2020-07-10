@@ -125,7 +125,7 @@ class Order extends Order_parent
             }
         } catch (\Exception $exc) {
             $oRequestLog = oxNew(RequestLog::class);
-            $oRequestLog->logExceptionResponse([], $exc->getCode(), $exc->getMessage(), 'shipAll', $this->getId(), $this->getConfig()->getShopId());
+            $oRequestLog->logExceptionResponse([], $exc->getCode(), $exc->getMessage(), 'updateTracking', $this->getId(), $this->getConfig()->getShopId());
         }
     }
 
