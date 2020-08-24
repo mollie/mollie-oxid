@@ -1,8 +1,10 @@
 {
   "name": "mollie/mollie-oxid",
   "description": "Mollie Payment Module for Oxid 6",
-  "version": "1.0.9",
   "type": "oxideshop-module",
+  "keywords": ["oxid", "modules", "eShop"],
+  "homepage": "https://www.mollie.com/",
+  "version": "1.0.9",
   "license": [
     "OSL-3.0",
     "AFL-3.0"
@@ -15,6 +17,7 @@
   "autoload": {
     "psr-4": {
       "Mollie\\Payment\\": "../../../source/modules/mollie/molliepayment"
-    }
+    },
+    "files": ["../../../source/modules/mollie/molliepayment/lib/mollie-api-php/vendor/autoload.php"]
   }
 }
