@@ -138,15 +138,30 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
+     * Returns true if order was made with Mollie order API
+     * False if payed with Mollie payment API
+     *
+     * @return bool
+     */
+    public function isMollieOrderApi()
+    {
+        $oMollieApiOrder = $this->getMollieApiOrder();
+        if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Get refund type - quantity or amount
      *
      * @return string
      */
     protected function getRefundType()
     {
-        $sType = Registry::getRequest()->getRequestEscapedParameter('mollie_refund_type');
-        if (empty($sType)) {
-            $sType = 'amount';
+        $sType = "amount"; // Payment API
+        if ($this->isMollieOrderApi() === true) {
+            $sType = "quantity"; // Order API
         }
         return $sType;
     }
@@ -282,12 +297,18 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Generate request parameter array
      *
-     * @param bool $blFull
+     * @param bool   $blFull
+     * @param double $dFreeAmount
      * @return array
      */
-    protected function getRefundParameters($blFull = true)
+    protected function getRefundParameters($blFull = true, $dFreeAmount = null)
     {
-        if ($blFull === false) {
+        if($dFreeAmount !== null) {
+            $aParams = ["amount" => [
+                "currency" => $this->getOrder()->oxorder__oxcurrency->value,
+                "value" => $this->formatPrice($dFreeAmount)
+            ]];
+        } elseif($blFull === false) {
             $aParams = $this->getPartialRefundParameters();
         } else {
             $dAmount = $this->getOrder()->oxorder__oxtotalordersum->value;
@@ -394,6 +415,58 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
+     * Fills refunded db-fields with free amount
+     *
+     * @param double $dFreeAmount
+     * @return void
+     */
+    protected function markOrderWithFreeAmount($dFreeAmount)
+    {
+        $oOrder = $this->getOrder();
+        foreach ($oOrder->getOrderArticles() as $oOrderArticle) {
+            if ($oOrderArticle->oxorderarticles__mollieamountrefunded->value < $oOrderArticle->oxorderarticles__oxbrutprice->value) {
+                $dRemaining = $oOrderArticle->oxorderarticles__oxbrutprice->value - $oOrderArticle->oxorderarticles__mollieamountrefunded->value;
+                if ($dRemaining > $dFreeAmount) {
+                    $oOrderArticle->oxorderarticles__mollieamountrefunded->value = new Field($oOrderArticle->oxorderarticles__mollieamountrefunded->value + $dFreeAmount);
+                    $oOrderArticle->save();
+                    break;
+                } else {
+                    $oOrderArticle->oxorderarticles__mollieamountrefunded = new Field($oOrderArticle->oxorderarticles__oxbrutprice->value);
+                    $oOrderArticle->save();
+                    $dFreeAmount -= $dRemaining;
+                }
+            }
+        }
+
+        $this->_oOrder = null; // update order for renderering the page
+        $this->_aRefundItems = null;
+    }
+
+    /**
+     * Execute full refund action
+     *
+     * @return void
+     */
+    public function freeRefund()
+    {
+        $dFreeAmount = Registry::getRequest()->getRequestEscapedParameter('free_amount');
+        $dFreeAmount = str_replace(',', '.', $dFreeAmount);
+        $aParams = $this->getRefundParameters(false, $dFreeAmount);
+
+        $oRequestLog = oxNew(RequestLog::class);
+        try {
+            $oResponse = $this->getMollieApiOrder()->refund($aParams);
+            $oRequestLog->logRequest($aParams, $oResponse, $this->getOrder()->getId(), $this->getConfig()->getShopId());
+            $this->markOrderWithFreeAmount($dFreeAmount);
+            $this->_blSuccessfulRefund = true;
+        } catch (\Exception $exc) {
+            $this->setErrorMessage($exc->getMessage());
+            $oRequestLog->logExceptionResponse($aParams, $exc->getCode(), $exc->getMessage(), 'refund', $this->getOrder()->getId(), $this->getConfig()->getShopId());
+            $this->_blSuccessfulRefund = false;
+        }
+    }
+
+    /**
      * Execute full refund action
      *
      * @return void
@@ -485,6 +558,38 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             return true;
         }
         return false;
+    }
+
+    /**
+     * Returns refunded amount from Mollie API
+     *
+     * @return string
+     */
+    public function getAmountRefunded()
+    {
+        $oApiOrder = $this->getMollieApiOrder();
+
+        $dPrice = 0;
+        if ($oApiOrder && !empty($oApiOrder->amountRefunded)) {
+            $dPrice = $oApiOrder->amountRefunded->value;
+        }
+        return $this->getFormatedPrice($dPrice);
+    }
+
+    /**
+     * Returns remaining amount from Mollie API
+     *
+     * @return string
+     */
+    public function getAmountRemaining()
+    {
+        $oApiOrder = $this->getMollieApiOrder();
+
+        $dPrice = 0;
+        if ($oApiOrder && !empty($oApiOrder->amountRemaining)) {
+            $dPrice = $oApiOrder->amountRemaining->value;
+        }
+        return $this->getFormatedPrice($dPrice);
     }
 
     /**
