@@ -15,8 +15,29 @@ $aModule = [
         'en' => 'Mollie Payment'
     ],
     'description'   => [
-        'de' => '',
-        'en' => '',
+        'de' => 'Steigern Sie Ihren Umsatz mit einer stressfreien Zahlungslösung. Mollie bietet alle relevanten Zahlungsarten,<br>
+einen optimierten Checkout und ein einfaches Onboarding. Ihr Nutzen? Ganz einfach: höhere Conversions, <br>
+zufriedene Käufer und eine stressfreie Anbindung in Ihren OXID eShop. Online-Zahlungen müssen<br>
+nicht kompliziert sein!<br><br>
+Mit der integrierten Lösung von Mollie erhalten Sie Zugang zu allen wichtigen Zahlungsarten wie Klarna, Kreditkarten, <br>
+SEPA Lastschrift, Apple Pay & mehr. Eine höhere Conversion erzielen Sie durch ein verbessertes Checkout-Erlebnis: <br>
+markengerecht und in vertrauter Umgebung, ohne Weiterleitung.<br>
+Das Onboarding ist einfach und schnell, mit dem Dashboard und der Mollie-App haben Sie alle Angaben zum Wachstum<br>
+immer zur Hand. Die Auszahlungsfrequenz bestimmen Sie selbst. Mit Mollie kommen keine monatlichen Kosten oder<br>
+Einrichtungsgebühren auf Sie zu. Sie zahlen nur pro Transaktion. Sie bleiben Kunde, weil Sie zufrieden sind. 
+',
+        'en' => "Boost your conversion with a hassle-free payment solution. Mollie offers all popular payment methods,<br>
+plus optimized checkout and super easy onboarding. How does it benefit you? The answer is simple: higher<br>
+conversion rates, satisfied customers and a simple integration into your OXID webshop. Online payments don't <br>
+have to be complicated.<br><br>
+With an integrated solution from Mollie, you gain access to all the most important payment methods, including Klarna,<br>
+credit cards, SEPA direct debit, Apple Pay and more. You’ll boost your conversion with an improved checkout experience—all<br>
+inside a familiar, branded environment, with no redirecting. <br>
+The onboarding process is quick and easy, and the Mollie dashboard and app let you keep track of all your transactions at<br>
+a glance. You can choose for yourself how often you want to receive your payouts. With Mollie, you’ll never pay any monthly<br>
+fees or setup costs. You’ll only pay for successful transactions. And you’ll stay because you're happy with our service,<br>
+not because a contract forces you! 
+",
     ],
     'thumbnail'    => 'mollie_logo.png',
     'version'       => '1.0.9',
