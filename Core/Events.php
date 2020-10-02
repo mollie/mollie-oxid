@@ -183,8 +183,15 @@ class Events
         self::addColumnIfNotExists('oxorder', 'MOLLIEGIFTCARDREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEGIFTCARDREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
         self::addColumnIfNotExists('oxorder', 'MOLLIEVOUCHERDISCOUNTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEVOUCHERDISCOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
         self::addColumnIfNotExists('oxorder', 'MOLLIEDISCOUNTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEDISCOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
+        self::addColumnIfNotExists('oxorder', 'MOLLIEMODE', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEMODE` VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;");
         self::addColumnIfNotExists('oxorderarticles', 'MOLLIEQUANTITYREFUNDED', "ALTER TABLE `oxorderarticles` ADD COLUMN `MOLLIEQUANTITYREFUNDED` INT(11) NOT NULL DEFAULT '0';");
         self::addColumnIfNotExists('oxorderarticles', 'MOLLIEAMOUNTREFUNDED', "ALTER TABLE `oxorderarticles` ADD COLUMN `MOLLIEAMOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
+
+        $aNewColumnDataQueriesMollieApi = [
+            "UPDATE `oxorder` SET mollieapi = 'payment' WHERE oxpaymenttype LIKE 'mollie%' AND oxtransid LIKE 'tr_%'",
+            "UPDATE `oxorder` SET mollieapi = 'order' WHERE oxpaymenttype LIKE 'mollie%' AND oxtransid LIKE 'ord_%'",
+        ];
+        self::addColumnIfNotExists('oxorder', 'MOLLIEAPI', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEAPI` VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;", $aNewColumnDataQueriesMollieApi);
     }
 
     /**
@@ -208,19 +215,23 @@ class Events
     /**
      * Add a column to a database table.
      *
-     * @param string $sTableName  table name
-     * @param string $sColumnName column name
-     * @param string $sQuery      sql-query to add column to table
+     * @param string $sTableName            table name
+     * @param string $sColumnName           column name
+     * @param string $sQuery                sql-query to add column to table
+     * @param array  $aNewColumnDataQueries  array of queries to execute when column was added
      *
      * @return boolean true or false
      */
-    protected static function addColumnIfNotExists($sTableName, $sColumnName, $sQuery)
+    protected static function addColumnIfNotExists($sTableName, $sColumnName, $sQuery, $aNewColumnDataQueries = array())
     {
         $aColumns = DatabaseProvider::getDb()->getAll("SHOW COLUMNS FROM {$sTableName} LIKE '{$sColumnName}'");
 
         if (empty($aColumns)) {
             try {
                 DatabaseProvider::getDb()->Execute($sQuery);
+                foreach ($aNewColumnDataQueries as $sQuery) {
+                    DatabaseProvider::getDb()->Execute($sQuery);
+                }
             } catch (\Exception $e) {
                 // do nothing as of yet
             }

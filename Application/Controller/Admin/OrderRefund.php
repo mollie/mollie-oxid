@@ -742,7 +742,15 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     protected function getMollieApiRequestModel()
     {
-        return $this->getOrder()->mollieGetPaymentModel()->getApiEndpoint();
+        $sMode = $this->getOrder()->oxorder__molliemode->value;
+        if (empty($sMode)) {
+            $sMode = false;
+        }
+        $sApi = $this->getOrder()->oxorder__mollieapi->value;
+        if (empty($sApi)) {
+            $sApi = false;
+        }
+        return $this->getOrder()->mollieGetPaymentModel()->getApiEndpoint($sMode, $sApi);
     }
 
     /**

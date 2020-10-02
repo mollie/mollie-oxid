@@ -252,7 +252,13 @@ class Order extends Order_parent
     protected function _setPayment($sPaymentid)
     {
         if ($this->blMollieFinalizeReturnMode === false) {
-            return parent::_setPayment($sPaymentid);
+            $mParentReturn = parent::_setPayment($sPaymentid);
+
+            if ($this->mollieIsMolliePaymentUsed()) {
+                $this->oxorder__molliemode = new Field(PaymentHelper::getInstance()->getMollieMode());
+                $this->oxorder__mollieapi = new Field($this->mollieGetPaymentModel()->getApiMethod());
+            }
+            return $mParentReturn;
         }
         $oUserpayment = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
         $oUserpayment->load($this->oxorder__oxpaymentid->value);

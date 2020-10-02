@@ -159,15 +159,21 @@ abstract class Base
 
     /**
      * Returns order API endpoint
+     * Mode and API method can be given as parameter for working with orders already created, since config could be changed
      *
+     * @param  string|bool $sMode
+     * @param  string|bool $sApiMethod
      * @return \Mollie\Api\Endpoints\EndpointAbstract
      */
-    public function getApiEndpoint()
+    public function getApiEndpoint($sMode = false, $sApiMethod = false)
     {
-        if ($this->getApiMethod() == 'order') {
-            return Payment::getInstance()->loadMollieApi()->orders;
+        if ($sApiMethod === false) {
+            $sApiMethod = $this->getApiMethod();
         }
-        return Payment::getInstance()->loadMollieApi()->payments;
+        if ($sApiMethod == 'order') {
+            return Payment::getInstance()->loadMollieApi($sMode)->orders;
+        }
+        return Payment::getInstance()->loadMollieApi($sMode)->payments;
     }
 
     /**
