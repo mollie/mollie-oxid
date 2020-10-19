@@ -270,6 +270,8 @@ class Events
      */
     protected static function deactivePaymentMethods()
     {
-        DatabaseProvider::getDb()->Execute("UPDATE oxpayments SET oxactive = 0 WHERE oxid IN ('".implode("','", array_keys(self::getMolliePaymentMethods()))."')");
+        if(Registry::getConfig()->isAdmin()) {
+            DatabaseProvider::getDb()->Execute("UPDATE oxpayments SET oxactive = 0 WHERE oxid IN ('".implode("','", array_keys(self::getMolliePaymentMethods()))."')");
+        }
     }
 }
