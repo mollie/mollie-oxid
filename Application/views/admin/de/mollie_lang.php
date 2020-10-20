@@ -74,5 +74,7 @@ $aLang = array(
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Kreditkarten-Daten',
     'MOLLIE_CC_HOSTED_CHECKOUT'                         => 'Eingabe auf externer Mollie-Webseite',
     'MOLLIE_CC_CHECKOUT_INTEGRATION'                    => 'Eingabe im Checkout &uuml;ber Iframe Formular-Felder',
-    'MOLLIE_APPLE_PAY_BUTTON_ONLY_LIVE_MODE'            => 'Hinweis: Bezahlung mit Apple Pay Button ist nur im Live-Modus m&ouml;glich'
+    'MOLLIE_APPLE_PAY_BUTTON_ONLY_LIVE_MODE'            => 'Hinweis: Bezahlung mit Apple Pay Button ist nur im Live-Modus m&ouml;glich',
+    'MOLLIE_APIKEY_CONNECTED'                           => 'Verbindung erfolgreich',
+    'MOLLIE_APIKEY_DISCONNECTED'                        => 'Verbindung nicht erfolgreich',
 );

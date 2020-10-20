@@ -162,6 +162,26 @@ class Payment
     }
 
     /**
+     * Check if connection with token can be established
+     *
+     * @param  string $sTokenConfVar
+     * @return bool
+     */
+    public function isConnectionWithTokenSuccessful($sTokenConfVar)
+    {
+        try {
+            $sMode = stripos($sTokenConfVar, 'live') !== false ? 'live' : 'test';
+            $aMollieInfo = $this->loadMollieApi($sMode)->methods->all(['resource' => 'orders', 'includeWallets' => 'applepay']);
+            if (empty($aMollieInfo)) {
+                return false;
+            }
+        } catch (\Exception $exc) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Return Mollie module version
      *
      * @return string
