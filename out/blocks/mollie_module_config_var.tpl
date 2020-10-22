@@ -15,7 +15,7 @@
 [{elseif $module_var == 'sMollieTestToken' || $module_var == 'sMollieLiveToken'}]
     <dl>
         <dt>
-            <input type=text  class="txt" style="width: 250px;" name="confstrs[[{$module_var}]]" value="[{$confstrs.$module_var}]" [{$readonly}]>
+            <input type="password"  class="txt" style="width: 250px;" name="confstrs[[{$module_var}]]" value="[{$confstrs.$module_var}]" [{$readonly}]>
             [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`"}]
         </dt>
         <dd style="white-space: nowrap;">
