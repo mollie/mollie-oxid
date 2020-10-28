@@ -403,4 +403,18 @@ class Order extends Order_parent
         }
         return 0;
     }
+
+    /**
+     * Performs order cancel process
+     */
+    public function cancelOrder()
+    {
+        parent::cancelOrder();
+        if ($this->mollieIsMolliePaymentUsed() === true) {
+            $sCancelledFolder = Registry::getConfig()->getShopConfVar('sMollieStatusCancelled');
+            if (!empty($sCancelledFolder)) {
+                $this->mollieSetFolder($sCancelledFolder);
+            }
+        }
+    }
 }

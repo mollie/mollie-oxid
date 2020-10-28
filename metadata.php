@@ -97,13 +97,15 @@ not because a contract forces you!
         ['template' => 'page/checkout/basket.tpl',              'block' => 'basket_btn_next_bottom',        'file' => 'mollie_basket_btn_next_bottom.tpl'],
     ],
     'settings'      => [
-        ['group' => 'MOLLIE_GENERAL',   'name' => 'sMollieMode',                        'type' => 'select',     'value' => 'test',      'position' => 10, 'constraints' => 'live|test'],
-        ['group' => 'MOLLIE_GENERAL',   'name' => 'sMollieTestToken',                   'type' => 'str',        'value' => '',          'position' => 20],
-        ['group' => 'MOLLIE_GENERAL',   'name' => 'sMollieLiveToken',                   'type' => 'str',        'value' => '',          'position' => 30],
-        ['group' => 'MOLLIE_GENERAL',   'name' => 'blMollieLogTransactionInfo',         'type' => 'bool',       'value' => '1',         'position' => 33],
-        ['group' => 'MOLLIE_GENERAL',   'name' => 'blMollieRemoveDeactivatedMethods',   'type' => 'bool',       'value' => '1',         'position' => 35],
-        ['group' => 'MOLLIE_GENERAL',   'name' => 'blMollieShowIcons',                  'type' => 'bool',       'value' => '1',         'position' => 40],
-        ['group' => 'MOLLIE_GENERAL',   'name' => 'sMollieStatusPending',               'type' => 'select',     'value' => '',          'position' => 50],
-        ['group' => 'MOLLIE_GENERAL',   'name' => 'sMollieStatusProcessing',            'type' => 'select',     'value' => '',          'position' => 60],
+        ['group' => 'MOLLIE_GENERAL',           'name' => 'sMollieMode',                        'type' => 'select',     'value' => 'test',      'position' => 10, 'constraints' => 'live|test'],
+        ['group' => 'MOLLIE_GENERAL',           'name' => 'sMollieTestToken',                   'type' => 'str',        'value' => '',          'position' => 20],
+        ['group' => 'MOLLIE_GENERAL',           'name' => 'sMollieLiveToken',                   'type' => 'str',        'value' => '',          'position' => 30],
+        ['group' => 'MOLLIE_GENERAL',           'name' => 'blMollieLogTransactionInfo',         'type' => 'bool',       'value' => '1',         'position' => 33],
+        ['group' => 'MOLLIE_GENERAL',           'name' => 'blMollieRemoveDeactivatedMethods',   'type' => 'bool',       'value' => '1',         'position' => 35],
+        ['group' => 'MOLLIE_GENERAL',           'name' => 'blMollieShowIcons',                  'type' => 'bool',       'value' => '1',         'position' => 40],
+        ['group' => 'MOLLIE_STATUS_MAPPING',    'name' => 'sMollieStatusPending',               'type' => 'select',     'value' => '',          'position' => 50],
+        ['group' => 'MOLLIE_STATUS_MAPPING',    'name' => 'sMollieStatusProcessing',            'type' => 'select',     'value' => '',          'position' => 60],
+        ['group' => 'MOLLIE_STATUS_MAPPING',    'name' => 'sMollieStatusCancelled',             'type' => 'select',     'value' => '',          'position' => 70],
+        ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronOrderExpiryActive',       'type' => 'bool',       'value' => '',          'position' => 80],
     ]
 ];

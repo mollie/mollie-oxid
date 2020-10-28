@@ -45,4 +45,18 @@ class PaymentMain extends PaymentMain_parent
         }
         return true;
     }
+
+    /**
+     * Returns option array for expiry day configuration
+     *
+     * @return array
+     */
+    public function mollieGetExpiryDayOptions()
+    {
+        $aOptions = ['deactivated' => Registry::getLang()->translateString('MOLLIE_DEACTIVATED')];
+        for($i = 1; $i <= 30; $i++) {
+            $aOptions[$i] = $i.' '.Registry::getLang()->translateString('MOLLIE_ORDER_EXPIRY_DAYS');
+        }
+        return $aOptions;
+    }
 }

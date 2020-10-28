@@ -7,6 +7,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Model\PaymentConfig;
+use Mollie\Payment\Application\Model\Cronjob;
 
 /**
  * Activation and deactivation handler
@@ -175,6 +176,7 @@ class Events
         //CREATE NEW TABLES
         self::addTableIfNotExists(PaymentConfig::$sTableName, PaymentConfig::getTableCreateQuery());
         self::addTableIfNotExists(RequestLog::$sTableName, RequestLog::getTableCreateQuery());
+        self::addTableIfNotExists(Cronjob::$sTableName, Cronjob::getTableCreateQuery());
 
         //ADD NEW COLUMNS
         self::addColumnIfNotExists('oxorder', 'MOLLIEDELCOSTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEDELCOSTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");

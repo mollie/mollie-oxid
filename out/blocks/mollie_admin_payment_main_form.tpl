@@ -22,17 +22,32 @@
         </tr>
     [{/if}]
     [{if $paymentModel->isOnlyOrderApiSupported() === false}]
-        <tr>
-            <td class="edittext" width="70">
-                [{oxmultilang ident="MOLLIE_CONFIG_METHOD"}]
-            </td>
-            <td class="edittext">
-                <select name="mollie[api]">
-                    <option value="payment" [{if $paymentModel->getApiMethod() == 'payment'}]selected[{/if}]>Payment API</option>
-                    <option value="order" [{if $paymentModel->getApiMethod() == 'order'}]selected[{/if}]>Order API</option>
-                </select>
-            </td>
-        </tr>
+    <tr>
+        <td class="edittext" width="70">
+            [{oxmultilang ident="MOLLIE_CONFIG_METHOD"}]
+        </td>
+        <td class="edittext">
+            <select name="mollie[api]">
+                <option value="payment" [{if $paymentModel->getApiMethod() == 'payment'}]selected[{/if}]>Payment API</option>
+                <option value="order" [{if $paymentModel->getApiMethod() == 'order'}]selected[{/if}]>Order API</option>
+            </select>
+        </td>
+    </tr>
+    [{/if}]
+    [{if $paymentModel->isOrderExpirySupported() === true}]
+    <tr>
+        <td class="edittext" width="70">
+            [{oxmultilang ident="MOLLIE_ORDER_EXPIRY"}]
+        </td>
+        <td class="edittext">
+            <select name="mollie[expiryDays]">
+                [{foreach from=$oView->mollieGetExpiryDayOptions() item=title key=days}]
+                    <option value="[{$days}]" [{if $paymentModel->getExpiryDays() == $days}]selected[{/if}]>[{$title}]</option>
+                [{/foreach}]
+            </select>
+            [{oxinputhelp ident="MOLLIE_ORDER_EXPIRY_HELP"}]
+        </td>
+    </tr>
     [{/if}]
     [{if $paymentModel->getCustomConfigTemplate() !== false}]
         [{include file=$paymentModel->getCustomConfigTemplate()}]

@@ -1,4 +1,4 @@
-[{if $module_var == 'sMollieStatusPending' || $module_var == 'sMollieStatusProcessing'}]
+[{if $module_var == 'sMollieStatusPending' || $module_var == 'sMollieStatusProcessing' || $module_var == 'sMollieStatusCancelled'}]
     <dl>
         <dt>
             <select class="select" name="confselects[[{$module_var}]]" [{ $readonly }]>

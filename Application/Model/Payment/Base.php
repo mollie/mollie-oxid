@@ -38,6 +38,13 @@ abstract class Base
     protected $blIsOnlyOrderApiSupported = false;
 
     /**
+     * Determines if the payment methods supports the order expiry mechanism
+     *
+     * @var bool
+     */
+    protected $blIsOrderExpirySupported = true;
+
+    /**
      * Determines if the payment methods has to add a redirect url to the request
      *
      * @var bool
@@ -100,6 +107,16 @@ abstract class Base
     public function isOnlyOrderApiSupported()
     {
         return $this->blIsOnlyOrderApiSupported;
+    }
+
+    /**
+     * Returns if the payment methods supports the order expiry mechanism
+     *
+     * @return bool
+     */
+    public function isOrderExpirySupported()
+    {
+        return $this->blIsOrderExpirySupported;
     }
 
     /**
@@ -217,6 +234,20 @@ abstract class Base
             }
         }
         return $sApiMethod;
+    }
+
+    /**
+     * Returns configured expiryDay count or default value if not saved yet
+     *
+     * @return int
+     */
+    public function getExpiryDays()
+    {
+        $iExpiryDays = $this->getConfigParam('expiryDays');
+        if (!empty($iExpiryDays)) {
+            return $iExpiryDays;
+        }
+        return 30; // default value
     }
 
     /**
