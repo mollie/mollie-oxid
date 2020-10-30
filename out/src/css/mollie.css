@@ -139,3 +139,33 @@
     }
 }
 
+.mollieAltLogo .mollieAltLogoLabel {
+    width: 250px;
+    float: left;
+}
+
+.mollieAltLogo .mollieAltLogoValue {
+    margin-left: 10px;
+    width: 250px;
+    float: left;
+}
+
+.mollieAltLogo IMG {
+    float: left;
+}
+
+.mollieAltLogoError FIELDSET {
+    border-radius: 15px!important;
+    margin-bottom: 5px!important;
+    padding: 10px!important;
+}
+.mollieAltLogoError FIELDSET.refundError {
+    background-color: #FF8282;
+    color: black;
+    border: 3px solid #F00000;
+}
+.mollieAltLogoError FIELDSET.message STRONG {
+    display: block;
+    margin-bottom: 10px;
+}
+

@@ -23,6 +23,7 @@ $aLang = array(
     'SHOP_MODULE_sMollieStatusCancelled'                => 'Status Cancelled',
     'SHOP_MODULE_GROUP_MOLLIE_CRONJOBS'                 => 'Cronjobs',
     'SHOP_MODULE_sMollieCronOrderExpiryActive'          => 'Cronjob "Cancel unpaid orders automatically" aktiv',
+    'SHOP_MODULE_GROUP_MOLLIE_PAYMENTLOGOS'             => 'Alternative payment logos',
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Show Payment Icons on Checkout',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Log file to be found here: SHOPROOT/log/MollieTransactions.log',
@@ -87,4 +88,8 @@ $aLang = array(
     'MOLLIE_ORDER_EXPIRY_DAYS'                          => 'days',
     'MOLLIE_DEACTIVATED'                                => 'Deactivated',
     'MOLLIE_ORDER_EXPIRY_HELP'                          => 'The Mollie module has the feature to cancel orders automatically after the timeframe you configured here. This applies to orders in the "Status Pending" configured by you. The Mollie cronjob has to be set up for this to work. You can find information on how to set up the cronjob in the README.md of this module.',
+    'MOLLIE_ALTLOGO_ERROR'                              => 'There has been an error during the file upload. Please check the permission of the folder SHOPROOT/source/modules/mollie/molliepayment/out/img/',
+    'MOLLIE_ALTLOGO_LABEL'                              => 'Alternative Logo',
+    'MOLLIE_ALTLOGO_FILENAME'                           => 'Filename',
+    'MOLLIE_ALTLOGO_DELETE'                             => 'Delete logo',
 );

@@ -321,12 +321,32 @@ abstract class Base
     }
 
     /**
+     * Returns alternative logo url
+     *
+     * @return string
+     */
+    public function getAlternativeLogoUrl()
+    {
+        $sConfVar = "sMollie".$this->getOxidPaymentId().'AltLogo';
+        $sAltLogo = Registry::getConfig()->getShopConfVar($sConfVar);
+        if (!empty($sAltLogo)) {
+            return Registry::getConfig()->getActiveView()->getViewConfig()->getModuleUrl('molliepayment', 'out/img/'.$sAltLogo);
+        }
+        return false;
+    }
+
+    /**
      * Returns URL of the payment method picture
      *
      * @return string|bool
      */
     public function getMolliePaymentMethodPic()
     {
+        $sAltLogoUrl = $this->getAlternativeLogoUrl();
+        if ($sAltLogoUrl !== false) {
+            return $sAltLogoUrl;
+        }
+
         $aInfo = Payment::getInstance()->getMolliePaymentInfo();
         if (isset($aInfo[$this->sMolliePaymentCode])) {
             return $aInfo[$this->sMolliePaymentCode]['pic'];

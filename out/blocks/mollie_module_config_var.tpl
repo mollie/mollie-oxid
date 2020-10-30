@@ -46,6 +46,48 @@
             <div class="spacer"></div>
         </dl>
     [{/if}]
+[{elseif $module_var == 'sMolliePaymentLogosPlaceholder'}]
+    <link rel="stylesheet" href="[{$oViewConf->getModuleUrl('molliepayment','out/src/css/mollie.css')}]">
+    <input type="hidden" name="mollieDeleteAltLogo" value="">
+    <script type="text/javascript">
+        <!--
+        document.module_configuration.enctype = "multipart/form-data";
+
+        function deleteAltLog(sConfVar) {
+            document.module_configuration.fnc.value = "deleteMollieAltLogo";
+            document.module_configuration.mollieDeleteAltLogo.value = sConfVar;
+        }
+        -->
+    </script>
+    [{if $oView->mollieHasUploadError()}]
+        <dl class="mollieAltLogoError">
+            <dt>
+                <fieldset class="refundError message">[{$oView->mollieGetUploadError()}]</fieldset>
+            </dt>
+        </dl>
+    [{/if}]
+    [{foreach from=$oView->molliePaymentMethods() key=sPaymentId item=sPaymentTitle}]
+        [{assign var="sMollieAltLogoVarName" value="sMollie"|cat:$sPaymentId|cat:"AltLogo"}]
+        [{assign var="sMollieAltLogoCurrentValue" value=$oView->mollieGetConfiguredAltLogoValue($sMollieAltLogoVarName)}]
+        <dl class="mollieAltLogo">
+            <dt>
+                <input type="file" name="[{$sMollieAltLogoVarName}]">
+                [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`"}]
+            </dt>
+            <dd style="white-space: nowrap;">
+                <div class="mollieAltLogoLabel">
+                    [{oxmultilang ident="MOLLIE_ALTLOGO_LABEL"}] [{$sPaymentTitle}]
+                </div>
+                [{if $sMollieAltLogoCurrentValue}]
+                    [{assign var="sMolliePicPath" value='out/img/'|cat:$sMollieAltLogoCurrentValue}]
+                    <img class="mollie-payment-icon" src="[{$oViewConf->getModuleUrl('molliepayment', $sMolliePicPath)}]">
+                    <div class="mollieAltLogoValue">[{oxmultilang ident="MOLLIE_ALTLOGO_FILENAME"}]: [{$sMollieAltLogoCurrentValue}]</div>
+                    <button onclick="deleteAltLog('[{$sMollieAltLogoVarName}]')">[{oxmultilang ident="MOLLIE_ALTLOGO_DELETE"}]</button>
+                [{/if}]
+            </dd>
+            <div class="spacer"></div>
+        </dl>
+    [{/foreach}]
 [{else}]
     [{$smarty.block.parent}]
 [{/if}]

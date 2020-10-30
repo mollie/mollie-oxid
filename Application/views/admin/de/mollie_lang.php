@@ -23,6 +23,7 @@ $aLang = array(
     'SHOP_MODULE_sMollieStatusCancelled'                => 'Status Storniert',
     'SHOP_MODULE_GROUP_MOLLIE_CRONJOBS'                 => 'Cronjobs',
     'SHOP_MODULE_sMollieCronOrderExpiryActive'          => 'Cronjob "Unbezahlte Bestellungen automatisch stornieren" aktiv',
+    'SHOP_MODULE_GROUP_MOLLIE_PAYMENTLOGOS'             => 'Alternative Zahlart Logos',
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Zahlungs-Icons beim Bezahlen Anzeigen',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Log-Datei zu finden unter SHOPROOT/log/MollieTransactions.log',
@@ -87,4 +88,8 @@ $aLang = array(
     'MOLLIE_ORDER_EXPIRY_DAYS'                          => 'Tage',
     'MOLLIE_DEACTIVATED'                                => 'Deaktiviert',
     'MOLLIE_ORDER_EXPIRY_HELP'                          => 'Das Mollie Modul bietet das Feature Bestellungen die seit einem hier zu konfigurierenden Zeitraum auf die Bezahlung warten automatisch zu stornieren. Dies trifft auf Bestellungen die im von Ihnen konfigurierten "Status Ausstehend" sind zu. Hierf&uuml;r m&uuml;ssen Sie den Mollie Cronjob einrichten. Mehr dazu erfahren Sie in der README.md Datei des Moduls.',
+    'MOLLIE_ALTLOGO_ERROR'                              => 'Beim Datei-Upload ist ein Fehler aufgetreten. Bitte pr&uuml;fen Sie die Berechtigung des Ordners SHOPROOT/source/modules/mollie/molliepayment/out/img/',
+    'MOLLIE_ALTLOGO_LABEL'                              => 'Alternatives Logo',
+    'MOLLIE_ALTLOGO_FILENAME'                           => 'Dateiname',
+    'MOLLIE_ALTLOGO_DELETE'                             => 'Logo l&ouml;schen',
 );
