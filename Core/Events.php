@@ -66,8 +66,10 @@ class Events
      */
     public static function onDeactivate()
     {
-        self::deactivePaymentMethods();
-        self::clearTmp();
+        if(Registry::getConfig()->isAdmin()) { // onDeactivate is triggered in the apply-configuration console command which should not deavtivate the payment methods
+            self::deactivePaymentMethods();
+            self::clearTmp();
+        }
     }
 
     /**
