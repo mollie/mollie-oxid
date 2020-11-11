@@ -92,4 +92,5 @@ $aLang = array(
     'MOLLIE_ALTLOGO_LABEL'                              => 'Alternatives Logo',
     'MOLLIE_ALTLOGO_FILENAME'                           => 'Dateiname',
     'MOLLIE_ALTLOGO_DELETE'                             => 'Logo l&ouml;schen',
+    'MOLLIE_SINGLE_CLICK'                               => 'Single Click payments aktivieren',
 );

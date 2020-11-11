@@ -227,4 +227,23 @@ class User
         }
         return $oUser;
     }
+
+    /**
+     * Creates Mollie API user and adds customerId to user model
+     *
+     * @param  object $oUser
+     * @return void
+     */
+    public function createMollieUser(&$oUser)
+    {
+        $oResponse = Payment::getInstance()->loadMollieApi()->customers->create([
+            'name' => $oUser->oxuser__oxfname->value.' '.$oUser->oxuser__oxlname->value,
+            'email' => $oUser->oxuser__oxusername->value,
+        ]);
+
+        if ($oResponse && !empty($oResponse->id)) {
+            $oUser->oxuser__molliecustomerid->value = new Field($oResponse->id);
+            $oUser->save();
+        }
+    }
 }

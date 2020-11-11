@@ -9,3 +9,12 @@
         </select>
     </td>
 </tr>
+<tr>
+    <td class="edittext" width="70">
+        [{oxmultilang ident="MOLLIE_SINGLE_CLICK"}]
+    </td>
+    <td class="edittext" width="150">
+        <input type="hidden" name="mollie[single_click_enabled]" value="0">
+        <input type="checkbox" name="mollie[single_click_enabled]" value="1" [{if $paymentModel->getConfigParam('single_click_enabled') == 1}]checked[{/if}]>
+    </td>
+</tr>
