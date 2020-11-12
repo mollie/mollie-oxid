@@ -93,6 +93,8 @@ $aLang = array(
     'MOLLIE_ALTLOGO_FILENAME'                           => 'Dateiname',
     'MOLLIE_ALTLOGO_DELETE'                             => 'Logo l&ouml;schen',
     'MOLLIE_SINGLE_CLICK'                               => 'Single Click payments aktivieren',
-    'MOLLIE_PAYMENT_API_LINK_1'                         => 'F&uuml;r mehr Informationen zur Payment-API finden Sie',
+    'MOLLIE_PAYMENT_API_LINK_1'                         => 'Mehr Informationen zur Payment-API finden Sie',
     'MOLLIE_PAYMENT_API_LINK_2'                         => 'hier',
+    'MOLLIE_ORDER_API_LINK_1'                           => 'Mehr Informationen zur Order-API finden Sie',
+    'MOLLIE_ORDER_API_LINK_2'                           => 'hier',
 );

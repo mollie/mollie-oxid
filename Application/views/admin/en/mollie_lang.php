@@ -95,4 +95,6 @@ $aLang = array(
     'MOLLIE_SINGLE_CLICK'                               => 'Single Click payments activated',
     'MOLLIE_PAYMENT_API_LINK_1'                         => 'For more information about the Payment-API click',
     'MOLLIE_PAYMENT_API_LINK_2'                         => 'here',
+    'MOLLIE_ORDER_API_LINK_1'                           => 'For more information about the Order-API click',
+    'MOLLIE_ORDER_API_LINK_2'                           => 'here',
 );

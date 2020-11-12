@@ -27,15 +27,33 @@
             [{oxmultilang ident="MOLLIE_CONFIG_METHOD"}]
         </td>
         <td class="edittext">
-            <select name="mollie[api]">
+            <script type="text/javascript">
+                <!--
+                function mollieHandleApiChange(oSelect)
+                {
+                    var aElements = document.getElementsByClassName("mollieApiHint");
+                    if (typeof aElements !== undefined && aElements.length > 0) {
+                        for (var i = 0; i < aElements.length; i++) {
+                            if (aElements[i].id != "mollie_apihint_" + oSelect.value) {
+                                aElements[i].style.display = "none";
+                            } else {
+                                aElements[i].style.display = "";
+                            }
+                        }
+                    }
+                }
+                -->
+            </script>
+            <select name="mollie[api]" onchange="mollieHandleApiChange(this)">
                 <option value="payment" [{if $paymentModel->getApiMethod() == 'payment'}]selected[{/if}]>Payment API</option>
                 <option value="order" [{if $paymentModel->getApiMethod() == 'order'}]selected[{/if}]>Order API</option>
             </select>
-            [{if $paymentModel->getApiMethod() == 'payment'}]
-                <span>
-                    [{oxmultilang ident="MOLLIE_PAYMENT_API_LINK_1"}] <a href="https://docs.mollie.com/payments/overview" target=”_blank” style="text-decoration: underline;">[{oxmultilang ident="MOLLIE_PAYMENT_API_LINK_2"}]</a>
-                </span>
-            [{/if}]
+            <span id="mollie_apihint_payment" class="mollieApiHint" [{if $paymentModel->getApiMethod() != 'payment'}]style="display:none;"[{/if}]>
+                [{oxmultilang ident="MOLLIE_PAYMENT_API_LINK_1"}] <a href="https://docs.mollie.com/payments/overview" target=”_blank” style="text-decoration: underline;">[{oxmultilang ident="MOLLIE_PAYMENT_API_LINK_2"}]</a>
+            </span>
+            <span id="mollie_apihint_order" class="mollieApiHint" [{if $paymentModel->getApiMethod() != 'order'}]style="display:none;"[{/if}]>
+                [{oxmultilang ident="MOLLIE_ORDER_API_LINK_1"}] <a href="https://docs.mollie.com/orders/overview" target=”_blank” style="text-decoration: underline;">[{oxmultilang ident="MOLLIE_ORDER_API_LINK_2"}]</a>
+            </span>
         </td>
     </tr>
     [{/if}]
