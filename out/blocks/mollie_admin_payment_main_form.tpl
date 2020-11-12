@@ -31,6 +31,11 @@
                 <option value="payment" [{if $paymentModel->getApiMethod() == 'payment'}]selected[{/if}]>Payment API</option>
                 <option value="order" [{if $paymentModel->getApiMethod() == 'order'}]selected[{/if}]>Order API</option>
             </select>
+            [{if $paymentModel->getApiMethod() == 'payment'}]
+                <span>
+                    [{oxmultilang ident="MOLLIE_PAYMENT_API_LINK_1"}] <a href="https://docs.mollie.com/payments/overview" target=”_blank” style="text-decoration: underline;">[{oxmultilang ident="MOLLIE_PAYMENT_API_LINK_2"}]</a>
+                </span>
+            [{/if}]
         </td>
     </tr>
     [{/if}]
