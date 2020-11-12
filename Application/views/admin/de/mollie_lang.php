@@ -97,4 +97,5 @@ $aLang = array(
     'MOLLIE_PAYMENT_API_LINK_2'                         => 'hier',
     'MOLLIE_ORDER_API_LINK_1'                           => 'Mehr Informationen zur Order-API finden Sie',
     'MOLLIE_ORDER_API_LINK_2'                           => 'hier',
+    'MOLLIE_CONNECTION_DATA'                            => 'Abruf der Verbindungsdaten &uuml;ber:',
 );

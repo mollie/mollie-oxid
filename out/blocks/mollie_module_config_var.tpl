@@ -28,23 +28,30 @@
         </dd>
         <div class="spacer"></div>
     </dl>
-    [{if $module_var == 'sMollieLiveToken' && $oView->mollieHasApiKeys()}]
-        <script type="text/javascript">
-            <!--
-                function mollieShowApiKeyStatus()
-                {
-                    document.getElementById('sMollieTestToken_status').style.display = 'block';
-                    document.getElementById('sMollieLiveToken_status').style.display = 'block';
-                }
-            -->
-        </script>
+    [{if $module_var == 'sMollieLiveToken'}]
         <dl>
-            <dt>
-                <button onclick="mollieShowApiKeyStatus();return false;">Test API keys</button>
-            </dt>
-            <dd></dd>
+            <dt></dt>
+            <dd>[{oxmultilang ident="MOLLIE_CONNECTION_DATA"}] <a href="https://www.mollie.com/admin" target="_blank">https://www.mollie.com/admin</a></dd>
             <div class="spacer"></div>
         </dl>
+        [{if $oView->mollieHasApiKeys()}]
+            <script type="text/javascript">
+                <!--
+                    function mollieShowApiKeyStatus()
+                    {
+                        document.getElementById('sMollieTestToken_status').style.display = 'block';
+                        document.getElementById('sMollieLiveToken_status').style.display = 'block';
+                    }
+                -->
+            </script>
+            <dl>
+                <dt>
+                    <button onclick="mollieShowApiKeyStatus();return false;">Test API keys</button>
+                </dt>
+                <dd></dd>
+                <div class="spacer"></div>
+            </dl>
+        [{/if}]
     [{/if}]
 [{elseif $module_var == 'sMolliePaymentLogosPlaceholder'}]
     <link rel="stylesheet" href="[{$oViewConf->getModuleUrl('molliepayment','out/src/css/mollie.css')}]">
