@@ -7,6 +7,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Model\PaymentConfig;
+use Mollie\Payment\Application\Model\Cronjob;
 
 /**
  * Activation and deactivation handler
@@ -65,8 +66,10 @@ class Events
      */
     public static function onDeactivate()
     {
-        self::deactivePaymentMethods();
-        self::clearTmp();
+        if(Registry::getConfig()->isAdmin()) { // onDeactivate is triggered in the apply-configuration console command which should not deavtivate the payment methods
+            self::deactivePaymentMethods();
+            self::clearTmp();
+        }
     }
 
     /**
@@ -175,6 +178,7 @@ class Events
         //CREATE NEW TABLES
         self::addTableIfNotExists(PaymentConfig::$sTableName, PaymentConfig::getTableCreateQuery());
         self::addTableIfNotExists(RequestLog::$sTableName, RequestLog::getTableCreateQuery());
+        self::addTableIfNotExists(Cronjob::$sTableName, Cronjob::getTableCreateQuery());
 
         //ADD NEW COLUMNS
         self::addColumnIfNotExists('oxorder', 'MOLLIEDELCOSTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEDELCOSTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
@@ -183,8 +187,17 @@ class Events
         self::addColumnIfNotExists('oxorder', 'MOLLIEGIFTCARDREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEGIFTCARDREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
         self::addColumnIfNotExists('oxorder', 'MOLLIEVOUCHERDISCOUNTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEVOUCHERDISCOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
         self::addColumnIfNotExists('oxorder', 'MOLLIEDISCOUNTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEDISCOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
+        self::addColumnIfNotExists('oxorder', 'MOLLIEMODE', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEMODE` VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;");
         self::addColumnIfNotExists('oxorderarticles', 'MOLLIEQUANTITYREFUNDED', "ALTER TABLE `oxorderarticles` ADD COLUMN `MOLLIEQUANTITYREFUNDED` INT(11) NOT NULL DEFAULT '0';");
         self::addColumnIfNotExists('oxorderarticles', 'MOLLIEAMOUNTREFUNDED', "ALTER TABLE `oxorderarticles` ADD COLUMN `MOLLIEAMOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
+
+        $aNewColumnDataQueriesMollieApi = [
+            "UPDATE `oxorder` SET mollieapi = 'payment' WHERE oxpaymenttype LIKE 'mollie%' AND oxtransid LIKE 'tr_%'",
+            "UPDATE `oxorder` SET mollieapi = 'order' WHERE oxpaymenttype LIKE 'mollie%' AND oxtransid LIKE 'ord_%'",
+        ];
+        self::addColumnIfNotExists('oxorder', 'MOLLIEAPI', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEAPI` VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;", $aNewColumnDataQueriesMollieApi);
+
+        self::addColumnIfNotExists('oxuser', 'MOLLIECUSTOMERID', "ALTER TABLE `oxuser` ADD COLUMN `MOLLIECUSTOMERID` VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;");
     }
 
     /**
@@ -208,19 +221,23 @@ class Events
     /**
      * Add a column to a database table.
      *
-     * @param string $sTableName  table name
-     * @param string $sColumnName column name
-     * @param string $sQuery      sql-query to add column to table
+     * @param string $sTableName            table name
+     * @param string $sColumnName           column name
+     * @param string $sQuery                sql-query to add column to table
+     * @param array  $aNewColumnDataQueries  array of queries to execute when column was added
      *
      * @return boolean true or false
      */
-    protected static function addColumnIfNotExists($sTableName, $sColumnName, $sQuery)
+    protected static function addColumnIfNotExists($sTableName, $sColumnName, $sQuery, $aNewColumnDataQueries = array())
     {
         $aColumns = DatabaseProvider::getDb()->getAll("SHOW COLUMNS FROM {$sTableName} LIKE '{$sColumnName}'");
 
         if (empty($aColumns)) {
             try {
                 DatabaseProvider::getDb()->Execute($sQuery);
+                foreach ($aNewColumnDataQueries as $sQuery) {
+                    DatabaseProvider::getDb()->Execute($sQuery);
+                }
             } catch (\Exception $e) {
                 // do nothing as of yet
             }

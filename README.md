@@ -119,3 +119,20 @@ Download the [domain validation file](http://www.mollie.com/.well-known/apple-de
 ```
 https://[domain]/.well-known/apple-developer-merchantid-domain-association
 ```
+
+## Cronjobs
+
+The Mollie module includes a cronjob script which is able to execute certain tasks of the Mollie module periodically.  
+For those periodic tasks to work you have to configure a cronjob on the webserver of your OXID eShop.  
+The cronjob script can be found here:
+```
+*PATH TO YOUR SHOP*/source/modules/mollie/molliepayment/cron.php
+```
+This cronjob main script starts all sub-jobs included in the Mollie module.  
+You can configure the minute interval in which you want the sub-jobs to run in the database table "molliecronjob".    
+You can enable or disable certain sub-jobs in the module configuration in the Cronjobs group.
+
+The Mollie module has the following sub-jobs currently:
+* OrderExpiry: Orders with pending payments can be cancelled automatically after a certain time. You can configure this timespan in the configuration for each Mollie payment method in the OXID backend. You can select a timespan between 1 and 30 days or deactivate this for each payment method.
+
+More sub-jobs will be added in the future.

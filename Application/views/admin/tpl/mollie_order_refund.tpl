@@ -19,6 +19,16 @@
         }
     }
 
+    function copyRefundDescription(oElem)
+    {
+        var aFormElements = document.getElementsByClassName("refund_description");
+        if (typeof aFormElements !== undefined && aFormElements.length > 0) {
+            for (var i = 0; i < aFormElements.length; i++) {
+                aFormElements[i].value = oElem.value;
+            }
+        }
+    }
+
     //-->
 </script>
 <style>
@@ -130,82 +140,117 @@
     [{if $oView->isMollieOrder() === false}]
         [{oxmultilang ident="MOLLIE_NO_MOLLIE_PAYMENT"}]
     [{else}]
-        <form name="search" id="search" action="[{$oViewConf->getSelfLink()}]" method="post">
-            [{$oViewConf->getHiddenSid()}]
-            <input type="hidden" name="cl" value="mollie_order_refund">
-            <input type="hidden" name="oxid" value="[{$oxid}]">
-            <input type="hidden" name="fnc" value="[{if $blIsOrderRefundable == true}]partialRefund[{/if}]">
-            [{if $oView->isQuantityAvailable() == true && $blIsOrderRefundable == true}]
-                <div class="typeSelect">
-                    <label for="mollie_refund_type">[{oxmultilang ident="MOLLIE_TYPE_SELECT_LABEL"}]:</label>
-                    <select name="mollie_refund_type" onchange="toggleRefundType(this);">
-                        <option value="amount">[{oxmultilang ident="MOLLIE_AMOUNT"}]</option>
-                        <option value="quantity">[{oxmultilang ident="MOLLIE_QUANTITY"}]</option>
-                    </select>
-                </div>
-            [{/if}]
-            <table cellspacing="0" cellpadding="0" border="0" width="98%" class="refundTable">
-                <tr>
-                    [{block name="admin_order_article_header"}]
-                        [{if $blIsOrderRefundable == true}]
-                            <td class="listheader first" height="15">[{oxmultilang ident="MOLLIE_REFUND_AMOUNT"}]</td>
-                            [{if $oView->isQuantityAvailable() == true}]<td class="listheader">[{oxmultilang ident="MOLLIE_REFUND_QUANTITY"}]</td>[{/if}]
-                        [{/if}]
-                        <td class="listheader">[{oxmultilang ident="GENERAL_ITEMNR"}]</td>
-                        <td class="listheader">[{oxmultilang ident="GENERAL_TITLE"}]</td>
-                        <td class="listheader">[{oxmultilang ident="MOLLIE_HEADER_SINGLE_PRICE"}]</td>
-                        <td class="listheader">[{oxmultilang ident="GENERAL_ATALL"}]</td>
-                        <td class="listheader">[{oxmultilang ident="ORDER_ARTICLE_MWST"}]</td>
-                        <td class="listheader">[{oxmultilang ident="MOLLIE_HEADER_ORDERED"}]</td>
-                        <td class="listheader">[{oxmultilang ident="MOLLIE_HEADER_REFUNDED"}]</td>
-                    [{/block}]
-                </tr>
-                [{assign var="blWhite" value=""}]
-                [{assign var="class" value=""}]
-                [{assign var="blBorderDrawn" value=false}]
-                [{foreach from=$oView->getRefundItems() item=listitem name=orderArticles}]
-                    <tr id="art.[{$smarty.foreach.orderArticles.iteration}]">
-                        [{if $listitem.isOrderarticle == false && $blBorderDrawn == false}]
-                            [{assign var="class" value=" borderTop"}]
-                            [{assign var="blBorderDrawn" value=true}]
-                        [{/if}]
-                        [{block name="admin_order_article_listitem"}]
-                            [{assign var="listclass" value=listitem$blWhite}]
-                            [{if $blIsOrderRefundable == true}]
-                                <td valign="top" class="[{$listclass}][{$class}]"><span [{if $listitem.isOrderarticle == true && $oView->isQuantityAvailable() == true}]class="refundAmount"[{/if}]><input type="text" name="aOrderArticles[[{$listitem.id}]][refund_amount]" value="[{$listitem.refundableAmount}]" class="listedit" [{if $listitem.refundableAmount <= 0 || $listitem.isPartialAllowed == false}]disabled[{/if}]></span></td>
-                                [{if $oView->isQuantityAvailable() == true}]<td valign="top" class="[{$listclass}][{$class}]">[{if $listitem.isOrderarticle == true}]<span class="refundQuantity" style="display:none;"><input type="text" name="aOrderArticles[[{$listitem.id}]][refund_quantity]" value="[{$listitem.refundableQuantity}]" class="listedit" [{if $listitem.refundableQuantity <= 0}]disabled[{/if}]></span>[{/if}]</td>[{/if}]
-                            [{/if}]
-                            <td valign="top" class="[{$listclass}][{$class}]" height="15">[{$listitem.artnum}]</a></td>
-                            <td valign="top" class="[{$listclass}][{$class}]">[{$listitem.title|strip_tags}]</a></td>
-                            <td valign="top" class="[{$listclass}][{$class}]">[{$oView->getFormatedPrice($listitem.singlePrice)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></td>
-                            <td valign="top" class="[{$listclass}][{$class}]">[{$oView->getFormatedPrice($listitem.totalPrice)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></td>
-                            <td valign="top" class="[{$listclass}][{$class}]">[{$listitem.vat}]</td>
-                            <td valign="top" class="[{$listclass}][{$class}]">
-                                <span [{if $listitem.isOrderarticle == true && $oView->isQuantityAvailable() == true}]class="refundAmount"[{/if}]>[{$oView->getFormatedPrice($listitem.totalPrice)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span>
-                                [{if $listitem.isOrderarticle == true && $oView->isQuantityAvailable() == true}]<span class="refundQuantity" style="display:none;">[{$listitem.quantity}]</span>[{/if}]
-                            </td>
-                            <td valign="top" class="[{$listclass}][{$class}]">
-                                <span [{if $listitem.isOrderarticle == true && $oView->isQuantityAvailable() == true}]class="refundAmount"[{/if}]>[{$oView->getFormatedPrice($listitem.amountRefunded)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span>
-                                [{if $listitem.isOrderarticle == true && $oView->isQuantityAvailable() == true}]<span class="refundQuantity" style="display:none;">[{$listitem.quantityRefunded}]</span>[{/if}]
-                            </td>
-                        [{/block}]
-                        [{if $listitem.isOrderarticle == false}]
-                            [{assign var="class" value=""}]
-                        [{/if}]
-                    </tr>
-                    [{if $blWhite == "2"}]
-                        [{assign var="blWhite" value=""}]
+        [{if $blIsOrderRefundable == true}]
+            <label for="refund_description">[{oxmultilang ident="MOLLIE_REFUND_DESCRIPTION"}]:</label>
+            <input type="text" name="refund_description" value="" placeholder="[{oxmultilang ident="MOLLIE_REFUND_DESCRIPTION_PLACEHOLDER"}]" maxlength="140" size="120" onkeyup="copyRefundDescription(this)"><br><br>
+        [{/if}]
+        <table cellspacing="0" cellpadding="0" border="0" width="98%" class="refundTable">
+            <tr>
+                <td class="listheader first" height="15" width="10%">[{oxmultilang ident="GENERAL_ITEMNR"}]</td>
+                <td class="listheader" width="10%">[{oxmultilang ident="GENERAL_TITLE"}]</td>
+                <td class="listheader" width="10%">[{oxmultilang ident="MOLLIE_HEADER_SINGLE_PRICE"}]</td>
+                <td class="listheader" width="10%">[{oxmultilang ident="GENERAL_ATALL"}]</td>
+                <td class="listheader" width="10%">[{oxmultilang ident="ORDER_ARTICLE_MWST"}]</td>
+                <td class="listheader" width="10%">[{oxmultilang ident="MOLLIE_HEADER_ORDERED"}]</td>
+                <td class="listheader" width="20%">[{oxmultilang ident="MOLLIE_HEADER_REFUNDED"}]</td>
+                [{if $blIsOrderRefundable == true}]
+                    [{if $oView->isMollieOrderApi()}]
+                        <td class="listheader" width="5%">[{oxmultilang ident="MOLLIE_REFUND_QUANTITY"}]</td>
                     [{else}]
-                        [{assign var="blWhite" value="2"}]
+                        <td class="listheader" width="5%">[{oxmultilang ident="MOLLIE_REFUND_AMOUNT"}]</td>
                     [{/if}]
-                [{/foreach}]
-            </table><br>
-            [{if $blIsOrderRefundable == true}]
-                <label for="refund_description">[{oxmultilang ident="MOLLIE_REFUND_DESCRIPTION"}]:</label>
-                <input type="text" name="refund_description" value="" placeholder="[{oxmultilang ident="MOLLIE_REFUND_DESCRIPTION_PLACEHOLDER"}]" maxlength="140" size="120"><br>
-                <input type="submit" value="[{oxmultilang ident="MOLLIE_REFUND_SUBMIT"}]" class="refundSubmit">
-            [{/if}]
-        </form>
+                [{/if}]
+            </tr>
+            [{assign var="blWhite" value=""}]
+            [{assign var="class" value=""}]
+            [{assign var="blBorderDrawn" value=false}]
+            [{foreach from=$oView->getRefundItems() item=listitem name=orderArticles}]
+                <tr id="art.[{$smarty.foreach.orderArticles.iteration}]">
+                    [{if $listitem.isOrderarticle == false && $blBorderDrawn == false}]
+                        [{assign var="class" value=" borderTop"}]
+                        [{assign var="blBorderDrawn" value=true}]
+                    [{/if}]
+                    [{assign var="listclass" value=listitem$blWhite}]
+                    <td valign="top" class="[{$listclass}][{$class}]" height="15">[{$listitem.artnum}]</a></td>
+                    <td valign="top" class="[{$listclass}][{$class}]">[{$listitem.title|strip_tags}]</a></td>
+                    <td valign="top" class="[{$listclass}][{$class}]">[{$oView->getFormatedPrice($listitem.singlePrice)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></td>
+                    <td valign="top" class="[{$listclass}][{$class}]">[{$oView->getFormatedPrice($listitem.totalPrice)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></td>
+                    <td valign="top" class="[{$listclass}][{$class}]">[{$listitem.vat}]</td>
+                    <td valign="top" class="[{$listclass}][{$class}]">
+                        [{if $oView->isMollieOrderApi()}]
+                            <span class="refundQuantity">[{$listitem.quantity}]</span>
+                        [{else}]
+                            <span class="refundAmount">[{$oView->getFormatedPrice($listitem.totalPrice)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span>
+                        [{/if}]
+                    </td>
+                    <td valign="top" class="[{$listclass}][{$class}]">
+                        [{if $oView->isMollieOrderApi()}]
+                            <span class="refundQuantity">[{$listitem.quantityRefunded}]</span>
+                        [{else}]
+                            <span>[{$oView->getFormatedPrice($listitem.amountRefunded)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span>
+                        [{/if}]
+                    </td>
+                    [{if $blIsOrderRefundable == true}]
+                        [{if $oView->isMollieOrderApi()}]
+                            <td valign="top" class="[{$listclass}][{$class}]" nowrap>
+                                [{if $listitem.isOrderarticle == true}]
+                                    <span class="refundQuantity">
+                                        <form action="[{$oViewConf->getSelfLink()}]" method="post">
+                                            [{$oViewConf->getHiddenSid()}]
+                                            <input type="hidden" name="cl" value="mollie_order_refund">
+                                            <input type="hidden" name="oxid" value="[{$oxid}]">
+                                            <input type="hidden" name="fnc" value="partialRefund">
+                                            <input type="hidden" name="refund_description" value="" class="refund_description">
+                                            <input type="text" name="aOrderArticles[[{$listitem.id}]][refund_quantity]" value="[{$listitem.refundableQuantity}]" class="listedit" [{if $listitem.refundableQuantity <= 0}]disabled[{/if}]>
+                                            <input type="submit" value="[{oxmultilang ident="MOLLIE_REFUND_SUBMIT"}]" [{if $listitem.refundableQuantity <= 0}]disabled[{/if}]>
+                                        </form>
+                                    </span>
+                                [{/if}]
+                            </td>
+                        [{else}]
+                            <td valign="top" class="[{$listclass}][{$class}]" nowrap>
+                                <span [{if $listitem.isOrderarticle == true && $oView->isQuantityAvailable() == true}]class="refundAmount"[{/if}]>
+                                    <form action="[{$oViewConf->getSelfLink()}]" method="post">
+                                        [{$oViewConf->getHiddenSid()}]
+                                        <input type="hidden" name="cl" value="mollie_order_refund">
+                                        <input type="hidden" name="oxid" value="[{$oxid}]">
+                                        <input type="hidden" name="fnc" value="partialRefund">
+                                        <input type="hidden" name="refund_description" value="" class="refund_description">
+                                        <input type="text" name="aOrderArticles[[{$listitem.id}]][refund_amount]" value="[{$listitem.refundableAmount}]" class="listedit" [{if $listitem.refundableAmount <= 0 || $listitem.isPartialAllowed == false}]disabled[{/if}]>
+                                        <small>[{$edit->oxorder__oxcurrency->value}]</small>
+                                        <input type="submit" value="[{oxmultilang ident="MOLLIE_REFUND_SUBMIT"}]" [{if $listitem.refundableAmount <= 0 || $listitem.isPartialAllowed == false}]disabled[{/if}]>
+                                    </form>
+                                </span>
+                            </td>
+                        [{/if}]
+                    [{/if}]
+                    [{if $listitem.isOrderarticle == false}]
+                        [{assign var="class" value=""}]
+                    [{/if}]
+                </tr>
+                [{if $blWhite == "2"}]
+                    [{assign var="blWhite" value=""}]
+                [{else}]
+                    [{assign var="blWhite" value="2"}]
+                [{/if}]
+            [{/foreach}]
+        </table><br>
+        [{if $blIsOrderRefundable == true && $oView->isMollieOrderApi() == false}]
+            <form id="free_refund" action="[{$oViewConf->getSelfLink()}]" method="post">
+                [{$oViewConf->getHiddenSid()}]
+                <input type="hidden" name="cl" value="mollie_order_refund">
+                <input type="hidden" name="oxid" value="[{$oxid}]">
+                <input type="hidden" name="fnc" value="freeRefund">
+                <input type="hidden" name="refund_description" value="" class="refund_description">
+                <label for="refund_description">[{oxmultilang ident="MOLLIE_REFUND_FREE_AMOUNT"}]:</label>
+                <span>
+                    <input type="text" name="free_amount" placeholder="0.00" value="" class="listedit">
+                    <small>[{$edit->oxorder__oxcurrency->value}]</small>
+                    <input type="submit" value="[{oxmultilang ident="MOLLIE_REFUND_SUBMIT"}]">
+                </span><br><br>
+                <span>[{oxmultilang ident="MOLLIE_REFUND_FREE_1"}] [{$oView->getFormatedPrice($edit->oxorder__oxtotalordersum->value)}] <small>[{$edit->oxorder__oxcurrency->value}]</small> [{oxmultilang ident="MOLLIE_REFUND_FREE_2"}] [{$oView->getAmountRefunded()}] <small>[{$edit->oxorder__oxcurrency->value}]</small> [{oxmultilang ident="MOLLIE_REFUND_FREE_3"}]: [{$oView->getAmountRemaining()}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span>
+            </form>
+        [{/if}]
     [{/if}]
 </fieldset>
 

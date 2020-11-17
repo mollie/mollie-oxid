@@ -115,11 +115,15 @@ class Payment
     /**
      * Return Mollie token depending on configured mode
      *
+     * @param  string|bool $sMode
      * @return string
      */
-    public function getMollieToken()
+    public function getMollieToken($sMode = false)
     {
-        if ($this->getMollieMode() == 'live') {
+        if ($sMode === false) {
+            $sMode = $this->getMollieMode();
+        }
+        if ($sMode == 'live') {
             return Registry::getConfig()->getShopConfVar('sMollieLiveToken');
         }
         return Registry::getConfig()->getShopConfVar('sMollieTestToken');
@@ -158,6 +162,26 @@ class Payment
     }
 
     /**
+     * Check if connection with token can be established
+     *
+     * @param  string $sTokenConfVar
+     * @return bool
+     */
+    public function isConnectionWithTokenSuccessful($sTokenConfVar)
+    {
+        try {
+            $sMode = stripos($sTokenConfVar, 'live') !== false ? 'live' : 'test';
+            $aMollieInfo = $this->loadMollieApi($sMode)->methods->all(['resource' => 'orders', 'includeWallets' => 'applepay']);
+            if (empty($aMollieInfo)) {
+                return false;
+            }
+        } catch (\Exception $exc) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Return Mollie module version
      *
      * @return string
@@ -182,18 +206,19 @@ class Payment
     /**
      * Instantiate MollieApiClient
      *
+     * @param  string|bool $sMode
      * @return \Mollie\Api\MollieApiClient
      * @throws \Exception
      */
-    public function loadMollieApi()
+    public function loadMollieApi($sMode = false)
     {
         try {
-            if (!$this->getMollieToken()) {
+            if (!$this->getMollieToken($sMode)) {
                 throw new \Exception('Mollie API token is not configured');
             }
             if (class_exists('Mollie\Api\MollieApiClient')) {
                 $mollieApi = new \Mollie\Api\MollieApiClient();
-                $mollieApi->setApiKey($this->getMollieToken());
+                $mollieApi->setApiKey($this->getMollieToken($sMode));
 
                 $mollieApi->addVersionString("MollieOxid/".$this->getModuleVersion());
                 $mollieApi->addVersionString("Oxid/".$this->getShopVersion());

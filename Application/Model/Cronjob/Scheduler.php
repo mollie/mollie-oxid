@@ -1,0 +1,61 @@
+<?php
+
+
+namespace Mollie\Payment\Application\Model\Cronjob;
+
+
+class Scheduler
+{
+    /**
+     * List of all existing cronjobs
+     *
+     * @var array
+     */
+    protected $aCronjobs = [
+        OrderExpiry::class
+    ];
+
+    /**
+     * Returns list of all cronjobs
+     *
+     * @return array
+     */
+    protected function getCronjobs()
+    {
+        return $this->aCronjobs;
+    }
+
+    /**
+     * Check if cronjob is due again
+     *
+     * @param  Base $oCronjob
+     * @return bool
+     */
+    protected function isCronjobDue(Base $oCronjob)
+    {
+        $iGracePeriod = 5; // Grace period timer to prevent cronjob not starting when crontab timer and minute invterval are exactly the same
+        if ((strtotime($oCronjob->getLastRunDateTime()) - $iGracePeriod) <= (time() - ($oCronjob->getMinuteInterval() * 60)) || empty($oCronjob->getLastRunDateTime())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Starts all cronjobs
+     *
+     * @return void
+     */
+    public function start()
+    {
+        echo "START MOLLIE CRONJOB EXECUTION\n";
+
+        foreach ($this->getCronjobs() as $sCronjobClass) {
+            $oCronjob = oxNew($sCronjobClass);
+            if ($oCronjob->isCronjobActivated() && $this->isCronjobDue($oCronjob)) {
+                $oCronjob->startCronjob();
+            }
+        }
+
+        echo "\nFINISHED MOLLIE CRONJOB EXECUTION\n";
+    }
+}

@@ -38,6 +38,13 @@ abstract class Base
     protected $blIsOnlyOrderApiSupported = false;
 
     /**
+     * Determines if the payment methods supports the order expiry mechanism
+     *
+     * @var bool
+     */
+    protected $blIsOrderExpirySupported = true;
+
+    /**
      * Determines if the payment methods has to add a redirect url to the request
      *
      * @var bool
@@ -103,6 +110,16 @@ abstract class Base
     }
 
     /**
+     * Returns if the payment methods supports the order expiry mechanism
+     *
+     * @return bool
+     */
+    public function isOrderExpirySupported()
+    {
+        return $this->blIsOrderExpirySupported;
+    }
+
+    /**
      * Returns if the payment methods needs to add the redirect url
      *
      * @param  Order $oOrder
@@ -159,15 +176,21 @@ abstract class Base
 
     /**
      * Returns order API endpoint
+     * Mode and API method can be given as parameter for working with orders already created, since config could be changed
      *
+     * @param  string|bool $sMode
+     * @param  string|bool $sApiMethod
      * @return \Mollie\Api\Endpoints\EndpointAbstract
      */
-    public function getApiEndpoint()
+    public function getApiEndpoint($sMode = false, $sApiMethod = false)
     {
-        if ($this->getApiMethod() == 'order') {
-            return Payment::getInstance()->loadMollieApi()->orders;
+        if ($sApiMethod === false) {
+            $sApiMethod = $this->getApiMethod();
         }
-        return Payment::getInstance()->loadMollieApi()->payments;
+        if ($sApiMethod == 'order') {
+            return Payment::getInstance()->loadMollieApi($sMode)->orders;
+        }
+        return Payment::getInstance()->loadMollieApi($sMode)->payments;
     }
 
     /**
@@ -211,6 +234,20 @@ abstract class Base
             }
         }
         return $sApiMethod;
+    }
+
+    /**
+     * Returns configured expiryDay count or default value if not saved yet
+     *
+     * @return int
+     */
+    public function getExpiryDays()
+    {
+        $iExpiryDays = $this->getConfigParam('expiryDays');
+        if (!empty($iExpiryDays)) {
+            return $iExpiryDays;
+        }
+        return 30; // default value
     }
 
     /**
@@ -284,12 +321,32 @@ abstract class Base
     }
 
     /**
+     * Returns alternative logo url
+     *
+     * @return string
+     */
+    public function getAlternativeLogoUrl()
+    {
+        $sConfVar = "sMollie".$this->getOxidPaymentId().'AltLogo';
+        $sAltLogo = Registry::getConfig()->getShopConfVar($sConfVar);
+        if (!empty($sAltLogo)) {
+            return Registry::getConfig()->getActiveView()->getViewConfig()->getModuleUrl('molliepayment', 'out/img/'.$sAltLogo);
+        }
+        return false;
+    }
+
+    /**
      * Returns URL of the payment method picture
      *
      * @return string|bool
      */
     public function getMolliePaymentMethodPic()
     {
+        $sAltLogoUrl = $this->getAlternativeLogoUrl();
+        if ($sAltLogoUrl !== false) {
+            return $sAltLogoUrl;
+        }
+
         $aInfo = Payment::getInstance()->getMolliePaymentInfo();
         if (isset($aInfo[$this->sMolliePaymentCode])) {
             return $aInfo[$this->sMolliePaymentCode]['pic'];

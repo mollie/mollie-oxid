@@ -3,6 +3,7 @@
 namespace Mollie\Payment\Application\Model\Payment;
 
 use Mollie\Payment\Application\Helper\Payment;
+use Mollie\Payment\Application\Helper\User;
 use OxidEsales\Eshop\Application\Model\Order;
 
 class Creditcard extends Base
@@ -74,14 +75,25 @@ class Creditcard extends Base
      */
     public function getPaymentSpecificParameters(Order $oOrder)
     {
+        $aParams = [];
+
+        $oUser = $oOrder->getUser();
+        // Feature is only activared for live mode, because Mollie throws an error when you send a request to live API with a test customerId which was created during testing before switching to live mode
+        if ((bool)$this->getConfigParam('single_click_enabled') === true && $oUser->hasAccount() && $this->getMollieMode() == 'live') {
+            if (empty((string)$oUser->oxuser__molliecustomerid->value)) {
+                User::getInstance()->createMollieUser($oUser);
+            }
+            $aParams['customerId'] = (string)$oUser->oxuser__molliecustomerid->value;
+        }
+
         $sCCToken = $this->getDynValueParameter('mollieCCToken');
         if (!empty($sCCToken)) {
-            if ($this->getApiMethod() == 'order') {
-                return ['payment' => ['cardToken' => $sCCToken]];
-            } else {
-                return ['cardToken' => $sCCToken];
-            }
+            $aParams['cardToken'] = $sCCToken;
         }
-        return parent::getPaymentSpecificParameters($oOrder);
+
+        if ($this->getApiMethod() == 'order') {
+            $aParams = ['payment' => $aParams];
+        }
+        return $aParams;
     }
 }
