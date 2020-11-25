@@ -10,6 +10,13 @@ Receive payments from European customers with ease. Mollie provides payment meth
 Choose the best payment provider available for your online OXID eShop. Create your merchant account at [Mollie.com](https://www.mollie.com/). 
 Download and install the Mollie OXID eShop payment module and start receiving online payments now!
 
+## Installation with Composer
+Connect to your webserver via SSH and navigate to the base folder of your OXID eShop (where the composer.json is located) and perform the following command:
+```
+composer require mollie/mollie-oxid
+```
+Continue by configuring the module in your shop backend.
+
 ## Manual Installation
 1. Create the folder "mollie" in the "source/modules" folder of the Oxid 6 installation
 2. Create the folder "molliepayment" in the new "source/modules/mollie" folder of the Oxid 6 installation
