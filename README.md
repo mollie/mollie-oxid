@@ -34,6 +34,11 @@ Continue by configuring the module in your shop backend.
 ```
 vendor/bin/composer dump-autoload
 ```
+**In OXID versions from 6.2 on (older versions can skip this step)** you must now import the module configuration. To do this, log in via SSH to the server on which the shop installation is located and navigate to the directory in which the source and vendor folders are located. Execute the following command:
+```
+vendor/bin/oe-console oe:module:install-configuration source/modules/mollie/molliepayment/ 
+```
+  You should then receive the message Module configuration has been installed.
 6. Log in to the shop admin area and enable and configure the module
 
 # Supported payment methods
