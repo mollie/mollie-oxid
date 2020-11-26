@@ -27,6 +27,14 @@ class Order extends Order_parent
     protected $blMollieIsApplePayButtonMode = false;
 
     /**
+     * Toggles certain behaviours in finalizeOrder for when order is being finished automatically
+     * because customer did not come back to shop
+     *
+     * @var bool
+     */
+    protected $blMollieFinishOrderReturnMode = false;
+
+    /**
      * Used to trigger the _setNumber() method before the payment-process during finalizeOrder to have the order-number there already
      *
      * @return void
@@ -291,7 +299,7 @@ class Order extends Order_parent
             return parent::_setFolder();
         }
 
-        if ($this->blMollieFinalizeReturnMode === false) { // Mollie module has it's own folder management, so order should not be set to status NEW by oxid core
+        if ($this->blMollieFinalizeReturnMode === false && $this->blMollieFinishOrderReturnMode === false) { // Mollie module has it's own folder management, so order should not be set to status NEW by oxid core
             $this->oxorder__oxfolder = new Field(Registry::getConfig()->getShopConfVar('sMollieStatusPending'), Field::T_RAW);
         }
     }
@@ -306,6 +314,22 @@ class Order extends Order_parent
     {
         if ($this->blMollieFinalizeReturnMode === false) {
             return parent::validateStock($oBasket);
+        }
+    }
+
+    /**
+     * Validates order parameters like stock, delivery and payment
+     * parameters
+     *
+     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket basket object
+     * @param \OxidEsales\Eshop\Application\Model\User   $oUser   order user
+     *
+     * @return null
+     */
+    public function validateOrder($oBasket, $oUser)
+    {
+        if ($this->blMollieFinishOrderReturnMode === false) {
+            return parent::validateOrder($oBasket, $oUser);
         }
     }
 
@@ -416,5 +440,43 @@ class Order extends Order_parent
                 $this->mollieSetFolder($sCancelledFolder);
             }
         }
+    }
+
+    /**
+     * Checks if Mollie order was not finished correctly
+     *
+     * @return bool
+     */
+    public function mollieIsOrderInUnfinishedState()
+    {
+        if ($this->oxorder__oxtransstatus->value == "NOT_FINISHED" && $this->oxorder__oxfolder->value == Registry::getConfig()->getShopConfVar('sMollieStatusProcessing')) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Tries to finish an order which was paid but where the customer seemingly didnt return to the shop after payment to finish the order process
+     *
+     * @return void
+     */
+    public function mollieFinishOrder()
+    {
+        $oBasket = $this->_getOrderBasket();
+
+        // add this order articles to virtual basket and recalculates basket
+        $this->_addOrderArticlesToBasket($oBasket, $this->getOrderArticles(true));
+
+        // recalculating basket
+        $oBasket->calculateBasket(true);
+
+        $this->blMollieFinalizeReturnMode = true;
+        $this->blMollieFinishOrderReturnMode = true;
+
+        Registry::getSession()->setVariable('sess_challenge', $this->getId());
+        Registry::getSession()->setVariable('paymentid', $this->oxorder__oxpaymenttype->value);
+
+        //finalizing order (skipping payment execution, vouchers marking and mail sending)
+        $iRet = $this->finalizeOrder($oBasket, $this->getOrderUser());
     }
 }

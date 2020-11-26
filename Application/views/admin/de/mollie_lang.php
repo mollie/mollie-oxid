@@ -23,6 +23,7 @@ $aLang = array(
     'SHOP_MODULE_sMollieStatusCancelled'                => 'Status Storniert',
     'SHOP_MODULE_GROUP_MOLLIE_CRONJOBS'                 => 'Cronjobs',
     'SHOP_MODULE_sMollieCronOrderExpiryActive'          => 'Cronjob "Unbezahlte Bestellungen automatisch stornieren" aktiv',
+    'SHOP_MODULE_sMollieCronFinishOrdersActive'         => 'Cronjob "Abschluss von bezahlten aber nicht vollendeten Bestellungen" aktiv',
     'SHOP_MODULE_GROUP_MOLLIE_PAYMENTLOGOS'             => 'Alternative Zahlart Logos',
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Zahlungs-Icons beim Bezahlen Anzeigen',
@@ -32,6 +33,7 @@ $aLang = array(
     'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Legen Sie den Bestell-Status für Abgeschlossene Zahlungen fest',
     'HELP_SHOP_MODULE_sMollieStatusCancelled'           => 'Legen Sie den Bestell-Status für stornierte Bestellungen fest',
     'HELP_SHOP_MODULE_sMollieCronOrderExpiryActive'     => 'Damit dieser Cronjob arbeitet, m&uuml;ssen Sie zus&auml;tzlich zu dieser Checkbox noch sicherstellen dass der Mollie Cronjob eingerichtet ist. Mehr dazu erfahren Sie in der README.md Datei des Moduls.',
+    'HELP_SHOP_MODULE_sMollieCronFinishOrdersActive'    => 'Dieser Cronjob hat zur Aufgabe Bestellungen abzuschließen, bei denen der Kunde erfolgreich bezahlt hat, aber scheinbar nicht wieder in den Shop zurückgekehrt ist für den Abschluss des Bestellvorgangs. Der Cronjob finalisiert nur Bestellungen aus den letzten 24 Stunden, um keine Bestellungen zu ver&auml;ndern die wahrscheinlich schon manuell bearbeitet wurden.<br><br>Damit dieser Cronjob arbeitet, m&uuml;ssen Sie zus&auml;tzlich zu dieser Checkbox noch sicherstellen dass der Mollie Cronjob eingerichtet ist. Mehr dazu erfahren Sie in der README.md Datei des Moduls.',
 
     'MOLLIE_YES'                                        => 'Ja',
     'MOLLIE_NO'                                         => 'Nein',

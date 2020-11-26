@@ -140,6 +140,7 @@ You can configure the minute interval in which you want the sub-jobs to run in t
 You can enable or disable certain sub-jobs in the module configuration in the Cronjobs group.
 
 The Mollie module has the following sub-jobs currently:
+* FinishOrders: When a customer has paid successfully on the Mollie redirect page but he does not return to your shop, the order is not finalized correctly. This can happen for example when the customer loses his internet connection after payment or when the browser tab is closed before return to the shop. This Cronjob will finish these corrupted orders and complete all the unfinished tasks like sending the order confirmation email.
 * OrderExpiry: Orders with pending payments can be cancelled automatically after a certain time. You can configure this timespan in the configuration for each Mollie payment method in the OXID backend. You can select a timespan between 1 and 30 days or deactivate this for each payment method.
 
 More sub-jobs will be added in the future.

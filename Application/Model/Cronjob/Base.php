@@ -129,6 +129,17 @@ abstract class Base
     }
 
     /**
+     * Echoes given information
+     *
+     * @param  string $sMessage
+     * @return void
+     */
+    public static function outputInfo($sMessage)
+    {
+        echo date('Y-m-d H:i:s - ').$sMessage."\n";
+    }
+
+    /**
      * Main method for cronjobs
      * Hook to be overloaded by child classes
      * Return true if successful
@@ -163,7 +174,7 @@ abstract class Base
      */
     public function startCronjob()
     {
-        echo "\nStart cronjob '".$this->getCronjobId()."'\n";
+        self::outputInfo("Start cronjob '".$this->getCronjobId()."'");
 
         $sError = false;
         $blResult = false;
@@ -174,9 +185,9 @@ abstract class Base
         }
         $this->finishCronjob($blResult, $sError);
 
-        echo "Finished cronjob '".$this->getCronjobId()."' - Status: ".($blResult === false ? 'NOT' : '')." successful\n";
+        self::outputInfo("Finished cronjob '".$this->getCronjobId()."' - Status: ".($blResult === false ? 'NOT' : '')." successful");
         if ($sError !== false) {
-            echo "Error-Message: ".$sError."\n";
+            self::outputInfo("Error-Message: ".$sError);
         }
 
         return $blResult;

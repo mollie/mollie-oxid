@@ -36,7 +36,9 @@ class Order
 
         $oOrder = oxNew(CoreOrder::class);
         if ($oOrder->load($sSessChallenge) === true) {
-            $oOrder->cancelOrder();
+            if ($oOrder->oxorder__oxtransstatus->value != 'OK') {
+                $oOrder->cancelOrder();
+            }
         }
         Registry::getSession()->deleteVariable('sess_challenge');
     }

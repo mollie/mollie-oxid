@@ -12,7 +12,8 @@ class Scheduler
      * @var array
      */
     protected $aCronjobs = [
-        OrderExpiry::class
+        OrderExpiry::class,
+        FinishOrders::class,
     ];
 
     /**
@@ -47,7 +48,7 @@ class Scheduler
      */
     public function start()
     {
-        echo "START MOLLIE CRONJOB EXECUTION\n";
+        Base::outputInfo("START MOLLIE CRONJOB EXECUTION");
 
         foreach ($this->getCronjobs() as $sCronjobClass) {
             $oCronjob = oxNew($sCronjobClass);
@@ -56,6 +57,6 @@ class Scheduler
             }
         }
 
-        echo "\nFINISHED MOLLIE CRONJOB EXECUTION\n";
+        Base::outputInfo("FINISHED MOLLIE CRONJOB EXECUTION");
     }
 }
