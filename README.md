@@ -114,13 +114,19 @@ KBC focuses on Flanders and CBC on Wallonia.
 [Belfius](https://www.mollie.com/en/payments/belfius) is one of the largest banks in Belgium. By introducing the Belfius Pay Button, the bank provides its customers with their own payment solution.
 
 ### Giftcard
-
 Smartcards that allow the giver to charge them with a desired amount.
 
 Mollie allows you to quickly and easily accepts payments through [gift cards](https://www.mollie.com/en/payments/gift-cards) from the most used suppliers. It only takes 10 minutes to start receiving payments and there are no hidden fees involved, you only pay for successful transactions.
 
 ### Apple Pay
 [Apple Pay](https://www.mollie.com/en/payments/apple-pay) is a digital wallet service by Apple Inc. that allows shoppers to make purchases with credit or debit cards stored on their Apple devices.
+
+### Przelewy24
+[Przelewy24](https://www.mollie.com/en/payments/przelewy24) is the most popular payment method in Poland. Przelewy24 makes it possible for customers in Poland to pay online, via a number of Polish banks, international credit cards and various other payment methods, for example SMS.
+
+### MyBank
+[MyBank](https://help.mollie.com/hc/en-us/articles/360034570333-What-is-MyBank-and-how-does-it-work-) is a popular direct bank transfer payment method in Italy and is integrated by over 140 banks. Because it uses real-time bank transfers, the payments made with MyBank are 100% guaranteed. MyBank can also be used in Spain and Greece.
+
 
 ## Server preparation for Apple Pay button usage
 Your checkout **must** be served over HTTPS. Up to date TLS ciphers are required. For more information, see Apple’s documentation on [setting up your server](https://developer.apple.com/documentation/apple_pay_on_the_web/setting_up_your_server).
