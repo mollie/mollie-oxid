@@ -47,6 +47,8 @@ class MollieApplePay extends FrontendController
         $oBasket = Registry::getSession()->getBasket();
         $oBasket->setPayment('mollieapplepay');
 
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('paymentid', 'mollieapplepay');
+
         $sDetailsProductId = Registry::getRequest()->getRequestEscapedParameter('detailsProductId');
         if (!empty($sDetailsProductId)) { // applies when Apple Pay button on details page is pressed, since product is not in basket yet
             $oBasketItem = $oBasket->addToBasket($sDetailsProductId, 1);
