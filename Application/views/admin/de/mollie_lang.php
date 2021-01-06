@@ -95,6 +95,7 @@ $aLang = array(
     'MOLLIE_ALTLOGO_FILENAME'                           => 'Dateiname',
     'MOLLIE_ALTLOGO_DELETE'                             => 'Logo l&ouml;schen',
     'MOLLIE_SINGLE_CLICK'                               => 'Single Click payments aktivieren',
+    'MOLLIE_SINGLE_CLICK_HELP'                          => 'Single Click payment bedeutet, dass die Zahlungsdaten des Kunden bei Mollie gespeichert werden, sodass der Kunde ohne Eingabe der Daten beim n&auml;chsten mal direkt bezahlen kann. Dies muss vom Kunden im Checkout noch mal explizit best&auml;tigt werden. Dies hat nur Effekt wenn der Kreditkarten-Daten Modus zur Eingabe bei Mollie aktiviert ist.',
     'MOLLIE_PAYMENT_API_LINK_1'                         => 'Mehr Informationen zur Payment-API finden Sie',
     'MOLLIE_PAYMENT_API_LINK_2'                         => 'hier',
     'MOLLIE_ORDER_API_LINK_1'                           => 'Mehr Informationen zur Order-API finden Sie',

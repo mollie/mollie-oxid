@@ -16,5 +16,6 @@
     <td class="edittext" width="150">
         <input type="hidden" name="mollie[single_click_enabled]" value="0">
         <input type="checkbox" name="mollie[single_click_enabled]" value="1" [{if $paymentModel->getConfigParam('single_click_enabled') == 1}]checked[{/if}]>
+        [{oxinputhelp ident="MOLLIE_SINGLE_CLICK_HELP"}]
     </td>
 </tr>

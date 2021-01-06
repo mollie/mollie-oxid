@@ -1,5 +1,6 @@
 [{assign var="oPaymentModel" value=$paymentmethod->getMolliePaymentModel()}]
 [{assign var="sDataStyle" value=$oPaymentModel->getConfigParam('creditcard_data_input')}]
+[{assign var="iSingleClickEnabled" value=$oPaymentModel->getConfigParam('single_click_enabled')}]
 [{if $sDataStyle == "checkout_integration"}]
     <input type="hidden" name="dynvalue[mollieCCToken]" id="mollieCCToken">
     <div id="mollieCreditcardErrorbox" class="form-group" style="display:none;">
@@ -75,4 +76,21 @@
         });
     [{/capture}]
     [{oxscript add=$smarty.capture.mollieComponentsLoad}]
+[{elseif $sDataStyle == "hosted_checkout" && $iSingleClickEnabled == 1 && $oxcmp_user->hasAccount()}]
+    <div class="form-check">
+        <div class="col-lg-9 col-lg-offset-2">
+            <input type="hidden" name="dynvalue[single_click_accepted]" value="0">
+            <input class="form-check-input" type="checkbox" name="dynvalue[single_click_accepted]" value="1" id="mollieSingleClickAccepted" [{if $oxcmp_user->oxuser__molliecustomerid->value != ""}]CHECKED[{/if}]>&nbsp;
+            <label class="form-check-label" for="mollieSingleClickAccepted">
+                [{if $oxcmp_user->oxuser__molliecustomerid->value != ""}]
+                    [{oxmultilang ident="MOLLIE_SINGLE_CLICK_ACCEPTED_HAS_CUSTOMER_ID"}]
+                [{else}]
+                    [{oxmultilang ident="MOLLIE_SINGLE_CLICK_ACCEPTED"}]
+                [{/if}]
+            </label>
+            <div class="clearfix"></div>
+            [{oxmultilang ident="MOLLIE_SINGLE_CLICK_INFO"}]
+        </div>
+    </div>
+    <div class="clearfix"></div>
 [{/if}]

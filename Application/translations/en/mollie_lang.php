@@ -18,6 +18,9 @@ $aLang = [
     'MOLLIE_SELECT_GIFTCARD'                    => 'Select giftcard',
     'MOLLIE_PLEASE_SELECT'                      => '-- Please select --',
     'MOLLIE_QR_CODE'                            => 'QR Code',
+    'MOLLIE_SINGLE_CLICK_ACCEPTED'              => 'Allow storage of creditcard data (optional)',
+    'MOLLIE_SINGLE_CLICK_ACCEPTED_HAS_CUSTOMER_ID' => 'Allow usage of saved creditcard data (optional)',
+    'MOLLIE_SINGLE_CLICK_INFO'                  => 'Hereby you confirm the secure storage of your creditcard date by the payment provider respectively the usage of your previously saved data.',
 
     'MOLLIE_ERROR_ORDER_NOT_FOUND'              => 'Order not found',
     'MOLLIE_ERROR_TRANSACTIONID_NOT_FOUND'      => 'Transaction id not found',
