@@ -49,9 +49,13 @@ class Banktransfer extends Base
      */
     public function getPaymentSpecificParameters(Order $oOrder)
     {
-        return [
+        $aParams = [
             'billingEmail' => $oOrder->oxorder__oxbillemail->value,
             'dueDate' => $this->getDueDate(),
         ];
+        if ($this->getApiMethod() == 'order') {
+            $aParams = []; // existance of billingEmail param in OrderAPI triggers error
+        }
+        return $aParams;
     }
 }
