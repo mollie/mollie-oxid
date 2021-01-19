@@ -127,7 +127,6 @@ Mollie allows you to quickly and easily accepts payments through [gift cards](ht
 ### MyBank
 [MyBank](https://help.mollie.com/hc/en-us/articles/360034570333-What-is-MyBank-and-how-does-it-work-) is a popular direct bank transfer payment method in Italy and is integrated by over 140 banks. Because it uses real-time bank transfers, the payments made with MyBank are 100% guaranteed. MyBank can also be used in Spain and Greece.
 
-
 ## Server preparation for Apple Pay button usage
 Your checkout **must** be served over HTTPS. Up to date TLS ciphers are required. For more information, see Apple’s documentation on [setting up your server](https://developer.apple.com/documentation/apple_pay_on_the_web/setting_up_your_server).
 
@@ -153,5 +152,6 @@ You can enable or disable certain sub-jobs in the module configuration in the Cr
 The Mollie module has the following sub-jobs currently:
 * FinishOrders: When a customer has paid successfully on the Mollie redirect page but he does not return to your shop, the order is not finalized correctly. This can happen for example when the customer loses his internet connection after payment or when the browser tab is closed before return to the shop. This Cronjob will finish these corrupted orders and complete all the unfinished tasks like sending the order confirmation email.
 * OrderExpiry: Orders with pending payments can be cancelled automatically after a certain time. You can configure this timespan in the configuration for each Mollie payment method in the OXID backend. You can select a timespan between 1 and 30 days or deactivate this for each payment method.
+* SecondChanceEmail: This cronjob enables you to send a reminder email to your customer for finishing the order process, when the customer did not continue the checkout during the payment process by e.g., closing the browser or having a failed payment attempt. No emails will be sent for payed orders or orders where the customer canceled the payment explicitly. You can configure the day interval between order attempt and sending the reminder in the Mollie configuration.
 
 More sub-jobs will be added in the future.

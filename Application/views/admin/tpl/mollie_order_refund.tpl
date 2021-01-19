@@ -112,6 +112,24 @@
         </fieldset>
     [{/if}]
 
+    [{assign var="order" value=$oView->getOrder()}]
+    [{if $order->mollieIsEligibleForPaymentFinish()}]
+        <fieldset>
+            <legend>[{oxmultilang ident="MOLLIE_SUBSEQUENT_ORDER_COMPLETION"}]</legend>
+            [{oxmultilang ident="MOLLIE_ORDER_PAYMENT_URL"}]: <a href="[{$order->mollieGetPaymentFinishUrl()}]" target="_blank" style="text-decoration: underline;">[{$order->mollieGetPaymentFinishUrl()}]</a><br><br>
+            <form action="[{$oViewConf->getSelfLink()}]" method="post">
+                [{$oViewConf->getHiddenSid()}]
+                <input type="hidden" name="cl" value="mollie_order_refund">
+                <input type="hidden" name="oxid" value="[{$oxid}]">
+                <input type="hidden" name="fnc" value="sendSecondChanceEmail">
+                <input type="submit" value="[{oxmultilang ident="MOLLIE_SEND_SECOND_CHANCE_MAIL"}]">
+                [{if $order->oxorder__molliesecondchancemailsent->value != "0000-00-00 00:00:00"}]
+                    <span style="color: crimson;">[{oxmultilang ident="MOLLIE_SECOND_CHANCE_MAIL_ALREADY_SENT"}] ( [{$order->oxorder__molliesecondchancemailsent->value}] )</span>
+                [{/if}]
+            </form>
+        </fieldset>
+    [{/if}]
+
     [{if $blIsOrderRefundable == true}]
         <fieldset class="fullRefund">
             <legend>[{oxmultilang ident="MOLLIE_FULL_REFUND"}]</legend>

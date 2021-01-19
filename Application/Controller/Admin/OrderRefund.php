@@ -869,4 +869,17 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         }
         return $this->_aRefundItems;
     }
+
+    /**
+     * Triggers sending Mollie second chance email
+     *
+     * @return void
+     */
+    public function sendSecondChanceEmail()
+    {
+        $oOrder = $this->getOrder();
+        if ($oOrder && $oOrder->mollieIsMolliePaymentUsed()) {
+            $oOrder->mollieSendSecondChanceEmail();
+        }
+    }
 }

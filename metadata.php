@@ -57,10 +57,13 @@ not because a contract forces you!
         \OxidEsales\Eshop\Application\Controller\PaymentController::class => Mollie\Payment\extend\Application\Controller\PaymentController::class,
         \OxidEsales\Eshop\Application\Controller\OrderController::class => Mollie\Payment\extend\Application\Controller\OrderController::class,
         \OxidEsales\Eshop\Core\ViewConfig::class => Mollie\Payment\extend\Core\ViewConfig::class,
+        \OxidEsales\Eshop\Core\Email::class => Mollie\Payment\extend\Core\Email::class,
+        \OxidEsales\Eshop\Core\Session::class => Mollie\Payment\extend\Core\Session::class,
     ],
     'controllers'   => [
         'MollieWebhook' => Mollie\Payment\Application\Controller\MollieWebhook::class,
         'MollieApplePay' => Mollie\Payment\Application\Controller\MollieApplePay::class,
+        'MollieFinishPayment' => Mollie\Payment\Application\Controller\MollieFinishPayment::class,
         'mollie_order_refund' => Mollie\Payment\Application\Controller\Admin\OrderRefund::class,
     ],
     'templates'     => [
@@ -80,6 +83,7 @@ not because a contract forces you!
         'molliecreditcard.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/molliecreditcard.tpl',
         'mollieapplepaybutton.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/mollieapplepaybutton.tpl',
         'mollie_order_refund.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/mollie_order_refund.tpl',
+        'mollie_second_chance.tpl' => 'mollie/molliepayment/Application/views/email/tpl/mollie_second_chance.tpl',
     ],
     'events'        => [
         'onActivate' => \Mollie\Payment\Core\Events::class.'::onActivate',
@@ -108,6 +112,8 @@ not because a contract forces you!
         ['group' => 'MOLLIE_STATUS_MAPPING',    'name' => 'sMollieStatusCancelled',             'type' => 'select',     'value' => '',          'position' => 70],
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronFinishOrdersActive',      'type' => 'bool',       'value' => '0',         'position' => 80],
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronOrderExpiryActive',       'type' => 'bool',       'value' => '0',         'position' => 85],
+        ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronSecondChanceActive',      'type' => 'bool',       'value' => '0',         'position' => 90],
+        ['group' => 'MOLLIE_CRONJOBS',          'name' => 'iMollieCronSecondChanceTimeDiff',    'type' => 'select',     'value' => '1',         'position' => 100],
         ['group' => 'MOLLIE_PAYMENTLOGOS',      'name' => 'sMolliePaymentLogosPlaceholder',     'type' => 'str',        'value' => '',          'position' => 500],
     ]
 ];

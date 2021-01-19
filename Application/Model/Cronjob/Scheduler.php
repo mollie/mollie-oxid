@@ -14,6 +14,7 @@ class Scheduler
     protected $aCronjobs = [
         OrderExpiry::class,
         FinishOrders::class,
+        SecondChance::class
     ];
 
     /**

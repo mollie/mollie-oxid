@@ -35,13 +35,36 @@ class Order extends Order_parent
     protected $blMollieFinishOrderReturnMode = false;
 
     /**
+     * Toggles certain behaviours in finalizeOrder for when the the payment is being reinitialized at a later point in time
+     *
+     * @var bool
+     */
+    protected $blMollieReinitializePaymentMode = false;
+
+    /**
+     * Temporary field for saving the order nr
+     *
+     * @var int|null
+     */
+    protected $mollieTmpOrderNr = null;
+
+    /**
+     * State is saved to prevent order being set to transstatus OK during recalculation
+     *
+     * @var bool|null
+     */
+    protected $mollieRecalculateOrder = null;
+
+    /**
      * Used to trigger the _setNumber() method before the payment-process during finalizeOrder to have the order-number there already
      *
      * @return void
      */
     public function mollieSetOrderNumber()
     {
-        $this->_setNumber();
+        if (!$this->oxorder__oxordernr->value) {
+            $this->_setNumber();
+        }
     }
 
     /**
@@ -184,6 +207,21 @@ class Order extends Order_parent
     }
 
     /**
+     * Mark order as paid
+     *
+     * @return void
+     */
+    public function mollieMarkAsSecondChanceMailSent()
+    {
+        $sDate = date('Y-m-d H:i:s');
+
+        $sQuery = "UPDATE oxorder SET molliesecondchancemailsent = ? WHERE oxid = ?";
+        DatabaseProvider::getDb()->Execute($sQuery, array($sDate, $this->getId()));
+
+        $this->oxorder__molliesecondchancemailsent = new Field($sDate);
+    }
+
+    /**
      * Set order folder
      *
      * @param string $sFolder
@@ -232,7 +270,7 @@ class Order extends Order_parent
      */
     protected function _checkOrderExist($sOxId = null)
     {
-        if ($this->blMollieFinalizeReturnMode === false) {
+        if ($this->blMollieFinalizeReturnMode === false && $this->blMollieReinitializePaymentMode === false) {
             return parent::_checkOrderExist($sOxId);
         }
         return false; // In finalize return situation the order will already exist, but thats ok
@@ -285,6 +323,29 @@ class Order extends Order_parent
         if ($this->blMollieFinalizeReturnMode === false) {
             return parent::_executePayment($oBasket, $oUserpayment);
         }
+
+        if ($this->blMollieReinitializePaymentMode === true) {
+            // Finalize order would set a new incremented order-nr if already filled
+            // Doing this to prevent this, oxordernr will be filled again in _setNumber
+            $this->mollieTmpOrderNr = $this->oxorder__oxordernr->value;
+            $this->oxorder__oxordernr->value = "";
+        }
+        return true;
+    }
+
+    /**
+     * Tries to fetch and set next record number in DB. Returns true on success
+     *
+     * @return bool
+     */
+    protected function _setNumber()
+    {
+        if ($this->blMollieFinalizeReturnMode === false && $this->blMollieReinitializePaymentMode === false && $this->mollieTmpOrderNr === null) {
+            return parent::_setNumber();
+        }
+
+        $this->oxorder__oxordernr->value = $this->mollieTmpOrderNr;
+
         return true;
     }
 
@@ -302,6 +363,21 @@ class Order extends Order_parent
         if ($this->blMollieFinalizeReturnMode === false && $this->blMollieFinishOrderReturnMode === false) { // Mollie module has it's own folder management, so order should not be set to status NEW by oxid core
             $this->oxorder__oxfolder = new Field(Registry::getConfig()->getShopConfVar('sMollieStatusPending'), Field::T_RAW);
         }
+    }
+
+    /**
+     * Extension: Changing the order in the backend results in da finalizeOrder call with recaltulateOrder = true
+     * This sets oxtransstatus to OK, which should not happen for Mollie orders when they were not finished
+     * This prevents this behaviour
+     *
+     * @param string $sStatus order transaction status
+     */
+    protected function _setOrderStatus($sStatus)
+    {
+        if ($this->mollieRecalculateOrder === true && $this->oxorder__oxtransstatus->value == "NOT_FINISHED" && $this->mollieIsMolliePaymentUsed()) {
+            return;
+        }
+        parent::_setOrderStatus($sStatus);
     }
 
     /**
@@ -334,6 +410,21 @@ class Order extends Order_parent
     }
 
     /**
+     * Checks if payment used for current order is available and active.
+     * Throws exception if not available
+     *
+     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket basket object
+     *
+     * @return null
+     */
+    public function validatePayment($oBasket)
+    {
+        if ($this->blMollieReinitializePaymentMode === false) {
+            return parent::validatePayment($oBasket);
+        }
+    }
+
+    /**
      * This overloaded method sets the return mode flag so that the behaviour of some methods is changed when the customer
      * returns after successful payment from Mollie
      *
@@ -344,8 +435,12 @@ class Order extends Order_parent
      */
     public function finalizeOrder(\OxidEsales\Eshop\Application\Model\Basket $oBasket, $oUser, $blRecalculatingOrder = false)
     {
+        $this->mollieRecalculateOrder = $blRecalculatingOrder;
         if (PaymentHelper::getInstance()->isMolliePaymentMethod($oBasket->getPaymentId()) === true && $this->mollieIsReturnAfterPayment() === true) {
             $this->blMollieFinalizeReturnMode = true;
+        }
+        if (Registry::getSession()->getVariable('mollieReinitializePaymentMode')) {
+            $this->blMollieReinitializePaymentMode = true;
         }
         return parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
     }
@@ -422,7 +517,7 @@ class Order extends Order_parent
      */
     public function validateDeliveryAddress($oUser)
     {
-        if ($this->blMollieIsApplePayButtonMode === false) {
+        if ($this->blMollieIsApplePayButtonMode === false && $this->blMollieReinitializePaymentMode === false) {
             return parent::validateDeliveryAddress($oUser);
         }
         return 0;
@@ -441,6 +536,16 @@ class Order extends Order_parent
             }
         }
     }
+    
+    /**
+     * Returns finish payment url
+     *
+     * @return string|bool
+     */
+    public function mollieGetPaymentFinishUrl()
+    {
+        return Registry::getConfig()->getSslShopUrl()."?cl=mollieFinishPayment&id=".$this->getId();
+    }
 
     /**
      * Checks if Mollie order was not finished correctly
@@ -456,11 +561,11 @@ class Order extends Order_parent
     }
 
     /**
-     * Tries to finish an order which was paid but where the customer seemingly didnt return to the shop after payment to finish the order process
+     * Recreates basket from order information
      *
-     * @return void
+     * @return object
      */
-    public function mollieFinishOrder()
+    public function mollieRecreateBasket()
     {
         $oBasket = $this->_getOrderBasket();
 
@@ -470,13 +575,90 @@ class Order extends Order_parent
         // recalculating basket
         $oBasket->calculateBasket(true);
 
+        Registry::getSession()->setVariable('sess_challenge', $this->getId());
+        Registry::getSession()->setVariable('paymentid', $this->oxorder__oxpaymenttype->value);
+        Registry::getSession()->setBasket($oBasket);
+
+        return $oBasket;
+    }
+
+    /**
+     * Checks if order is elibible for finishing the payment
+     *
+     * @param bool $blSecondChanceEmail
+     * @return bool
+     */
+    public function mollieIsEligibleForPaymentFinish($blSecondChanceEmail = false)
+    {
+        if (!$this->mollieIsMolliePaymentUsed() || $this->oxorder__oxpaid->value != '0000-00-00 00:00:00' || $this->oxorder__oxtransstatus->value != 'NOT_FINISHED') {
+            return false;
+        }
+
+        $aStatus = $this->mollieGetPaymentModel()->getTransactionHandler()->processTransaction($this, 'success');
+
+        $aStatusBlacklist = ['paid'];
+        if ($blSecondChanceEmail === true) {
+            $aStatusBlacklist[] = 'canceled';
+        }
+        if (in_array($aStatus['status'], $aStatusBlacklist)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Triggers sending Mollie second chance email
+     *
+     * @return void
+     */
+    public function mollieSendSecondChanceEmail()
+    {
+        $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $oEmail->mollieSendSecondChanceEmail($this, $this->mollieGetPaymentFinishUrl());
+
+        $this->mollieMarkAsSecondChanceMailSent();
+    }
+
+    /**
+     * Tries to finish an order which was paid but where the customer seemingly didnt return to the shop after payment to finish the order process
+     *
+     * @return void
+     */
+    public function mollieFinishOrder()
+    {
+        $oBasket = $this->mollieRecreateBasket();
+
         $this->blMollieFinalizeReturnMode = true;
         $this->blMollieFinishOrderReturnMode = true;
 
-        Registry::getSession()->setVariable('sess_challenge', $this->getId());
-        Registry::getSession()->setVariable('paymentid', $this->oxorder__oxpaymenttype->value);
-
         //finalizing order (skipping payment execution, vouchers marking and mail sending)
         $iRet = $this->finalizeOrder($oBasket, $this->getOrderUser());
+    }
+
+    /**
+     * Starts a new payment with Mollie
+     *
+     * @return integer
+     */
+    public function mollieReinitializePayment()
+    {
+        if ($this->oxorder__oxstorno->value == 1) {
+            $this->mollieUncancelOrder();
+        }
+
+        $oBasket = $this->mollieRecreateBasket();
+        $oUser = $this->getUser();
+        if (!$oUser) {
+            $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+            $oUser->load($this->oxorder__oxuserid->value);
+            $this->setUser($oUser);
+            Registry::getSession()->setVariable('usr', $this->oxorder__oxuserid->value);
+        }
+
+        $this->blMollieReinitializePaymentMode = true;
+
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('mollieReinitializePaymentMode', true);
+
+        return $this->finalizeOrder($oBasket, $oUser);
     }
 }

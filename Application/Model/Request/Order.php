@@ -28,8 +28,9 @@ class Order extends Base
         $this->addParameter('orderNumber', (string)$oOrder->oxorder__oxordernr->value);
         $this->addParameter('lines', $this->getBasketItems($oOrder));
 
-        if ($oOrder->getUser()->oxuser__oxbirthday->value != '0000-00-00') {
-            $this->addParameter('consumerDateOfBirth', $oOrder->getUser()->oxuser__oxbirthday->value);
+        $oUser = $oOrder->getUser();
+        if ($oUser && $oUser->oxuser__oxbirthday->value != '0000-00-00') {
+            $this->addParameter('consumerDateOfBirth', $oUser->oxuser__oxbirthday->value);
         }
     }
 }

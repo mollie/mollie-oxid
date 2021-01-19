@@ -33,6 +33,20 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     }
 
     /**
+     * Returns array with options for iMollieCronSecondChanceTimeDiff config option
+     *
+     * @return array
+     */
+    public function mollieSecondChanceDayDiffs()
+    {
+        $aReturn = [];
+        for ($i = 1; $i <= 14; $i++) {
+            $aReturn[] = $i;
+        }
+        return $aReturn;
+    }
+
+    /**
      * Returns if request had a upload error
      *
      * @return bool

@@ -85,7 +85,33 @@ class RequestLog
         if (isset($aResponse['_links'])) {
             unset($aResponse['_links']);
         }
+        if (method_exists($oResponse, 'getCheckoutUrl')) {
+            $sCheckoutUrl = $oResponse->getCheckoutUrl();
+            if (!empty($sCheckoutUrl)) {
+                $aResponse['checkoutUrl'] = $sCheckoutUrl;
+            }
+        }
         return $aResponse;
+    }
+
+    /**
+     * Returns log entry for given order id
+     *
+     * @param  string $sOrderId
+     * @return array|bool
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     */
+    public function getLogEntryForOrder($sOrderId)
+    {
+        $oDb = DatabaseProvider::getDb();
+        $oDb->setFetchMode(DatabaseProvider::FETCH_MODE_ASSOC);
+
+        $sQuery = "SELECT * FROM ".self::$sTableName." WHERE orderid = ".$oDb->quote($sOrderId)." AND ((requesttype = 'order' AND responsestatus = 'created') OR (requesttype = 'payment' AND responsestatus = 'open')) AND response LIKE '%checkoutUrl%'";
+        $aRow = $oDb->getRow($sQuery);
+        if ($aRow) {
+            return $aRow;
+        }
+        return false;
     }
 
     /**

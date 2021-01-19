@@ -19,7 +19,6 @@ class PaymentGateway extends PaymentGateway_parent
         'sDeliveryAddressMD5',
         'oxdownloadableproductsagreement',
         'oxserviceproductsagreement',
-        'ord_agb',
     ];
 
     /**
@@ -69,6 +68,10 @@ class PaymentGateway extends PaymentGateway_parent
             $sAddParams .= '&'.$sSid;
         }
 
+        if (!$oRequest->getRequestEscapedParameter('stoken')) {
+            $sAddParams .= '&stoken='.$oSession->getSessionChallengeToken();
+        }
+        $sAddParams .= '&ord_agb=1';
         $sAddParams .= '&rtoken='.$oSession->getRemoteAccessToken();
 
         return $sAddParams;

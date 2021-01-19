@@ -3,7 +3,9 @@
 namespace Mollie\Payment\Application\Model\Request;
 
 use Mollie\Payment\Application\Model\RequestLog;
+use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Order as CoreOrder;
+use OxidEsales\Eshop\Application\Model\OrderArticle;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
@@ -203,17 +205,22 @@ abstract class Base
 
         $aOrderArticleListe = $oOrder->getOrderArticles();
         foreach ($aOrderArticleListe->getArray() as $oOrderarticle) {
+            $oArticle = $oOrderarticle->getArticle();
+            if ($oArticle instanceof OrderArticle) {
+                $oArticle = oxNew(Article::class);
+                $oArticle->load($oOrderarticle->oxorderarticles__oxartid->value);
+            }
             $aItems[] = [
                 'name' => $oOrderarticle->oxorderarticles__oxtitle->value,
                 'sku' => $oOrderarticle->oxorderarticles__oxartnum->value,
-                'type' => $oOrderarticle->getArticle()->isDownloadable() ? 'digital' : 'physical',
+                'type' => $oArticle->isDownloadable() ? 'digital' : 'physical',
                 'quantity' => $oOrderarticle->oxorderarticles__oxamount->value,
                 'unitPrice' => $this->getAmountArray($oOrderarticle->oxorderarticles__oxbprice->value, $sCurrency),
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrderarticle->oxorderarticles__oxbrutprice->value, $sCurrency),
                 'vatRate' => $oOrderarticle->oxorderarticles__oxvat->value,
                 'vatAmount' => $this->getAmountArray($oOrderarticle->oxorderarticles__oxvatprice->value, $sCurrency),
-                'productUrl' => $oOrderarticle->getArticle()->getLink(),
+                'productUrl' => $oArticle->getLink(),
             ];
         }
 

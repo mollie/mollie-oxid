@@ -53,7 +53,7 @@ class Events
     public static function onActivate()
     {
         self::addDatabaseStructure();
-        self::addPaymentMethods();
+        self::addData();
         self::deleteRemovedPaymentMethods();
         self::regenerateViews();
         self::clearTmp();
@@ -109,6 +109,18 @@ class Events
     protected static function getMolliePaymentMethods()
     {
         return Payment::getInstance()->getMolliePaymentMethods();
+    }
+
+    /**
+     * Add database data needed for the Mollie module
+     *
+     * @return void
+     */
+    protected static function addData()
+    {
+        self::addPaymentMethods();
+
+        self::insertRowIfNotExists('oxcontents', array('OXID' => 'molliesecondchanceemail'), 'INSERT INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`, `OXSNIPPET`, `OXTYPE`, `OXACTIVE`, `OXACTIVE_1`, `OXPOSITION`, `OXTITLE`, `OXCONTENT`, `OXTITLE_1`, `OXCONTENT_1`, `OXACTIVE_2`, `OXTITLE_2`, `OXCONTENT_2`, `OXACTIVE_3`, `OXTITLE_3`, `OXCONTENT_3`, `OXCATID`, `OXFOLDER`, `OXTERMVERSION`) VALUES ("molliesecondchanceemail", "molliesecondchanceemail", 1, 1, 0, 1, 1, "", "Mollie Second Chance Email", "Hallo [{ $order->oxorder__oxbillsal->value|oxmultilangsal }] [{ $order->oxorder__oxbillfname->value }] [{ $order->oxorder__oxbilllname->value }],<br>\r\n<br>\r\nVielen Dank für Ihren Einkauf bei [{ $shop->oxshops__oxname->value }]!<br>\r\n<br>\r\nSie k&ouml;nnen Ihren Bestellvorgang abschlie&szlig;en indem Sie auf <a href=\'[{$sFinishPaymentUrl}]\'>diesen Link</a> klicken.", "Mollie Second Chance Email", "Hello [{ $order->oxorder__oxbillsal->value|oxmultilangsal }] [{ $order->oxorder__oxbillfname->value }] [{ $order->oxorder__oxbilllname->value }],<br>\r\n<br>\r\nThank you for shopping with [{ $shop->oxshops__oxname->value }]!<br>\r\n<br>\r\nYou can now finish your order by clicking <a href=\'[{$sFinishPaymentUrl}]\'>here</a>", 1, "", "", 1, "", "", "30e44ab83fdee7564.23264141", "CMSFOLDER_EMAILS", "");');
     }
 
     /**
@@ -188,6 +200,7 @@ class Events
         self::addColumnIfNotExists('oxorder', 'MOLLIEVOUCHERDISCOUNTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEVOUCHERDISCOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
         self::addColumnIfNotExists('oxorder', 'MOLLIEDISCOUNTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEDISCOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
         self::addColumnIfNotExists('oxorder', 'MOLLIEMODE', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEMODE` VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;");
+        self::addColumnIfNotExists('oxorder', 'MOLLIESECONDCHANCEMAILSENT', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIESECONDCHANCEMAILSENT` datetime NOT NULL default '0000-00-00 00:00:00';");
         self::addColumnIfNotExists('oxorderarticles', 'MOLLIEQUANTITYREFUNDED', "ALTER TABLE `oxorderarticles` ADD COLUMN `MOLLIEQUANTITYREFUNDED` INT(11) NOT NULL DEFAULT '0';");
         self::addColumnIfNotExists('oxorderarticles', 'MOLLIEAMOUNTREFUNDED', "ALTER TABLE `oxorderarticles` ADD COLUMN `MOLLIEAMOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
 

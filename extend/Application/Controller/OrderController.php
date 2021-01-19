@@ -29,10 +29,10 @@ class OrderController extends OrderController_parent
      */
     protected function mollieGetOrder()
     {
-        $sSessChallenge = Registry::getSession()->getVariable('sess_challenge');
-        if (!empty($sSessChallenge)) {
+        $sOrderId = Registry::getSession()->getVariable('sess_challenge');
+        if (!empty($sOrderId)) {
             $oOrder = oxNew(Order::class);
-            $oOrder->load($sSessChallenge);
+            $oOrder->load($sOrderId);
             if ($oOrder->isLoaded() === true) {
                 return $oOrder;
             }
@@ -59,7 +59,8 @@ class OrderController extends OrderController_parent
      */
     public function handleMollieReturn()
     {
-        if ($this->getPayment()->isMolliePaymentMethod()) {
+        $oPayment = $this->getPayment();
+        if ($oPayment && $oPayment->isMolliePaymentMethod()) {
             Registry::getSession()->deleteVariable('mollieIsRedirected');
 
             $oOrder = $this->mollieGetOrder();
@@ -88,7 +89,14 @@ class OrderController extends OrderController_parent
 
             // else - continue to parent::execute since success must be true
         }
+        $sReturn = parent::execute();
 
-        return parent::execute();
+        if (Registry::getSession()->getVariable('mollieReinitializePaymentMode')) {
+            Registry::getSession()->deleteVariable('usr'); // logout user since the payment link should not be seen as a successful login
+        }
+
+        Registry::getSession()->deleteVariable('mollieReinitializePaymentMode');
+
+        return $sReturn;
     }
 }

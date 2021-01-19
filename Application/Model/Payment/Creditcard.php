@@ -79,7 +79,7 @@ class Creditcard extends Base
 
         $oUser = $oOrder->getUser();
         // Feature is only activared for live mode, because Mollie throws an error when you send a request to live API with a test customerId which was created during testing before switching to live mode
-        if ((bool)$this->getConfigParam('single_click_enabled') === true && $oUser->hasAccount() && (bool)$this->getDynValueParameter('single_click_accepted') === true && $this->getMollieMode() == 'live') {
+        if ((bool)$this->getConfigParam('single_click_enabled') === true && $oUser && $oUser->hasAccount() && (bool)$this->getDynValueParameter('single_click_accepted') === true && $this->getMollieMode() == 'live') {
             if (empty((string)$oUser->oxuser__molliecustomerid->value)) {
                 User::getInstance()->createMollieUser($oUser);
             }
