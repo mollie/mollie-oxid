@@ -52,8 +52,14 @@ class OrderExpiry extends \Mollie\Payment\Application\Model\Cronjob\Base
         $aOrders = [];
         $iExpiryDays = $oPaymentModel->getExpiryDays();
         if ($oPaymentModel->isOrderExpirySupported() === true && $iExpiryDays !== 'deactivated' && is_numeric($iExpiryDays)) {
-            $sPendingFolder = Registry::getConfig()->getShopConfVar('sMollieStatusPending');
-            $sQuery = "SELECT OXID FROM oxorder WHERE oxstorno = 0 AND oxpaymenttype = '{$oPaymentModel->getOxidPaymentId()}' AND oxfolder = '{$sPendingFolder}' AND oxorderdate < DATE_ADD(NOW(), INTERVAL -{$iExpiryDays} DAY)";
+            $aFolders = [Registry::getConfig()->getShopConfVar('sMollieStatusPending')];
+            if ($oPaymentModel->getOxidPaymentId() == "molliebanktransfer") {
+                $sBanktransferPending = $oPaymentModel->getConfigParam('pending_status');
+                if (!empty($sBanktransferPending)) {
+                    $aFolders[] = $sBanktransferPending;
+                }
+            }
+            $sQuery = "SELECT OXID FROM oxorder WHERE oxstorno = 0 AND oxpaymenttype = '{$oPaymentModel->getOxidPaymentId()}' AND oxfolder IN ('".implode("','", $aFolders)."') AND oxorderdate < DATE_ADD(NOW(), INTERVAL -{$iExpiryDays} DAY)";
             $aResult = DatabaseProvider::getDb()->getAll($sQuery);
             foreach ($aResult as $aRow) {
                 $aOrders[] = $aRow[0];
