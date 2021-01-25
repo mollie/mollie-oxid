@@ -3,11 +3,51 @@
 namespace Mollie\Payment\extend\Core;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 
 class Email extends Email_parent
 {
     protected $_sMollieSecondChanceTemplate = 'mollie_second_chance.tpl';
 
+    /**
+     * Returns old or current template renderer
+     *
+     * @return \OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface|\Smarty
+     */
+    protected function mollieGetRenderer()
+    {
+        if (method_exists($this, 'getRenderer')) { // mechanism changed in Oxid 6.2
+            // content of getRenderer method... for whatever reason someone put the method on private so that it cant be used here
+            $bridge = $this->getContainer()->get(TemplateRendererBridgeInterface::class);
+            $bridge->setEngine($this->_getSmarty());
+
+            return $bridge->getTemplateRenderer();
+        }
+        return $this->_getSmarty();
+    }
+
+    /**
+     * Renders the template with old or current method
+     *
+     * @param \OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface|\Smarty $oRenderer
+     * @param string $sTemplate
+     * @return string
+     */
+    protected function mollieRenderTemplate($oRenderer, $sTemplate)
+    {
+        if (method_exists($this, 'getRenderer')) { // mechanism changed in Oxid 6.2
+            return $oRenderer->renderTemplate($sTemplate, $this->getViewData());
+        }
+        return $oRenderer->fetch($sTemplate);
+    }
+
+    /**
+     * Sends second chance email to customer
+     *
+     * @param object $oOrder
+     * @param string $sFinishPaymentUrl
+     * @return bool
+     */
     public function mollieSendSecondChanceEmail($oOrder, $sFinishPaymentUrl)
     {
         // add user defined stuff if there is any
@@ -20,7 +60,7 @@ class Email extends Email_parent
         $this->_setMailParams($shop);
 
         // create messages
-        $smarty = $this->_getSmarty();
+        $oRenderer = $this->mollieGetRenderer();
 
         $subject = Registry::getLang()->translateString('MOLLIE_SECOND_CHANCE_MAIL_SUBJECT', null, false) . " " . $shop->oxshops__oxname->getRawValue() . " (#" . $oOrder->oxorder__oxordernr->value . ")";
 
@@ -35,7 +75,7 @@ class Email extends Email_parent
         $oConfig = $this->getConfig();
         $oConfig->setAdminMode(false);
 
-        $this->setBody($smarty->fetch($this->_sMollieSecondChanceTemplate));
+        $this->setBody($this->mollieRenderTemplate($oRenderer, $this->_sMollieSecondChanceTemplate));
         $this->setSubject($subject);
 
         $oConfig->setAdminMode(true);
