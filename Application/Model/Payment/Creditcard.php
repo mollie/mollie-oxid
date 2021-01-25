@@ -91,9 +91,6 @@ class Creditcard extends Base
             $aParams['cardToken'] = $sCCToken;
         }
 
-        if ($this->getApiMethod() == 'order') {
-            $aParams = ['payment' => $aParams];
-        }
         return $aParams;
     }
 }

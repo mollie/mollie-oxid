@@ -52,11 +52,7 @@ class ApplePay extends Base
     {
         $aApplePayToken = Registry::getRequest()->getRequestEscapedParameter('token');
         if (!empty($aApplePayToken) && $oOrder->mollieIsApplePayButtonMode() === true) {
-            if ($this->getApiMethod() == 'order') {
-                return ['payment' => ['applePayPaymentToken' => json_encode($aApplePayToken)]];
-            } else {
-                return ['applePayPaymentToken' => json_encode($aApplePayToken)];
-            }
+            return ['applePayPaymentToken' => json_encode($aApplePayToken)];
         }
         return parent::getPaymentSpecificParameters($oOrder);
     }
