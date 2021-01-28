@@ -34,7 +34,6 @@ class Payment
         'molliegiftcard'        => array('title' => 'Giftcard',         'model' => \Mollie\Payment\Application\Model\Payment\Giftcard::class),
         'molliegiropay'         => array('title' => 'Giropay',          'model' => \Mollie\Payment\Application\Model\Payment\Giropay::class),
         'mollieideal'           => array('title' => 'iDeal',            'model' => \Mollie\Payment\Application\Model\Payment\Ideal::class),
-        'mollieinghomepay'      => array('title' => 'ING Homepay',      'model' => \Mollie\Payment\Application\Model\Payment\IngHomepay::class),
         'molliekbc'             => array('title' => 'KBC',              'model' => \Mollie\Payment\Application\Model\Payment\Kbc::class),
         'mollieklarnapaylater'  => array('title' => 'Klarna Pay Later', 'model' => \Mollie\Payment\Application\Model\Payment\KlarnaPayLater::class),
         'mollieklarnasliceit'   => array('title' => 'Klarna Slice It',  'model' => \Mollie\Payment\Application\Model\Payment\KlarnaSliceIt::class),

@@ -42,7 +42,8 @@ class Events
      * @var array
      */
     public static $aRemovedPaymentMethods = array(
-        'molliebitcoin'
+        'molliebitcoin',
+        'mollieinghomepay',
     );
 
     /**

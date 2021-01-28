@@ -97,9 +97,6 @@ for more than 40,000 websites.
 
 Because payments are guaranteed, this payment method is a huge surplus for your online store.
 
-### ING Home’Pay
-[ING Home’Pay](https://www.mollie.com/en/payments/ing-homepay). Mollie allows you to quickly and easily accept payments with ING Home'Pay.
-
 It only takes 10 minutes to start receiving payments and there are no hidden fees involved, you only pay for successful transactions.
 
 ### paysafecard
