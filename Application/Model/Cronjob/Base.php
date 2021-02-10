@@ -5,7 +5,7 @@ namespace Mollie\Payment\Application\Model\Cronjob;
 use Mollie\Payment\Application\Model\Cronjob;
 use OxidEsales\Eshop\Core\Registry;
 
-abstract class Base
+class Base
 {
     /**
      * Id of current cronjob

@@ -59,6 +59,17 @@ class Payment
     }
 
     /**
+     * Resets singleton class
+     * Needed for unit testing
+     *
+     * @return void
+     */
+    public static function destroyInstance()
+    {
+        self::$oInstance = null;
+    }
+
+    /**
      * Return all available Mollie payment methods
      *
      * @return array
@@ -214,12 +225,13 @@ class Payment
     public function loadMollieApi($sMode = false)
     {
         try {
-            if (!$this->getMollieToken($sMode)) {
+            $sMollieToken = $this->getMollieToken($sMode);
+            if (!$sMollieToken) {
                 throw new \Exception('Mollie API token is not configured');
             }
             if (class_exists('Mollie\Api\MollieApiClient')) {
-                $mollieApi = new \Mollie\Api\MollieApiClient();
-                $mollieApi->setApiKey($this->getMollieToken($sMode));
+                $mollieApi = oxNew(\Mollie\Api\MollieApiClient::class);
+                $mollieApi->setApiKey($sMollieToken);
 
                 $mollieApi->addVersionString("MollieOxid/".$this->getModuleVersion());
                 $mollieApi->addVersionString("Oxid/".$this->getShopVersion());

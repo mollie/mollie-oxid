@@ -29,6 +29,17 @@ class User
     }
 
     /**
+     * Resets singleton class
+     * Needed for unit testing
+     *
+     * @return void
+     */
+    public static function destroyInstance()
+    {
+        self::$oInstance = null;
+    }
+
+    /**
      * Splits single line address given by Apple Pay into 2 fields
      *
      * @param  array $aStreet
@@ -83,10 +94,6 @@ class User
      */
     public function getSalByFirstname($sFirstname)
     {
-        if(empty($sAdministrativeArea)) {
-            return false;
-        }
-
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $sQuery = "SELECT oxsal FROM oxuser WHERE oxfname = {$oDb->quote($sFirstname)} LIMIT 1";
         return $oDb->getOne($sQuery);
@@ -123,7 +130,7 @@ class User
         $aShippingContact = $oRequest->getRequestEscapedParameter('shippingContact');
         if (!empty($aShippingContact)) {
             $oUser->oxuser__oxusername = new Field($aShippingContact['emailAddress']);
-            $oUser = $this->updateUserFromApplePayData($oUser);
+            $this->updateUserFromApplePayData($oUser);
             $oUser->save();
         }
 
@@ -138,7 +145,7 @@ class User
      * @param  \OxidEsales\Eshop\Application\Model\User $oUser
      * @return void
      */
-    protected function updateUserFromApplePayData($oUser)
+    protected function updateUserFromApplePayData(&$oUser)
     {
         $aBillingContact = Registry::getRequest()->getRequestEscapedParameter('billingContact');
         if (!empty($aBillingContact)) {
@@ -242,7 +249,7 @@ class User
         ]);
 
         if ($oResponse && !empty($oResponse->id)) {
-            $oUser->oxuser__molliecustomerid->value = new Field($oResponse->id);
+            $oUser->oxuser__molliecustomerid = new Field($oResponse->id);
             $oUser->save();
         }
     }

@@ -203,8 +203,8 @@ abstract class Base
 
         $sCurrency = $oOrder->oxorder__oxcurrency->value;
 
-        $aOrderArticleListe = $oOrder->getOrderArticles();
-        foreach ($aOrderArticleListe->getArray() as $oOrderarticle) {
+        $aOrderArticleList = $oOrder->getOrderArticles();
+        foreach ($aOrderArticleList->getArray() as $oOrderarticle) {
             $oArticle = $oOrderarticle->getArticle();
             if ($oArticle instanceof OrderArticle) {
                 $oArticle = oxNew(Article::class);

@@ -36,7 +36,7 @@ class Scheduler
     protected function isCronjobDue(Base $oCronjob)
     {
         $iGracePeriod = 5; // Grace period timer to prevent cronjob not starting when crontab timer and minute invterval are exactly the same
-        if ((strtotime($oCronjob->getLastRunDateTime()) - $iGracePeriod) <= (time() - ($oCronjob->getMinuteInterval() * 60)) || empty($oCronjob->getLastRunDateTime())) {
+        if (empty($oCronjob->getLastRunDateTime()) || (strtotime($oCronjob->getLastRunDateTime()) - $iGracePeriod) <= (time() - ($oCronjob->getMinuteInterval() * 60))) {
             return true;
         }
         return false;

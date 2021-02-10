@@ -242,7 +242,7 @@ class Events
      *
      * @return boolean true or false
      */
-    protected static function addColumnIfNotExists($sTableName, $sColumnName, $sQuery, $aNewColumnDataQueries = array())
+    public static function addColumnIfNotExists($sTableName, $sColumnName, $sQuery, $aNewColumnDataQueries = array())
     {
         $aColumns = DatabaseProvider::getDb()->getAll("SHOW COLUMNS FROM {$sTableName} LIKE '{$sColumnName}'");
 
@@ -252,10 +252,10 @@ class Events
                 foreach ($aNewColumnDataQueries as $sQuery) {
                     DatabaseProvider::getDb()->Execute($sQuery);
                 }
+                return true;
             } catch (\Exception $e) {
                 // do nothing as of yet
             }
-            return true;
         }
         return false;
     }

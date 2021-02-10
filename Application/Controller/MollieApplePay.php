@@ -47,7 +47,7 @@ class MollieApplePay extends FrontendController
         $oBasket = Registry::getSession()->getBasket();
         $oBasket->setPayment('mollieapplepay');
 
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('paymentid', 'mollieapplepay');
+        Registry::getSession()->setVariable('paymentid', 'mollieapplepay');
 
         $sDetailsProductId = Registry::getRequest()->getRequestEscapedParameter('detailsProductId');
         if (!empty($sDetailsProductId)) { // applies when Apple Pay button on details page is pressed, since product is not in basket yet
@@ -55,7 +55,7 @@ class MollieApplePay extends FrontendController
             $oBasket->calculateBasket();
 
             $this->sDetailsProductBasketItemId = $oBasketItem->getBasketItemKey();
-            \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable("blAddedNewItem");
+            Registry::getSession()->deleteVariable("blAddedNewItem");
         }
         return $oBasket;
     }
@@ -132,7 +132,7 @@ class MollieApplePay extends FrontendController
         }
 
         $aResponse['success'] = $blSuccess;
-        return Registry::getUtils()->showMessageAndExit(json_encode($aResponse));
+        Registry::getUtils()->showMessageAndExit(json_encode($aResponse));
     }
 
     /**
@@ -158,7 +158,7 @@ class MollieApplePay extends FrontendController
         }
 
         $aResponse['success'] = $blSuccess;
-        return Registry::getUtils()->showMessageAndExit(json_encode($aResponse));
+        Registry::getUtils()->showMessageAndExit(json_encode($aResponse));
     }
 
     /**

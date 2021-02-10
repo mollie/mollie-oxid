@@ -303,7 +303,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     protected function getRefundParameters($blFull = true, $dFreeAmount = null)
     {
-        if($dFreeAmount !== null) {
+        if(!empty($dFreeAmount)) {
             $aParams = ["amount" => [
                 "currency" => $this->getOrder()->oxorder__oxcurrency->value,
                 "value" => $this->formatPrice($dFreeAmount)
@@ -367,19 +367,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
                     $aRefundItem['refund_amount'] = $aBasketItem['totalPrice'];
                 }
 
-                if ($aBasketItem['type'] == 'shipping_fee') {
-                    $oOrder->oxorder__molliedelcostrefunded = new Field((double)$oOrder->oxorder__molliedelcostrefunded->value + $aRefundItem['refund_amount']);
-                } elseif ($aBasketItem['type'] == 'payment_fee') {
-                    $oOrder->oxorder__molliepaycostrefunded = new Field((double)$oOrder->oxorder__molliepaycostrefunded->value + $aRefundItem['refund_amount']);
-                } elseif ($aBasketItem['type'] == 'wrapping') {
-                    $oOrder->oxorder__molliewrapcostrefunded = new Field((double)$oOrder->oxorder__molliewrapcostrefunded->value + $aRefundItem['refund_amount']);
-                } elseif ($aBasketItem['type'] == 'giftcard') {
-                    $oOrder->oxorder__molliegiftcardrefunded = new Field((double)$oOrder->oxorder__molliegiftcardrefunded->value + $aRefundItem['refund_amount']);
-                } elseif ($aBasketItem['type'] == 'voucher') {
-                    $oOrder->oxorder__mollievoucherdiscountrefunded = new Field((double)$oOrder->oxorder__mollievoucherdiscountrefunded->value + $aRefundItem['refund_amount']);
-                } elseif ($aBasketItem['type'] == 'discount') {
-                    $oOrder->oxorder__molliediscountrefunded = new Field((double)$oOrder->oxorder__molliediscountrefunded->value + $aRefundItem['refund_amount']);
-                }
+                $oOrder = $this->updateRefundedAmounts($oOrder, $aBasketItem['type'], $aRefundItem['refund_amount']);
             }
 
         }
@@ -387,6 +375,32 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
 
         $this->_oOrder = $oOrder; // update order for renderering the page
         $this->_aRefundItems = null;
+    }
+
+    /**
+     * Updated refunded amounts of order object
+     *
+     * @param object $oOrder
+     * @param string $sType
+     * @param double $dAmount
+     * @return object
+     */
+    protected function updateRefundedAmounts($oOrder, $sType, $dAmount)
+    {
+        if ($sType == 'shipping_fee') {
+            $oOrder->oxorder__molliedelcostrefunded = new Field((double)$oOrder->oxorder__molliedelcostrefunded->value + $dAmount);
+        } elseif ($sType == 'payment_fee') {
+            $oOrder->oxorder__molliepaycostrefunded = new Field((double)$oOrder->oxorder__molliepaycostrefunded->value + $dAmount);
+        } elseif ($sType == 'wrapping') {
+            $oOrder->oxorder__molliewrapcostrefunded = new Field((double)$oOrder->oxorder__molliewrapcostrefunded->value + $dAmount);
+        } elseif ($sType == 'giftcard') {
+            $oOrder->oxorder__molliegiftcardrefunded = new Field((double)$oOrder->oxorder__molliegiftcardrefunded->value + $dAmount);
+        } elseif ($sType == 'voucher') {
+            $oOrder->oxorder__mollievoucherdiscountrefunded = new Field((double)$oOrder->oxorder__mollievoucherdiscountrefunded->value + $dAmount);
+        } elseif ($sType == 'discount') {
+            $oOrder->oxorder__molliediscountrefunded = new Field((double)$oOrder->oxorder__molliediscountrefunded->value + $dAmount);
+        }
+        return $oOrder;
     }
 
     /**
@@ -625,29 +639,6 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             return false;
         }
         return true;
-    }
-
-    /**
-     * Returns user payment used for current order. In case current order was executed using
-     * credit card and user payment info is not stored in db (if \OxidEsales\Eshop\Core\Config::blStoreCreditCardInfo = false),
-     * just for preview user payment is set from oxPayment
-     *
-     * @param object $oOrder Order object
-     *
-     * @return oxUserPayment
-     */
-    protected function _getPaymentType($oOrder)
-    {
-        if (!($oUserPayment = $oOrder->getPaymentType()) && $oOrder->oxorder__oxpaymenttype->value) {
-            $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
-            if ($oPayment->load($oOrder->oxorder__oxpaymenttype->value)) {
-                // in case due to security reasons payment info was not kept in db
-                $oUserPayment = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
-                $oUserPayment->oxpayments__oxdesc = new \OxidEsales\Eshop\Core\Field($oPayment->oxpayments__oxdesc->value);
-            }
-        }
-
-        return $oUserPayment;
     }
 
     /**
