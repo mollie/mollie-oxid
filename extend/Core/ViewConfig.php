@@ -36,25 +36,6 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
-     * Returns the configured home country of the shop
-     *
-     * @return bool
-     */
-    protected function mollieGetHomeCountry()
-    {
-        $aHomeCountries = Registry::getConfig()->getConfigParam('aHomeCountry');
-        if (!empty($aHomeCountries)) {
-            $sCountryId = current($aHomeCountries); // get first element
-
-            $oCountry = oxNew(\OxidEsales\Eshop\Application\Model\Country::class);
-            if ($oCountry->load($sCountryId)) {
-                return $oCountry;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Returns iso2 country code of the homecountry of the shop
      *
      * @return string|bool

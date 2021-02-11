@@ -79,16 +79,6 @@ class Order extends Order_parent
     }
 
     /**
-     * Generate Mollie payment model from paymentId
-     *
-     * @return \Mollie\Payment\Application\Model\Payment\Base
-     */
-    public function mollieGetPaymentModel()
-    {
-        return PaymentHelper::getInstance()->getMolliePaymentModel($this->oxorder__oxpaymenttype->value);
-    }
-
-    /**
      * Getter for blMollieIsApplePayButtonMode property
      *
      * @return bool
@@ -96,6 +86,16 @@ class Order extends Order_parent
     public function mollieIsApplePayButtonMode()
     {
         return $this->blMollieIsApplePayButtonMode;
+    }
+
+    /**
+     * Generate Mollie payment model from paymentId
+     *
+     * @return \Mollie\Payment\Application\Model\Payment\Base
+     */
+    public function mollieGetPaymentModel()
+    {
+        return PaymentHelper::getInstance()->getMolliePaymentModel($this->oxorder__oxpaymenttype->value);
     }
 
     /**
@@ -185,7 +185,7 @@ class Order extends Order_parent
      */
     public function mollieIsPaid()
     {
-        if ($this->oxorder__oxpaid->value != "0000-00-00 00:00:00") {
+        if (!empty($this->oxorder__oxpaid->value) && $this->oxorder__oxpaid->value != "0000-00-00 00:00:00") {
             return true;
         }
         return false;
@@ -536,7 +536,7 @@ class Order extends Order_parent
             }
         }
     }
-    
+
     /**
      * Returns finish payment url
      *
@@ -622,7 +622,7 @@ class Order extends Order_parent
     /**
      * Tries to finish an order which was paid but where the customer seemingly didnt return to the shop after payment to finish the order process
      *
-     * @return void
+     * @return integer
      */
     public function mollieFinishOrder()
     {
@@ -632,7 +632,7 @@ class Order extends Order_parent
         $this->blMollieFinishOrderReturnMode = true;
 
         //finalizing order (skipping payment execution, vouchers marking and mail sending)
-        $iRet = $this->finalizeOrder($oBasket, $this->getOrderUser());
+        return $this->finalizeOrder($oBasket, $this->getOrderUser());
     }
 
     /**

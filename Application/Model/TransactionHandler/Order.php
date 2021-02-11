@@ -27,8 +27,7 @@ class Order extends Base
         $sLastPaymentStatus = isset($oLastPayment) ? $oLastPayment->status : null;
         if ($sLastPaymentStatus == 'canceled' || $sLastPaymentStatus == 'failed' || $sLastPaymentStatus == 'expired') {
             $oOrder->cancelOrder();
-            $msg = ['success' => false, 'status' => $sLastPaymentStatus];
-            return $msg;
+            return ['success' => false, 'status' => $sLastPaymentStatus];
         }
 
         if ($oTransaction->isPaid() || $oTransaction->isAuthorized()) {

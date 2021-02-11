@@ -25,6 +25,17 @@ class DeliverySet
     }
 
     /**
+     * Resets singleton class
+     * Needed for unit testing
+     *
+     * @return void
+     */
+    public static function destroyInstance()
+    {
+        self::$oInstance = null;
+    }
+
+    /**
      * Returns object of the configured home country
      *
      * @return bool|object
@@ -75,10 +86,6 @@ class DeliverySet
 
         if (count($aDeliveryList) > 0) {
             foreach ($aDeliveryList as $oDelivery) {
-                //debug trace
-                if ($myConfig->getConfigParam('iDebug') == 5) {
-                    echo("DelCost : " . $oDelivery->oxdelivery__oxtitle->value . "<br>");
-                }
                 $oDeliveryPrice->addPrice($oDelivery->getDeliveryPrice($fDelVATPercent));
             }
         }

@@ -85,6 +85,10 @@ class Email extends Email_parent
         $this->setRecipient($oOrder->oxorder__oxbillemail->value, $fullName);
         $this->setReplyTo($shop->oxshops__oxorderemail->value, $shop->oxshops__oxname->getRawValue());
 
+        if (defined('OXID_PHP_UNIT')) { // dont send email when unittesting
+            return true;
+        }
+
         return $this->send();
     }
 }

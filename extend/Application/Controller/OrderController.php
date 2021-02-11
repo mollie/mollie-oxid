@@ -44,13 +44,14 @@ class OrderController extends OrderController_parent
      * Writes error-status to session and redirects to payment page
      *
      * @param string $sErrorLangIdent
-     * @return void
+     * @return false
      */
     protected function redirectWithError($sErrorLangIdent)
     {
         Registry::getSession()->setVariable('payerror', -50);
         Registry::getSession()->setVariable('payerrortext', Registry::getLang()->translateString($sErrorLangIdent));
         Registry::getUtils()->redirect(Registry::getConfig()->getCurrentShopUrl().'index.php?cl=payment');
+        return false; // execution ends with redirect - return used for unit tests
     }
 
     /**
@@ -65,12 +66,12 @@ class OrderController extends OrderController_parent
 
             $oOrder = $this->mollieGetOrder();
             if (!$oOrder) {
-                $this->redirectWithError('MOLLIE_ERROR_ORDER_NOT_FOUND');
+                return $this->redirectWithError('MOLLIE_ERROR_ORDER_NOT_FOUND');
             }
 
             $sTransactionId = $oOrder->oxorder__oxtransid->value;
             if (empty($sTransactionId)) {
-                $this->redirectWithError('MOLLIE_ERROR_TRANSACTIONID_NOT_FOUND');
+                return $this->redirectWithError('MOLLIE_ERROR_TRANSACTIONID_NOT_FOUND');
             }
 
             $aResult = $oOrder->mollieGetPaymentModel()->getTransactionHandler()->processTransaction($oOrder, 'success');
@@ -84,7 +85,7 @@ class OrderController extends OrderController_parent
                 } elseif ($aResult['status'] == 'failed') {
                     $sErrorIdent = 'MOLLIE_ERROR_ORDER_FAILED';
                 }
-                $this->redirectWithError($sErrorIdent);
+                return $this->redirectWithError($sErrorIdent);
             }
 
             // else - continue to parent::execute since success must be true

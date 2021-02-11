@@ -26,7 +26,7 @@ class OrderMain extends OrderMain_parent
      */
     public function save()
     {
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestParameter('editval');
 
         $blUpdateTrackingCode = false;
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);

@@ -53,7 +53,7 @@ class Payment extends Base
             $blSuccess = true;
         }
 
-        if (($oTransaction->isCanceled() || $oTransaction->isExpired() || $oTransaction->isExpired())) {
+        if (($oTransaction->isCanceled() || $oTransaction->isExpired())) {
             $oOrder->cancelOrder();
         }
 
