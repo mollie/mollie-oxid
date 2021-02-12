@@ -290,6 +290,11 @@ class Events
      */
     protected static function deactivePaymentMethods()
     {
+        $oRequest = Registry::getRequest();
+        if ($oRequest->getRequestParameter('cl') == 'module_config' && $oRequest->getRequestParameter('fnc') == 'save') {
+            return; // Dont deactivate payment methods when changing config in admin ( this triggers module deactivation )
+        }
+
         DatabaseProvider::getDb()->Execute("UPDATE oxpayments SET oxactive = 0 WHERE oxid IN ('".implode("','", array_keys(self::getMolliePaymentMethods()))."')");
     }
 }
