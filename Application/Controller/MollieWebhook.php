@@ -16,27 +16,6 @@ class MollieWebhook extends FrontendController
     protected $_sThisTemplate = 'molliewebhook.tpl';
 
     /**
-     * Gather order id for the given transaction id from the db and load the order object if possible
-     *
-     * @param string $sTransactionId
-     * @return Order|false
-     */
-    protected function getOrderByTransactionId($sTransactionId)
-    {
-        $sQuery = "SELECT oxid FROM oxorder WHERE oxtransid = ?";
-
-        $sOrderId = DatabaseProvider::getDb()->getOne($sQuery, array($sTransactionId));
-        if (!empty($sOrderId)) {
-            $oOrder = oxNew(Order::class);
-            $oOrder->load($sOrderId);
-            if ($oOrder->isLoaded()) {
-                return $oOrder;
-            }
-        }
-        return false;
-    }
-
-    /**
      * The render function
      */
     public function render()
@@ -47,8 +26,8 @@ class MollieWebhook extends FrontendController
 
         $sTransactionId = Registry::getRequest()->getRequestParameter('id');
         if (!empty($sTransactionId)) {
-            $oOrder = $this->getOrderByTransactionId($sTransactionId);
-            if ($oOrder) {
+            $oOrder = oxNew(Order::class);
+            if ($oOrder->mollieLoadOrderByTransactionId($sTransactionId) === true) {
                 $oOrder->mollieGetPaymentModel()->getTransactionHandler()->processTransaction($oOrder);
             } else {
                 // Throw HTTP error when order not found, this will trigger Mollie to retry sending the status

@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\extend\Application\Controller\Admin;
 
+use Mollie\Payment\Application\Helper\Database;
 use Mollie\Payment\Application\Helper\Payment;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
@@ -179,10 +180,8 @@ class ModuleConfiguration extends ModuleConfiguration_parent
      */
     public function deleteMollieAltLogo()
     {
-        $oDb = DatabaseProvider::getDb();
         $sDeleteConfVar = Registry::getRequest()->getRequestEscapedParameter('mollieDeleteAltLogo');
 
-        $sQuery = "DELETE FROM oxconfig WHERE oxvarname = ".$oDb->quote($sDeleteConfVar)." AND oxshopid = '".$this->getConfig()->getShopId()."' AND oxvartype = 'str'";
-        DatabaseProvider::getDb()->Execute($sQuery);
+        Database::getInstance()->deleteMollieAltLogo($sDeleteConfVar);
     }
 }

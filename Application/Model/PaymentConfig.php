@@ -74,15 +74,15 @@ class PaymentConfig
      */
     protected function handleData($sPaymentId, $sMollieApi, $aCustomConfig)
     {
-        $oDb = DatabaseProvider::getDb();
+        $sConfig = $this->encodeCustomConfig($aCustomConfig);
 
-        $sPaymentId = $oDb->quote($sPaymentId);
-        $sMollieApi = $oDb->quote($sMollieApi);
-        $sConfig = $oDb->quote($this->encodeCustomConfig($aCustomConfig));
+        $sQuery = "INSERT INTO ".self::$sTableName." (OXID, API, CONFIG) VALUES(:paymentid, :mollieapi, :config) ON DUPLICATE KEY UPDATE API = :mollieapi, CONFIG = :config";
 
-        $sQuery = "INSERT INTO ".self::$sTableName." (OXID, API, CONFIG) VALUES({$sPaymentId}, {$sMollieApi}, {$sConfig}) ON DUPLICATE KEY UPDATE API = {$sMollieApi}, CONFIG = {$sConfig}";
-
-        DatabaseProvider::getDb()->Execute($sQuery);
+        DatabaseProvider::getDb()->Execute($sQuery, [
+            ':paymentid' => $sPaymentId,
+            ':mollieapi' => $sMollieApi,
+            ':config' => $sConfig,
+        ]);
 
         return true;
     }
@@ -97,8 +97,8 @@ class PaymentConfig
     {
         $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
 
-        $sQuery = "SELECT * FROM ".self::$sTableName." WHERE OXID = ".$oDb->quote($sPaymentId)." LIMIT 1";
-        $aResult = $oDb->getRow($sQuery);
+        $sQuery = "SELECT * FROM ".self::$sTableName." WHERE OXID = ? LIMIT 1";
+        $aResult = $oDb->getRow($sQuery, array($sPaymentId));
 
         $aReturn = [];
         if (!empty($aResult)) {

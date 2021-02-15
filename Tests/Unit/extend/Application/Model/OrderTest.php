@@ -684,4 +684,16 @@ class OrderTest extends UnitTestCase
 
         $this->assertEquals(Order::ORDER_STATE_OK, $result);
     }
+
+    public function testMollieLoadOrderByTransactionId()
+    {
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("REPLACE INTO oxorder (OXID, OXTRANSID) VALUE ('webhookTest', 'testTransId')");
+
+        $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
+        $result = $oOrder->mollieLoadOrderByTransactionId('testTransId');
+
+        $this->assertTrue($result);
+
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('DELETE FROM oxorder WHERE oxid = "webhookTest"');
+    }
 }

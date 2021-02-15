@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Core;
 
+use Mollie\Payment\Application\Helper\Database;
 use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -150,10 +151,14 @@ class Events
         if ($blNewlyAdded === true) {
             //Insert basic payment method configuration
             foreach (self::$aGroupsToAdd as $sGroupId) {
-                DatabaseProvider::getDb()->Execute("INSERT INTO oxobject2group(OXID,OXSHOPID,OXOBJECTID,OXGROUPSID) values (REPLACE(UUID(),'-',''), '".Registry::getConfig()->getShopId()."', '{$sPaymentId}', '{$sGroupId}');");
+                DatabaseProvider::getDb()->Execute("INSERT INTO oxobject2group(OXID,OXSHOPID,OXOBJECTID,OXGROUPSID) values (REPLACE(UUID(),'-',''), :shopid, :paymentid, :groupid);", [
+                    ':shopid' => Registry::getConfig()->getShopId(),
+                    ':paymentid' => $sPaymentId,
+                    ':groupid' => $sGroupId,
+                ]);
             }
 
-            self::insertRowIfNotExists('oxobject2payment', array('OXPAYMENTID' => $sPaymentId, 'OXTYPE' => 'oxdelset'), "INSERT INTO oxobject2payment(OXID,OXPAYMENTID,OXOBJECTID,OXTYPE) values (REPLACE(UUID(),'-',''), '{$sPaymentId}', 'oxidstandard', 'oxdelset');");
+            self::insertRowIfNotExists('oxobject2payment', array('OXPAYMENTID' => $sPaymentId, 'OXTYPE' => 'oxdelset'), "INSERT INTO oxobject2payment(OXID,OXPAYMENTID,OXOBJECTID,OXTYPE) values (REPLACE(UUID(),'-',''), :paymentid, 'oxidstandard', 'oxdelset');", [':paymentid' => $sPaymentId]);
         }
     }
 
@@ -177,8 +182,8 @@ class Events
      */
     protected static function deletePaymentMethod($sPaymentId)
     {
-        DatabaseProvider::getDb()->Execute("DELETE FROM oxpayments WHERE oxid = '".$sPaymentId."'");
-        DatabaseProvider::getDb()->Execute("DELETE FROM ".PaymentConfig::$sTableName." WHERE oxid = '".$sPaymentId."'");
+        DatabaseProvider::getDb()->Execute("DELETE FROM oxpayments WHERE oxid = ?", array($sPaymentId));
+        DatabaseProvider::getDb()->Execute("DELETE FROM ".PaymentConfig::$sTableName." WHERE oxid = ?", array($sPaymentId));
     }
 
     /**
@@ -224,7 +229,7 @@ class Events
      */
     protected static function addTableIfNotExists($sTableName, $sQuery)
     {
-        $aTables = DatabaseProvider::getDb()->getAll("SHOW TABLES LIKE '{$sTableName}'");
+        $aTables = DatabaseProvider::getDb()->getAll("SHOW TABLES LIKE ?", array($sTableName));
         if (!$aTables || count($aTables) == 0) {
             DatabaseProvider::getDb()->Execute($sQuery);
             return true;
@@ -244,8 +249,7 @@ class Events
      */
     public static function addColumnIfNotExists($sTableName, $sColumnName, $sQuery, $aNewColumnDataQueries = array())
     {
-        $aColumns = DatabaseProvider::getDb()->getAll("SHOW COLUMNS FROM {$sTableName} LIKE '{$sColumnName}'");
-
+        $aColumns = DatabaseProvider::getDb()->getAll("SHOW COLUMNS FROM {$sTableName} LIKE ?", array($sColumnName));
         if (empty($aColumns)) {
             try {
                 DatabaseProvider::getDb()->Execute($sQuery);
@@ -266,10 +270,11 @@ class Events
      * @param string $sTableName database table name
      * @param array  $aKeyValue  keys of rows to add for existance check
      * @param string $sQuery     sql-query to insert data
+     * @param array  $aParams    sql-query insert parameters
      *
      * @return boolean true or false
      */
-    protected static function insertRowIfNotExists($sTableName, $aKeyValue, $sQuery)
+    protected static function insertRowIfNotExists($sTableName, $aKeyValue, $sQuery, $aParams = [])
     {
         $sCheckQuery = "SELECT * FROM {$sTableName} WHERE 1";
         foreach ($aKeyValue as $key => $value) {
@@ -277,7 +282,7 @@ class Events
         }
 
         if (!DatabaseProvider::getDb()->getOne($sCheckQuery)) { // row not existing yet?
-            DatabaseProvider::getDb()->Execute($sQuery);
+            DatabaseProvider::getDb()->Execute($sQuery, $aParams);
             return true;
         }
         return false;
@@ -290,6 +295,12 @@ class Events
      */
     protected static function deactivePaymentMethods()
     {
-        DatabaseProvider::getDb()->Execute("UPDATE oxpayments SET oxactive = 0 WHERE oxid IN ('".implode("','", array_keys(self::getMolliePaymentMethods()))."')");
+        $oRequest = Registry::getRequest();
+        if ($oRequest->getRequestParameter('cl') == 'module_config' && $oRequest->getRequestParameter('fnc') == 'save') {
+            return; // Dont deactivate payment methods when changing config in admin ( this triggers module deactivation )
+        }
+
+        $aInValues = array_keys(self::getMolliePaymentMethods());
+        DatabaseProvider::getDb()->Execute("UPDATE oxpayments SET oxactive = 0 WHERE oxid IN ".Database::getInstance()->getPreparedInStatement($aInValues), $aInValues);
     }
 }

@@ -70,19 +70,20 @@ class User
             return false;
         }
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $sQuery = "SELECT 
                        oxid 
                    FROM 
                        oxstates 
                    WHERE 
-                       oxtitle = {$oDb->quote($sAdministrativeArea)} OR 
-                       oxtitle_1 = {$oDb->quote($sAdministrativeArea)} OR 
-                       oxtitle_2 = {$oDb->quote($sAdministrativeArea)} OR 
-                       oxtitle_3 = {$oDb->quote($sAdministrativeArea)} OR 
-                       oxisoalpha2 = {$oDb->quote($sAdministrativeArea)}
+                       oxtitle = :state OR 
+                       oxtitle_1 = :state OR 
+                       oxtitle_2 = :state OR 
+                       oxtitle_3 = :state OR 
+                       oxisoalpha2 = :state
                    LIMIT 1";
-        return $oDb->getOne($sQuery);
+        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQuery, [
+            ':state' => $sAdministrativeArea,
+        ]);
     }
 
     /**
@@ -94,9 +95,8 @@ class User
      */
     public function getSalByFirstname($sFirstname)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sQuery = "SELECT oxsal FROM oxuser WHERE oxfname = {$oDb->quote($sFirstname)} LIMIT 1";
-        return $oDb->getOne($sQuery);
+        $sQuery = "SELECT oxsal FROM oxuser WHERE oxfname = ? LIMIT 1";
+        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQuery, array($sFirstname));
     }
 
     /**
@@ -189,9 +189,8 @@ class User
      */
     protected function getUserIdByEmail($sApplePayEmail)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sQuery = "SELECT oxid FROM oxuser WHERE oxusername = {$oDb->quote($sApplePayEmail)} LIMIT 1";
-        return $oDb->getOne($sQuery);
+        $sQuery = "SELECT oxid FROM oxuser WHERE oxusername = ? LIMIT 1";
+        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQuery, array($sApplePayEmail));
     }
 
     /**

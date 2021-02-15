@@ -243,8 +243,7 @@ class Order extends Order_parent
      */
     public function mollieSetTransactionId($sTransactionId)
     {
-        $oDb = DatabaseProvider::getDb();
-        $oDb->execute('UPDATE oxorder SET oxtransid = '.$oDb->quote($sTransactionId).' WHERE oxid = '.$oDb->quote($this->getId()));
+        DatabaseProvider::getDb()->execute('UPDATE oxorder SET oxtransid = ? WHERE oxid = ?', array($sTransactionId, $this->getId()));
 
         $this->oxorder__oxtransid = new Field($sTransactionId);
     }
@@ -660,5 +659,24 @@ class Order extends Order_parent
         \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('mollieReinitializePaymentMode', true);
 
         return $this->finalizeOrder($oBasket, $oUser);
+    }
+
+    /**
+     * Retrieves order id connected to given transaction id and trys to load it
+     * Returns if order was found and loading was a success
+     *
+     * @param string $sTransactionId
+     * @return bool
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     */
+    public function mollieLoadOrderByTransactionId($sTransactionId)
+    {
+        $sQuery = "SELECT oxid FROM oxorder WHERE oxtransid = ?";
+
+        $sOrderId = DatabaseProvider::getDb()->getOne($sQuery, array($sTransactionId));
+        if (!empty($sOrderId)) {
+            return $this->load($sOrderId);
+        }
+        return false;
     }
 }

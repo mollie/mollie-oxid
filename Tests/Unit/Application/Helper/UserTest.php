@@ -27,7 +27,7 @@ class UserTest extends UnitTestCase
         $expected = "unitTestState";
 
         $title = "UnitTestState Title";
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('INSERT INTO oxstates (oxid, oxtitle) VALUES ("unitTestState", "'.$title.'")');
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('INSERT INTO oxstates (oxid, oxtitle) VALUES ("unitTestState", ?)', array($title));
 
         $oUser = User::getInstance();
         $result = $oUser->getStateFromAdministrativeArea($title);
@@ -45,7 +45,7 @@ class UserTest extends UnitTestCase
         $this->assertFalse($result);
 
         $expected = "test";
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('INSERT INTO oxuser (oxid, oxfname, oxsal) VALUES ("unitTestUser", "TestName - existant", "'.$expected.'")');
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('INSERT INTO oxuser (oxid, oxfname, oxsal) VALUES ("unitTestUser", "TestName - existant", ?)', array($expected));
 
         $result = $oUser->getSalByFirstname("TestName - existant");
         $this->assertEquals($expected, $result);

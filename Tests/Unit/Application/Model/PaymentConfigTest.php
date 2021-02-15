@@ -25,7 +25,7 @@ class PaymentConfigTest extends UnitTestCase
 
         $this->assertTrue($result);
 
-        $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT oxid FROM ".PaymentConfig::$sTableName." WHERE oxid = '".$sPaymentId."'");
+        $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT oxid FROM ".PaymentConfig::$sTableName." WHERE oxid = ?", array($sPaymentId));
 
         $this->assertEquals($sPaymentId, $result);
     }

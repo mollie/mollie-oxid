@@ -53,7 +53,7 @@ class OrderExpiryTest extends UnitTestCase
 
         Registry::set(Config::class, $oConfig);
 
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("INSERT INTO oxorder (OXID, OXSTORNO, OXPAYMENTTYPE, OXORDERDATE, OXFOLDER) VALUE ('orderExpiryTest', 0, 'molliebanktransfer', '".date('Y-m-d H:i:s', time() - (60 * 60 * 24 * $iExpiryDays) - 360)."', '".$sFolder."')");
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("INSERT INTO oxorder (OXID, OXSTORNO, OXPAYMENTTYPE, OXORDERDATE, OXFOLDER) VALUE ('orderExpiryTest', 0, 'molliebanktransfer', ?, ?)", array(date('Y-m-d H:i:s', time() - (60 * 60 * 24 * $iExpiryDays) - 360), $sFolder));
 
         $oCronjob = new OrderExpiry();
         $result = $oCronjob->startCronjob();

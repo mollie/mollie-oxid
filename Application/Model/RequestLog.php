@@ -106,8 +106,8 @@ class RequestLog
         $oDb = DatabaseProvider::getDb();
         $oDb->setFetchMode(DatabaseProvider::FETCH_MODE_ASSOC);
 
-        $sQuery = "SELECT * FROM ".self::$sTableName." WHERE orderid = ".$oDb->quote($sOrderId)." AND ((requesttype = 'order' AND responsestatus = 'created') OR (requesttype = 'payment' AND responsestatus = 'open')) AND response LIKE '%checkoutUrl%'";
-        $aRow = $oDb->getRow($sQuery);
+        $sQuery = "SELECT * FROM ".self::$sTableName." WHERE orderid = ? AND ((requesttype = 'order' AND responsestatus = 'created') OR (requesttype = 'payment' AND responsestatus = 'open')) AND response LIKE '%checkoutUrl%'";
+        $aRow = $oDb->getRow($sQuery, array($sOrderId));
         if ($aRow) {
             return $aRow;
         }
@@ -141,13 +141,15 @@ class RequestLog
         $sQuery = " INSERT INTO `".self::$sTableName."` (
                         ORDERID, STOREID, REQUESTTYPE, RESPONSESTATUS, REQUEST, RESPONSE
                     ) VALUES (
-                        {$oDb->quote($sOrderId)},
-                        {$oDb->quote($sStoreId)},
-                        {$oDb->quote($sRequestType)},
-                        {$oDb->quote($sResponseStatus)},
-                        {$oDb->quote($sSavedRequest)},
-                        {$oDb->quote($sSavedResponse)}
+                        :orderid, :storeid, :requesttype, :responsestatus, :savedrequest, :savedresponse
                     )";
-        $oDb->Execute($sQuery);
+        $oDb->Execute($sQuery, [
+            ':orderid' => $sOrderId,
+            ':storeid' => $sStoreId,
+            ':requesttype' => $sRequestType,
+            ':responsestatus' => $sResponseStatus,
+            ':savedrequest' => $sSavedRequest,
+            ':savedresponse' => $sSavedResponse,
+        ]);
     }
 }
