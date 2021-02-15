@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Model\Cronjob;
 
+use Mollie\Payment\Application\Helper\Database;
 use Mollie\Payment\Application\Helper\Payment;
 use OxidEsales\Eshop\Application\Model\Order;
 use Mollie\Payment\Application\Model\Payment\Base;
@@ -59,8 +60,9 @@ class OrderExpiry extends \Mollie\Payment\Application\Model\Cronjob\Base
                     $aFolders[] = $sBanktransferPending;
                 }
             }
-            $sQuery = "SELECT OXID FROM oxorder WHERE oxstorno = 0 AND oxpaymenttype = '{$oPaymentModel->getOxidPaymentId()}' AND oxfolder IN ('".implode("','", $aFolders)."') AND oxorderdate < DATE_ADD(NOW(), INTERVAL -{$iExpiryDays} DAY)";
-            $aResult = DatabaseProvider::getDb()->getAll($sQuery);
+
+            $sQuery = "SELECT OXID FROM oxorder WHERE oxstorno = 0 AND oxpaymenttype = ? AND oxfolder IN ".Database::getInstance()->getPreparedInStatement($aFolders)." AND oxorderdate < DATE_ADD(NOW(), INTERVAL ? DAY)";
+            $aResult = DatabaseProvider::getDb()->getAll($sQuery, array_merge([$oPaymentModel->getOxidPaymentId()], $aFolders, ["-".$iExpiryDays]));
             foreach ($aResult as $aRow) {
                 $aOrders[] = $aRow[0];
             }

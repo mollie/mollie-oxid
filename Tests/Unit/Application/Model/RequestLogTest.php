@@ -57,7 +57,7 @@ class RequestLogTest extends UnitTestCase
         $oRequestLog = new RequestLog();
         $oRequestLog->logExceptionResponse(['foo' => 'bar'], 'test', 'test', 'mollietest', $sOrderId);
 
-        $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT orderid FROM ".RequestLog::$sTableName." WHERE orderid = '".$sOrderId."'");
+        $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT orderid FROM ".RequestLog::$sTableName." WHERE orderid = ?", array($sOrderId));
 
         $this->assertEquals($sOrderId, $result);
     }

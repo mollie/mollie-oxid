@@ -24,7 +24,7 @@ class OrderArticleTest extends UnitTestCase
         $iStock = 10;
         $iOrderedAmount = 2;
 
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('INSERT INTO oxarticles (OXID, OXSTOCK) VALUES ("'.$sProdId.'", '.$iStock.')');
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('INSERT INTO oxarticles (OXID, OXSTOCK) VALUES (?, ?)', array($sProdId, $iStock));
 
         $oOrderArticle = new \Mollie\Payment\extend\Application\Model\OrderArticle();
         $oOrderArticle->setId("testOrderArticle");
@@ -35,7 +35,7 @@ class OrderArticleTest extends UnitTestCase
 
         $oOrderArticle->mollieUncancelOrderArticle();
 
-        $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT OXSTOCK FROM oxarticles WHERE oxid = '{$sProdId}'");
+        $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT OXSTOCK FROM oxarticles WHERE oxid = ?", array($sProdId));
 
         $this->assertEquals(8, $result);
     }

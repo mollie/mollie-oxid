@@ -28,7 +28,7 @@ class UserTest extends UnitTestCase
 
         $oUser->mollieSetAutoGroups();
 
-        $iCount = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT COUNT(OXID) FROM oxobject2group WHERE oxobjectid = '{$sUserId}'");
+        $iCount = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT COUNT(OXID) FROM oxobject2group WHERE oxobjectid = ?", array($sUserId));
 
         $this->assertGreaterThan(0, $iCount);
     }

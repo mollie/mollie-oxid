@@ -23,7 +23,7 @@ class CronjobTest extends UnitTestCase
         $oCronjob = Cronjob::getInstance();
         $oCronjob->addNewCronjob($sTestId, 5);
 
-        $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT oxid FROM ".Cronjob::$sTableName." WHERE oxid = '".$sTestId."'");
+        $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT oxid FROM ".Cronjob::$sTableName." WHERE oxid = ?", array($sTestId));
 
         $this->assertEquals($sTestId, $result);
     }

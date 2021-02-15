@@ -25,20 +25,4 @@ class OrderOverviewTest extends UnitTestCase
 
         $this->assertNull($result);
     }
-/* TODO: Move to RefundOrder Controller
-    public function testMollieSendSecondChanceEmail()
-    {
-        $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
-        $oOrder->method('load')->willReturn(true);
-        $oOrder->method('mollieIsMolliePaymentUsed')->willReturn(true);
-
-        UtilsObject::setClassInstance(Order::class, $oOrder);
-
-        $oOrderOverview = new \Mollie\Payment\extend\Application\Controller\Admin\OrderOverview();
-
-        $result = $oOrderOverview->mollieSendSecondChanceEmail();
-
-        $this->assertNull($result);
-    }
-*/
 }

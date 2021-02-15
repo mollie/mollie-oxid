@@ -5,6 +5,7 @@ namespace Mollie\Payment\Tests\Unit\extend\Application\Controller\Admin;
 
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Request;
 use OxidEsales\TestingLibrary\UnitTestCase;
 
 class ModuleConfigurationTest extends UnitTestCase
@@ -190,6 +191,14 @@ class ModuleConfigurationTest extends UnitTestCase
 
         Registry::set(\OxidEsales\Eshop\Core\UtilsFile::class, $oUtilsFile);
 
+        $oRequest = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $oRequest->method('getRequestParameter')->willReturnMap([
+            ['cl', null, 'module_config'],
+            ['fnc', null, 'save'],
+        ]);
+
+        Registry::set(Request::class, $oRequest);
+        
         $oModuleConfigController = oxNew($this->getProxyClassName(\Mollie\Payment\extend\Application\Controller\Admin\ModuleConfiguration::class));
         $oModuleConfigController->setNonPublicVar('_sModuleId', "molliepayment");
         $oModuleConfigController->setEditObjectId("molliepayment");

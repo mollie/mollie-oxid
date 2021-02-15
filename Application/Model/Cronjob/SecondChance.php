@@ -50,13 +50,13 @@ class SecondChance extends \Mollie\Payment\Application\Model\Cronjob\Base
                         oxorder 
                     WHERE 
                         oxpaymenttype LIKE '%mollie%' AND 
-                        oxorderdate > '".$sTriggerMinDate."' AND 
-                        oxorderdate < '".$sTriggerDate."' AND 
+                        oxorderdate > ? AND 
+                        oxorderdate < ? AND 
                         oxtransstatus = 'NOT_FINISHED' AND  
                         oxpaid = '0000-00-00 00:00:00' AND
                         molliesecondchancemailsent = '0000-00-00 00:00:00';";
 
-        $aResult = DatabaseProvider::getDb()->getAll($sQuery);
+        $aResult = DatabaseProvider::getDb()->getAll($sQuery, array($sTriggerMinDate, $sTriggerDate));
         foreach ($aResult as $aRow) {
             $aOrders[] = $aRow[0];
         }

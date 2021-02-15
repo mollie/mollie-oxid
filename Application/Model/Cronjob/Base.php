@@ -43,7 +43,7 @@ class Base
     public function __construct()
     {
         $oCronjob = Cronjob::getInstance();
-        if ($oCronjob->isCronjobAlreadyExisting($this->getCronjobId()) === false) {
+        if ($this->getCronjobId() !== null && $oCronjob->isCronjobAlreadyExisting($this->getCronjobId()) === false) {
             $oCronjob->addNewCronjob($this->getCronjobId(), $this->getDefaultMinuteInterval());
         }
         $this->loadDbData();

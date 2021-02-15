@@ -56,11 +56,12 @@ class Cronjob
      */
     public function addNewCronjob($sCronjobId, $iDefaultMinuteInterval)
     {
-        $oDb = DatabaseProvider::getDb();
+        $sQuery = "INSERT INTO `".self::$sTableName."` (OXID, MINUTE_INTERVAL, LAST_RUN) VALUES(:oxid, :minuteinterval, '0000-00-00 00:00:00');";
 
-        $sQuery = "INSERT INTO `".self::$sTableName."` (OXID, MINUTE_INTERVAL, LAST_RUN) VALUES(".$oDb->quote($sCronjobId).", ".$oDb->quote($iDefaultMinuteInterval).", '0000-00-00 00:00:00');";
-
-        DatabaseProvider::getDb()->Execute($sQuery);
+        DatabaseProvider::getDb()->Execute($sQuery, [
+            ':oxid' => $sCronjobId,
+            ':minuteinterval' => $iDefaultMinuteInterval,
+        ]);
     }
 
     /**
@@ -71,9 +72,8 @@ class Cronjob
      */
     public function isCronjobAlreadyExisting($sCronjobId)
     {
-        $oDb = DatabaseProvider::getDb();
-        $sQuery = "SELECT OXID FROM `".self::$sTableName."` WHERE OXID = ".$oDb->quote($sCronjobId).";";
-        if (!DatabaseProvider::getDb()->getOne($sQuery)) {
+        $sQuery = "SELECT OXID FROM `".self::$sTableName."` WHERE OXID = ?;";
+        if (!DatabaseProvider::getDb()->getOne($sQuery, array($sCronjobId))) {
             return false;
         }
         return true;
@@ -87,7 +87,7 @@ class Cronjob
      */
     public function markCronjobAsFinished($sCronjobId)
     {
-        DatabaseProvider::getDb()->execute("UPDATE `".self::$sTableName."` SET LAST_RUN = NOW() WHERE OXID = '{$sCronjobId}';");
+        DatabaseProvider::getDb()->execute("UPDATE `".self::$sTableName."` SET LAST_RUN = NOW() WHERE OXID = ?;", array($sCronjobId));
     }
 
     /**
@@ -100,7 +100,7 @@ class Cronjob
     {
         $oDb = DatabaseProvider::getDb(true);
         $oDb->setFetchMode(DatabaseInterface::FETCH_MODE_ASSOC);
-        $sQuery = "SELECT * FROM `".self::$sTableName."` WHERE OXID = ".$oDb->quote($sCronjobId).";";
-        return $oDb->getRow($sQuery);
+        $sQuery = "SELECT * FROM `".self::$sTableName."` WHERE OXID = ?;";
+        return $oDb->getRow($sQuery, array($sCronjobId));
     }
 }

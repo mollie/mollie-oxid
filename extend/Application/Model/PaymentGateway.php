@@ -37,10 +37,7 @@ class PaymentGateway extends PaymentGateway_parent
         if(!PaymentHelper::getInstance()->isMolliePaymentMethod($oOrder->oxorder__oxpaymenttype->value)) {
             return parent::executePayment($dAmount, $oOrder);
         }
-
-        $blSuccess = $this->handleMolliePayment($oOrder, $dAmount);
-
-        return $blSuccess;
+        return $this->handleMolliePayment($oOrder, $dAmount);;
     }
 
     /**
@@ -112,10 +109,8 @@ class PaymentGateway extends PaymentGateway_parent
         } catch(ApiException $exc) {
             $this->_iLastErrorNo = $exc->getCode();
             $this->_sLastError = $exc->getMessage();
-
             return false;
         }
-
         return true;
     }
 }

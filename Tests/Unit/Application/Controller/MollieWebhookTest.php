@@ -12,17 +12,8 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class MollieWebhookTest extends UnitTestCase
 {
-    public function tearDown()
-    {
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('DELETE FROM oxorder WHERE oxid = "webhookTest"');
-
-        parent::tearDown();
-    }
-
     public function testRender()
     {
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("INSERT INTO oxorder (OXID, OXTRANSID) VALUE ('webhookTest', 'testTransId')");
-
         $oRequest = $this->getMockBuilder(\OxidEsales\Eshop\Core\Request::class)->disableOriginalConstructor()->getMock();
         $oRequest->method('getRequestParameter')->willReturnMap([
             ['testByMollie', null, null],
@@ -39,6 +30,7 @@ class MollieWebhookTest extends UnitTestCase
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $oOrder->method('isLoaded')->willReturn(true);
         $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
+        $oOrder->method('mollieLoadOrderByTransactionId')->willReturn(true);
 
         UtilsObject::setClassInstance(Order::class, $oOrder);
 
