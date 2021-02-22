@@ -4,8 +4,11 @@ namespace Mollie\Payment\Application\Model\Request;
 
 use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\BasketItem;
 use OxidEsales\Eshop\Application\Model\Order as CoreOrder;
 use OxidEsales\Eshop\Application\Model\OrderArticle;
+use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
@@ -192,6 +195,86 @@ abstract class Base
     }
 
     /**
+     * Returns vat value for given brut price
+     *
+     * @param double $dBrutPrice
+     * @param double $dVat
+     * @return double
+     */
+    protected function getVatValue($dBrutPrice, $dVat)
+    {
+        $oPrice = oxNew(Price::class);
+        $oPrice->setBruttoPriceMode();
+        $oPrice->setPrice($dBrutPrice);
+        $oPrice->setVat($dVat);
+        return $oPrice->getVatValue();
+    }
+
+    /**
+     * Search basket content for discounted item with amount 1
+     *
+     * @param array $aItems
+     * @param double $dMismatchSum
+     * @return string|false
+     */
+    protected function getArtnumForCorrection($aItems, $dMismatchSum)
+    {
+        // search for product mismatch in unitPrice and totalAmount
+        foreach ($aItems as $aItem) {
+            if ($aItem['quantity'] > 1) {
+                $dCalculatedTotalAmount = bcmul($aItem['unitPrice']['value'], $aItem['quantity'], 2);
+                $dTotalMismatch = bcsub($dCalculatedTotalAmount, $aItem['totalAmount']['value'], 2);
+                if ($dTotalMismatch != 0 && $dTotalMismatch == $dMismatchSum) {
+                    return $aItem['sku'];
+                }
+            }
+        }
+
+        // search for discounted basketitem with amount = 1
+        foreach (Registry::getSession()->getBasket()->getContents() as $oBasketItem) {
+            if ($oBasketItem->getRegularUnitPrice()->getBruttoPrice() > $oBasketItem->getUnitPrice()->getBruttoPrice() && $oBasketItem->getAmount() == 1) { // product is discounted ?!?
+                $oArticle = $oBasketItem->getArticle();
+                if ($oArticle) {
+                    return $oArticle->oxarticles__oxartnum->value;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Fix price mismatch in items array
+     *
+     * @param CoreOrder $oOrder
+     * @param array $aItems
+     * @param double $dMismatchSum
+     * @return array
+     */
+    protected function getFixedItemArray(CoreOrder $oOrder, $aItems, $dMismatchSum)
+    {
+        $sFixArtnum = $this->getArtnumForCorrection($aItems, $dMismatchSum);
+        for($i = 0; $i < count($aItems); $i++) {
+            $dCalculatedTotalAmount = bcmul($aItems[$i]['unitPrice']['value'], $aItems[$i]['quantity'], 2);
+            $dTotalMismatch = bcsub($dCalculatedTotalAmount, $aItems[$i]['totalAmount']['value'], 2);
+            $blChangeTotalOnly = false;
+            if ($dTotalMismatch != 0 && $dTotalMismatch == $dMismatchSum) {
+                $blChangeTotalOnly = true;
+            }
+            if (($sFixArtnum === false && $aItems[$i]['quantity'] == 1) || // No specific product to be fixed found - use one with quantity of 1
+                $sFixArtnum == $aItems[$i]['sku']// getArtnumForCorrection method found a product to be fixed
+            ) {
+                if ($blChangeTotalOnly === false) {
+                    $aItems[$i]['unitPrice']['value'] = $this->formatPrice($aItems[$i]['unitPrice']['value'] + $dMismatchSum);
+                }
+                $aItems[$i]['totalAmount']['value'] = $this->formatPrice($aItems[$i]['totalAmount']['value'] + $dMismatchSum);
+                $aItems[$i]['vatAmount']['value'] = $this->formatPrice($this->getVatValue($aItems[$i]['totalAmount']['value'], $aItems[$i]['vatRate']));
+                break;
+            }
+        }
+        return $aItems;
+    }
+
+    /**
      * Add all different types of basket items to the basketline array
      *
      * @param CoreOrder $oOrder
@@ -204,6 +287,8 @@ abstract class Base
         $sCurrency = $oOrder->oxorder__oxcurrency->value;
 
         $aOrderArticleList = $oOrder->getOrderArticles();
+
+        $dProductSum = 0;
         foreach ($aOrderArticleList->getArray() as $oOrderarticle) {
             $oArticle = $oOrderarticle->getArticle();
             if ($oArticle instanceof OrderArticle) {
@@ -222,6 +307,13 @@ abstract class Base
                 'vatAmount' => $this->getAmountArray($oOrderarticle->oxorderarticles__oxvatprice->value, $sCurrency),
                 'productUrl' => $oArticle->getLink(),
             ];
+
+            $dProductSum += $oOrderarticle->oxorderarticles__oxbrutprice->value;
+        }
+
+        $dMismatchSum = bcsub($oOrder->oxorder__oxtotalbrutsum->value, $dProductSum, 2);
+        if ($dMismatchSum != 0) {
+            $aItems = $this->getFixedItemArray($oOrder, $aItems, $dMismatchSum);
         }
 
         if ($oOrder->oxorder__oxdelcost->value != 0) {

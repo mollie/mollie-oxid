@@ -118,7 +118,7 @@ class ModuleConfigurationTest extends UnitTestCase
         $oModuleConfigController = new \Mollie\Payment\extend\Application\Controller\Admin\ModuleConfiguration();
         $result = $oModuleConfigController->molliePaymentMethods();
 
-        $this->assertCount(18, $result);
+        $this->assertCount(17, $result);
     }
 
     public function testMollieIsApiKeyUsable()
