@@ -311,6 +311,26 @@ abstract class Base
             $dProductSum += $oOrderarticle->oxorderarticles__oxbrutprice->value;
         }
 
+        $oVoucherDiscount = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        if ($oOrder->oxorder__oxvoucherdiscount->value != 0) {
+            $oVoucherDiscount->setBruttoPriceMode();
+            if (Registry::getSession()->getBasket()->isCalculationModeNetto() === true) {
+                $oVoucherDiscount->setNettoPriceMode();
+            }
+            $oVoucherDiscount->setPrice($oOrder->oxorder__oxvoucherdiscount->value, $oOrder->oxorder__oxartvat1->value);
+            $dProductSum -= $oVoucherDiscount->getBruttoPrice();
+        }
+
+        $oDiscount = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        if ($oOrder->oxorder__oxdiscount->value != 0) {
+            $oDiscount->setBruttoPriceMode();
+            if (Registry::getSession()->getBasket()->isCalculationModeNetto() === true) {
+                $oDiscount->setNettoPriceMode();
+            }
+            $oDiscount->setPrice($oOrder->oxorder__oxdiscount->value, $oOrder->oxorder__oxartvat1->value);
+            $dProductSum -= $oDiscount->getBruttoPrice();
+        }
+
         $dMismatchSum = bcsub($oOrder->oxorder__oxtotalbrutsum->value, $dProductSum, 2);
         if ($dMismatchSum != 0) {
             $aItems = $this->getFixedItemArray($oOrder, $aItems, $dMismatchSum);
@@ -373,36 +393,28 @@ abstract class Base
         }
 
         if ($oOrder->oxorder__oxvoucherdiscount->value != 0) {
-            $oVoucherDiscount = oxNew(\OxidEsales\Eshop\Core\Price::class);
-            $oVoucherDiscount->setBruttoPriceMode();
-            $oVoucherDiscount->setPrice($oOrder->oxorder__oxvoucherdiscount->value, $oOrder->oxorder__oxartvat1->value);
-
             $aItems[] = [
                 'name' => Registry::getLang()->translateString('MOLLIE_VOUCHER'),
                 'sku' => 'voucher',
                 'type' => 'gift_card',
                 'quantity' => 1,
                 'unitPrice' => $this->getAmountArray(0, $sCurrency),
-                'discountAmount' => $this->getAmountArray($oOrder->oxorder__oxvoucherdiscount->value, $sCurrency),
-                'totalAmount' => $this->getAmountArray($oOrder->oxorder__oxvoucherdiscount->value * -1, $sCurrency),
+                'discountAmount' => $this->getAmountArray($oVoucherDiscount->getBruttoPrice(), $sCurrency),
+                'totalAmount' => $this->getAmountArray($oVoucherDiscount->getBruttoPrice() * -1, $sCurrency),
                 'vatRate' => $oOrder->oxorder__oxartvat1->value,
                 'vatAmount' => $this->getAmountArray($oVoucherDiscount->getVatValue() * -1, $sCurrency),
             ];
         }
 
         if ($oOrder->oxorder__oxdiscount->value != 0) {
-            $oDiscount = oxNew(\OxidEsales\Eshop\Core\Price::class);
-            $oDiscount->setBruttoPriceMode();
-            $oDiscount->setPrice($oOrder->oxorder__oxdiscount->value, $oOrder->oxorder__oxartvat1->value);
-
             $aItems[] = [
                 'name' => Registry::getLang()->translateString('MOLLIE_DISCOUNT'),
                 'sku' => 'discount',
                 'type' => 'discount',
                 'quantity' => 1,
                 'unitPrice' => $this->getAmountArray(0, $sCurrency),
-                'discountAmount' => $this->getAmountArray($oOrder->oxorder__oxdiscount->value, $sCurrency),
-                'totalAmount' => $this->getAmountArray($oOrder->oxorder__oxdiscount->value * -1, $sCurrency),
+                'discountAmount' => $this->getAmountArray($oDiscount->getBruttoPrice(), $sCurrency),
+                'totalAmount' => $this->getAmountArray($oDiscount->getBruttoPrice() * -1, $sCurrency),
                 'vatRate' => $oOrder->oxorder__oxartvat1->value,
                 'vatAmount' => $this->getAmountArray($oDiscount->getVatValue() * -1, $sCurrency),
             ];

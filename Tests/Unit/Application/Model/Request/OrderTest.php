@@ -144,7 +144,15 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oOrder->method('getOrderPaymentPrice')->willReturn($oPrice);
         $oOrder->method('getOrderWrappingPrice')->willReturn($oPrice);
         $oOrder->method('getOrderGiftCardPrice')->willReturn($oPrice);
-        $oOrder->method('__get')->willReturn(new Field(200));
+        $oOrder->method('__get')->willReturnMap([
+            ['oxorder__oxvoucherdiscount', new Field(0)],
+            ['oxorder__oxdiscount', new Field(0)],
+            ['oxorder__oxtotalbrutsum', new Field(200)],
+            ['oxorder__oxdelcost', new Field(0)],
+            ['oxorder__oxpaycost', new Field(0)],
+            ['oxorder__oxwrapcost', new Field(0)],
+            ['oxorder__oxgiftcardcost', new Field(0)],
+        ]);
 
         $oRequest = new \Mollie\Payment\Application\Model\Request\Order();
         $result = $oRequest->sendRequest($oOrder, 50, "http://someurl.com");
@@ -175,6 +183,7 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $oBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
         $oBasket->method('getContents')->willReturn([$oBasketItem]);
+        $oBasket->method('isCalculationModeNetto')->willReturn(true);
 
         $oSession = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $oSession->method('getBasket')->willReturn($oBasket);
