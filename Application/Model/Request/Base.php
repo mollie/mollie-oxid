@@ -311,24 +311,30 @@ abstract class Base
             $dProductSum += $oOrderarticle->oxorderarticles__oxbrutprice->value;
         }
 
+        $blNettoMode = Registry::getSession()->getBasket()->isCalculationModeNetto();
+
         $oVoucherDiscount = oxNew(\OxidEsales\Eshop\Core\Price::class);
         if ($oOrder->oxorder__oxvoucherdiscount->value != 0) {
             $oVoucherDiscount->setBruttoPriceMode();
-            if (Registry::getSession()->getBasket()->isCalculationModeNetto() === true) {
+            if ($blNettoMode === true) {
                 $oVoucherDiscount->setNettoPriceMode();
             }
             $oVoucherDiscount->setPrice($oOrder->oxorder__oxvoucherdiscount->value, $oOrder->oxorder__oxartvat1->value);
-            $dProductSum -= $oVoucherDiscount->getBruttoPrice();
+            if ($blNettoMode === true) {
+                $dProductSum -= $oVoucherDiscount->getBruttoPrice(); // voucher discount is only included in oxtotalbrutsum when shop is in netto mode...
+            }
         }
 
         $oDiscount = oxNew(\OxidEsales\Eshop\Core\Price::class);
         if ($oOrder->oxorder__oxdiscount->value != 0) {
             $oDiscount->setBruttoPriceMode();
-            if (Registry::getSession()->getBasket()->isCalculationModeNetto() === true) {
+            if ($blNettoMode === true) {
                 $oDiscount->setNettoPriceMode();
             }
             $oDiscount->setPrice($oOrder->oxorder__oxdiscount->value, $oOrder->oxorder__oxartvat1->value);
-            $dProductSum -= $oDiscount->getBruttoPrice();
+            if ($blNettoMode === true) {
+                $dProductSum -= $oDiscount->getBruttoPrice(); // discount is only included in oxtotalbrutsum when shop is in netto mode...
+            }
         }
 
         $dMismatchSum = bcsub($oOrder->oxorder__oxtotalbrutsum->value, $dProductSum, 2);
@@ -365,6 +371,9 @@ abstract class Base
         }
 
         if ($oOrder->oxorder__oxwrapcost->value != 0) {
+            $iFixedVat = round($oOrder->oxorder__oxwrapvat->value, 0);  // should be $oOrder->oxorder__oxwrapvat->value but seems to be buggy i.e. "18.951612903226"
+            $dWrapVatValue = $this->getVatValue($oOrder->getOrderWrappingPrice()->getBruttoPrice(), $iFixedVat);
+
             $aItems[] = [
                 'name' => Registry::getLang()->translateString('MOLLIE_WRAPPING'),
                 'sku' => 'wrapping',
@@ -373,8 +382,8 @@ abstract class Base
                 'unitPrice' => $this->getAmountArray($oOrder->oxorder__oxwrapcost->value, $sCurrency),
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrder->oxorder__oxwrapcost->value, $sCurrency),
-                'vatRate' => $oOrder->oxorder__oxartvat1->value, // should be $oOrder->oxorder__oxwrapvat->value but seems to be buggy i.e. "18.951612903226"
-                'vatAmount' => $this->getAmountArray($oOrder->getOrderWrappingPrice()->getVatValue(), $sCurrency),
+                'vatRate' => $iFixedVat,
+                'vatAmount' => $this->getAmountArray($dWrapVatValue, $sCurrency),
             ];
         }
 
