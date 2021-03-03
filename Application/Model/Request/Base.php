@@ -252,6 +252,8 @@ abstract class Base
      */
     protected function getFixedItemArray(CoreOrder $oOrder, $aItems, $dMismatchSum)
     {
+        $blFixed = false;
+
         $sFixArtnum = $this->getArtnumForCorrection($aItems, $dMismatchSum);
         for($i = 0; $i < count($aItems); $i++) {
             $dCalculatedTotalAmount = bcmul($aItems[$i]['unitPrice']['value'], $aItems[$i]['quantity'], 2);
@@ -268,8 +270,23 @@ abstract class Base
                 }
                 $aItems[$i]['totalAmount']['value'] = $this->formatPrice($aItems[$i]['totalAmount']['value'] + $dMismatchSum);
                 $aItems[$i]['vatAmount']['value'] = $this->formatPrice($this->getVatValue($aItems[$i]['totalAmount']['value'], $aItems[$i]['vatRate']));
+                $blFixed = true;
                 break;
             }
+        }
+
+        if ($blFixed === false) {
+            $aItems[] = [
+                'name' => Registry::getLang()->translateString('MOLLIE_ROUNDINGCORRECTION'),
+                'sku' => 'adjustment',
+                'type' => 'surcharge',
+                'quantity' => 1,
+                'unitPrice' => $this->getAmountArray($dMismatchSum, $oOrder->oxorder__oxcurrency->value),
+                'discountAmount' => $this->getAmountArray(0, $oOrder->oxorder__oxcurrency->value),
+                'totalAmount' => $this->getAmountArray($dMismatchSum, $oOrder->oxorder__oxcurrency->value),
+                'vatRate' => $oOrder->oxorder__oxartvat1->value,
+                'vatAmount' => $this->getAmountArray($this->getVatValue($dMismatchSum, $oOrder->oxorder__oxartvat1->value), $oOrder->oxorder__oxcurrency->value),
+            ];
         }
         return $aItems;
     }
@@ -308,7 +325,7 @@ abstract class Base
                 'productUrl' => $oArticle->getLink(),
             ];
 
-            $dProductSum += $oOrderarticle->oxorderarticles__oxbrutprice->value;
+            $dProductSum = bcadd($dProductSum, $oOrderarticle->oxorderarticles__oxbrutprice->value, 4);
         }
 
         $blNettoMode = Registry::getSession()->getBasket()->isCalculationModeNetto();
@@ -321,7 +338,7 @@ abstract class Base
             }
             $oVoucherDiscount->setPrice($oOrder->oxorder__oxvoucherdiscount->value, $oOrder->oxorder__oxartvat1->value);
             if ($blNettoMode === true) {
-                $dProductSum -= $oVoucherDiscount->getBruttoPrice(); // voucher discount is only included in oxtotalbrutsum when shop is in netto mode...
+                $dProductSum = bcsub($dProductSum, $oVoucherDiscount->getBruttoPrice(), 4); // voucher discount is only included in oxtotalbrutsum when shop is in netto mode...
             }
         }
 
@@ -333,7 +350,7 @@ abstract class Base
             }
             $oDiscount->setPrice($oOrder->oxorder__oxdiscount->value, $oOrder->oxorder__oxartvat1->value);
             if ($blNettoMode === true) {
-                $dProductSum -= $oDiscount->getBruttoPrice(); // discount is only included in oxtotalbrutsum when shop is in netto mode...
+                $dProductSum = bcsub($dProductSum, $oDiscount->getBruttoPrice(), 4); // discount is only included in oxtotalbrutsum when shop is in netto mode...
             }
         }
 

@@ -14,6 +14,7 @@ $aLang = [
     'MOLLIE_GIFTCARD'                           => "Grußkarte",
     'MOLLIE_VOUCHER'                            => 'Gutschein',
     'MOLLIE_DISCOUNT'                           => 'Rabatt',
+    'MOLLIE_ROUNDINGCORRECTION'                 => 'Rundungskorrektur',
     'MOLLIE_SELECT_BANK'                        => 'Bank ausw&auml;hlen',
     'MOLLIE_SELECT_GIFTCARD'                    => 'Geschenkkarte ausw&auml;hlen',
     'MOLLIE_PLEASE_SELECT'                      => '-- Bitte w&auml;hlen --',
