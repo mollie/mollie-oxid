@@ -24,8 +24,9 @@ $aLang = array(
     'SHOP_MODULE_GROUP_MOLLIE_CRONJOBS'                 => 'Cronjobs',
     'SHOP_MODULE_sMollieCronOrderExpiryActive'          => 'Cronjob "Cancel unpaid orders automatically" active',
     'SHOP_MODULE_sMollieCronFinishOrdersActive'         => 'Cronjob "Completion of paid but unfinished orders" active',
-    'SHOP_MODULE_sMollieCronSecondChanceActive'         => 'Cronjob "Dispatch of payment reminder email" aktiv',
+    'SHOP_MODULE_sMollieCronSecondChanceActive'         => 'Cronjob "Dispatch of payment reminder email" active',
     'SHOP_MODULE_iMollieCronSecondChanceTimeDiff'       => 'Timeframe after which payment reminder email is sent',
+    'SHOP_MODULE_sMollieCronOrderShipmentActive'        => 'Cronjob "Transmission of shipping status to Mollie" active',
     'SHOP_MODULE_GROUP_MOLLIE_PAYMENTLOGOS'             => 'Alternative payment logos',
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Show Payment Icons on Checkout',
@@ -37,6 +38,7 @@ $aLang = array(
     'HELP_SHOP_MODULE_sMollieCronOrderExpiryActive'     => 'For this cronjob to work, in addition to this checkbox you have to ensure that the Mollie cronjob is set up properly. You can find information on how to set up the cronjob in the README.md of this module.',
     'HELP_SHOP_MODULE_sMollieCronFinishOrdersActive'    => 'This cronjob has the job to finish orders where the customer paid successfully but seemingly didnt return to the shop to complete the order process. The cronjob only finishes orders from the last 24 hours, to not change orders that were probably handled manually.<br><br>For this cronjob to work, in addition to this checkbox you have to ensure that the Mollie cronjob is set up properly. You can find information on how to set up the cronjob in the README.md of this module.',
     'HELP_SHOP_MODULE_sMollieCronSecondChanceActive'    => 'For this cronjob to work, in addition to this checkbox you have to ensure that the Mollie cronjob is set up properly. You can find information on how to set up the cronjob in the README.md of this module.',
+    'HELP_SHOP_MODULE_sMollieCronOrderShipmentActive'   => 'This cronjob is only needed if the shipping status in your shop is set by an external service and NOT by the "Ship Now" button. For this cronjob to work, in addition to this checkbox you have to ensure that the Mollie cronjob is set up properly. You can find information on how to set up the cronjob in the README.md of this module.',
 
     'MOLLIE_YES'                                        => 'Yes',
     'MOLLIE_NO'                                         => 'No',

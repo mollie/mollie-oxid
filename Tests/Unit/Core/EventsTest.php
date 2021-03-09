@@ -15,8 +15,6 @@ class EventsTest extends UnitTestCase
         \OxidEsales\Eshop\Core\DatabaseProvider::getDB()->execute("DROP TABLE IF EXISTS `molliepaymentconfig`");
         \OxidEsales\Eshop\Core\DatabaseProvider::getDB()->execute("DROP TABLE IF EXISTS `mollierequestlog`");
 
-        #
-
         \OxidEsales\Eshop\Core\DatabaseProvider::getDB()->execute("DELETE FROM oxpayments WHERE oxid LIKE '%mollie%'");
         \OxidEsales\Eshop\Core\DatabaseProvider::getDB()->execute("DELETE FROM oxobject2group WHERE oxobjectid LIKE '%mollie%'");
         \OxidEsales\Eshop\Core\DatabaseProvider::getDB()->execute("DELETE FROM oxobject2payment WHERE oxpaymentid LIKE '%mollie%'");

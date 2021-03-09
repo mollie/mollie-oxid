@@ -114,6 +114,7 @@ not because a contract forces you!
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronOrderExpiryActive',       'type' => 'bool',       'value' => '0',         'position' => 85],
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronSecondChanceActive',      'type' => 'bool',       'value' => '0',         'position' => 90],
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'iMollieCronSecondChanceTimeDiff',    'type' => 'select',     'value' => '1',         'position' => 100],
+        ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronOrderShipmentActive',     'type' => 'bool',       'value' => '0',         'position' => 110],
         ['group' => 'MOLLIE_PAYMENTLOGOS',      'name' => 'sMolliePaymentLogosPlaceholder',     'type' => 'str',        'value' => '',          'position' => 500],
     ]
 ];

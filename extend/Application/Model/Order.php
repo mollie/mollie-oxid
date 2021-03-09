@@ -130,6 +130,8 @@ class Order extends Order_parent
                 }
                 $oResponse = $oMollieApiOrder->shipAll($aOptions);
                 $oRequestLog->logRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
+
+                DatabaseProvider::getDb()->Execute("UPDATE oxorder SET mollieshipmenthasbeenmarked = 1 WHERE oxid = ?", array($this->getId()));
             }
         } catch (\Exception $exc) {
             $oRequestLog->logExceptionResponse([], $exc->getCode(), $exc->getMessage(), 'shipAll', $this->getId(), $this->getConfig()->getShopId());

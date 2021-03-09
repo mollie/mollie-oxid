@@ -215,6 +215,8 @@ class Events
             "UPDATE `oxorder` SET mollieapi = 'order' WHERE oxpaymenttype LIKE 'mollie%' AND oxtransid LIKE 'ord_%'",
         ];
         self::addColumnIfNotExists('oxorder', 'MOLLIEAPI', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEAPI` VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;", $aNewColumnDataQueriesMollieApi);
+        $aShipmentSentQuery = ["UPDATE `oxorder` SET MOLLIESHIPMENTHASBEENMARKED = 1 WHERE oxpaymenttype LIKE 'mollie%' AND oxsenddate > '1970-01-01 00:00:01';"];
+        self::addColumnIfNotExists('oxorder', 'MOLLIESHIPMENTHASBEENMARKED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIESHIPMENTHASBEENMARKED` tinyint(1) UNSIGNED NOT NULL DEFAULT  '0';", $aShipmentSentQuery);
 
         self::addColumnIfNotExists('oxuser', 'MOLLIECUSTOMERID', "ALTER TABLE `oxuser` ADD COLUMN `MOLLIECUSTOMERID` VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;");
     }
