@@ -414,14 +414,20 @@ class Order extends Order_parent
      * Checks if payment used for current order is available and active.
      * Throws exception if not available
      *
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket basket object
+     * @param \OxidEsales\Eshop\Application\Model\Basket    $oBasket basket object
+     * @param \OxidEsales\Eshop\Application\Model\User|null $oUser   user object
      *
      * @return null
      */
-    public function validatePayment($oBasket)
+    public function validatePayment($oBasket, $oUser = null)
     {
         if ($this->blMollieReinitializePaymentMode === false) {
-            return parent::validatePayment($oBasket);
+            $oReflection = new \ReflectionMethod(\OxidEsales\Eshop\Application\Model\Order::class, 'validatePayment');
+            $aParams = $oReflection->getParameters();
+            if (count($aParams) == 1) {
+                return parent::validatePayment($oBasket); // Oxid 6.1 didnt have the $oUser parameter yet
+            }
+            return parent::validatePayment($oBasket, $oUser);
         }
     }
 
