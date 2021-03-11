@@ -118,6 +118,10 @@ class Order extends Order_parent
      */
     public function mollieMarkOrderAsShipped()
     {
+        if ($this->mollieIsMolliePaymentUsed() === false) {
+            return;
+        }
+
         $oRequestLog = oxNew(RequestLog::class);
 
         try {

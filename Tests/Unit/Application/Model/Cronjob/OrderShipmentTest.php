@@ -23,10 +23,11 @@ class OrderShipmentTest extends UnitTestCase
     {
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $oOrder->method('load')->willReturn(true);
+        $oOrder->method('mollieIsMolliePaymentUsed')->willReturn(true);
 
         UtilsObject::setClassInstance(Order::class, $oOrder);
 
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("INSERT INTO oxorder (oxid, oxsenddate, mollieshipmenthasbeenmarked) VALUE ('markShipmentTest', '2021-02-02 00:00:01', 0)");
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("INSERT INTO oxorder (oxid, oxpaymenttype, oxsenddate, mollieshipmenthasbeenmarked) VALUE ('markShipmentTest', 'molliecreditcard', '2021-02-02 00:00:01', 0)");
 
         $oCronjob = oxNew($this->getProxyClassName(OrderShipment::class));
 

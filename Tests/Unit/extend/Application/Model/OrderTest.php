@@ -67,17 +67,28 @@ class OrderTest extends UnitTestCase
 
         $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
         $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);
+        $oPaymentHelper->method('isMolliePaymentMethod')->willReturn(true);
 
         UtilsObject::setClassInstance(Payment::class, $oPaymentHelper);
 
         $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
         $oOrder->oxorder__oxtrackcode = new Field("test123");
+        $oOrder->oxorder__oxpaymenttype = new Field("molliecreditcard");
         $result = $oOrder->mollieMarkOrderAsShipped();
 
         $this->assertNull($result);
 
         UtilsObject::resetClassInstances();
         Payment::destroyInstance();
+    }
+
+    public function testMollieMarkOrderAsShippedNonMolliePayment()
+    {
+        $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
+        $oOrder->oxorder__oxpaymenttype = new Field("oxcreditcard");
+        $result = $oOrder->mollieMarkOrderAsShipped();
+
+        $this->assertNull($result);
     }
 
     public function testMollieMarkOrderAsShippedException()
@@ -92,11 +103,13 @@ class OrderTest extends UnitTestCase
 
         $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
         $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);
+        $oPaymentHelper->method('isMolliePaymentMethod')->willReturn(true);
 
         UtilsObject::setClassInstance(Payment::class, $oPaymentHelper);
 
         $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
         $oOrder->oxorder__oxtrackcode = new Field("test123");
+        $oOrder->oxorder__oxpaymenttype = new Field("molliecreditcard");
         $result = $oOrder->mollieMarkOrderAsShipped();
 
         $this->assertNull($result);

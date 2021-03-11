@@ -59,7 +59,7 @@ class OrderShipment extends \Mollie\Payment\Application\Model\Cronjob\Base
         $aUnmarkedOrders = $this->getUnmarkedShippedOrders();
         foreach ($aUnmarkedOrders as $sUnmarkedOrderId) {
             $oOrder = oxNew(Order::class);
-            if ($oOrder->load($sUnmarkedOrderId)) {
+            if ($oOrder->load($sUnmarkedOrderId) && $oOrder->mollieIsMolliePaymentUsed()) {
                 $oOrder->mollieMarkOrderAsShipped();
                 $this->outputInfo("Marked order-id ".$oOrder->getId()." as shipped.");
             }
