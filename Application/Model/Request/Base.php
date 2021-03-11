@@ -109,7 +109,10 @@ abstract class Base
             $aReturn['region'] = $this->getRegionTitle($oOrder->oxorder__oxbillstateid->value);
         }
         if ($this->blNeedsExtendedAddress === true) {
-            $aReturn['title'] = Registry::getLang()->translateString($oOrder->oxorder__oxbillsal->value);
+            $sTranslatedSalutation = Registry::getLang()->translateString($oOrder->oxorder__oxbillsal->value);
+            if (!empty($sTranslatedSalutation)) {
+                $aReturn['title'] = $sTranslatedSalutation;
+            }
             $aReturn['givenName'] = $oOrder->oxorder__oxbillfname->value;
             $aReturn['familyName'] = $oOrder->oxorder__oxbilllname->value;
             $aReturn['email'] = $oOrder->oxorder__oxbillemail->value;
@@ -135,7 +138,10 @@ abstract class Base
             $aReturn['region'] = $this->getRegionTitle($oOrder->oxorder__oxdelstateid->value);
         }
         if ($this->blNeedsExtendedAddress === true) {
-            $aReturn['title'] = Registry::getLang()->translateString($oOrder->oxorder__oxdelsal->value);
+            $sTranslatedSalutation = Registry::getLang()->translateString($oOrder->oxorder__oxdelsal->value);
+            if (!empty($sTranslatedSalutation)) {
+                $aReturn['title'] = $sTranslatedSalutation;
+            }
             $aReturn['givenName'] = $oOrder->oxorder__oxdelfname->value;
             $aReturn['familyName'] = $oOrder->oxorder__oxdellname->value;
             $aReturn['email'] = $oOrder->oxorder__oxbillemail->value; // there is no explicit delivery email address
