@@ -38,6 +38,7 @@ class OrderShipment extends \Mollie\Payment\Application\Model\Cronjob\Base
                     FROM 
                         oxorder 
                     WHERE 
+                        oxpaymenttype LIKE '%mollie%' AND
                         oxsenddate != '0000-00-00 00:00:00' AND
                         mollieshipmenthasbeenmarked = 0;";
         $aResult = DatabaseProvider::getDb()->getAll($sQuery);
