@@ -502,6 +502,8 @@ class OrderTest extends UnitTestCase
 
     public function testCancelOrder()
     {
+        Payment::destroyInstance();
+
         $expected = 'mollieCancelFolder';
 
         $oConfig = $this->getMockBuilder(Config::class)->disableOriginalConstructor()->getMock();
@@ -509,11 +511,29 @@ class OrderTest extends UnitTestCase
 
         Registry::set(Config::class, $oConfig);
 
+        $oApiOrder = $this->getMockBuilder(\Mollie\Api\Resources\Order::class)->disableOriginalConstructor()->getMock();
+        $oApiOrder->method('cancel')->willReturn(true);
+        $oApiOrder->isCancelable = true;
+
+        $oApiEndpoint = $this->getMockBuilder(\Mollie\Api\Endpoints\OrderEndpoint::class)->disableOriginalConstructor()->getMock();
+        $oApiEndpoint->method('get')->willReturn($oApiOrder);
+
+        $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
+        $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+
+        $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
+        $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);
+        $oPaymentHelper->method('isMolliePaymentMethod')->willReturn(true);
+
+        UtilsObject::setClassInstance(Payment::class, $oPaymentHelper);
+
         $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
         $oOrder->oxorder__oxpaymenttype = new Field('molliecreditcard');
         $oOrder->cancelOrder();
 
         $this->assertEquals($expected, $oOrder->oxorder__oxfolder->value);
+
+        Payment::destroyInstance();
     }
 
     public function testMollieGetPaymentFinishUrl()

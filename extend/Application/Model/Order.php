@@ -541,6 +541,12 @@ class Order extends Order_parent
             if (!empty($sCancelledFolder)) {
                 $this->mollieSetFolder($sCancelledFolder);
             }
+
+            $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpoint();
+            $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value);
+            if ($oMollieApiOrder->isCancelable) {
+                $oApiEndpoint->cancel($this->oxorder__oxtransid->value);
+            }
         }
     }
 
