@@ -2,8 +2,8 @@
 
 namespace Mollie\Payment\Application\Helper;
 
-use Mollie\Payment\Application\Helper\User as UserHelper;
 use Mollie\Payment\Application\Helper\DeliverySet;
+use Mollie\Payment\Application\Helper\User as UserHelper;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Application\Model\Country;
@@ -107,11 +107,33 @@ class User
     protected function getDummyUser()
     {
         $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-        $oRequest = Registry::getRequest();
 
         // setting object id as it is requested later while processing user object
         $oUser->setId(\OxidEsales\Eshop\Core\UtilsObject::getInstance()->generateUID());
 
+        $this->setInitialDeliveryData($oUser);
+
+        $aShippingContact = Registry::getRequest()->getRequestEscapedParameter('shippingContact');
+        if (!empty($aShippingContact)) {
+            $oUser->oxuser__oxusername = new Field($aShippingContact['emailAddress']);
+            $this->updateUserFromApplePayData($oUser);
+            $oUser->save();
+        }
+
+        $oUser->mollieSetAutoGroups();
+
+        return $oUser;
+    }
+
+    /**
+     * Sets delivery information with zip, city and country given by apple pay initially
+     *
+     * @param  \OxidEsales\Eshop\Application\Model\User $oUser
+     * @return void
+     */
+    public function setInitialDeliveryData(&$oUser)
+    {
+        $oRequest = Registry::getRequest();
         $sCountryCode = $oRequest->getRequestEscapedParameter('countryCode');
         if (!empty($sCountryCode)) {
             $oUser->oxuser__oxcity = new Field($oRequest->getRequestEscapedParameter('city'));
@@ -126,17 +148,6 @@ class User
                 $oUser->oxuser__oxcountryid = new Field($oHomeCountry->getId());
             }
         }
-
-        $aShippingContact = $oRequest->getRequestEscapedParameter('shippingContact');
-        if (!empty($aShippingContact)) {
-            $oUser->oxuser__oxusername = new Field($aShippingContact['emailAddress']);
-            $this->updateUserFromApplePayData($oUser);
-            $oUser->save();
-        }
-
-        $oUser->mollieSetAutoGroups();
-
-        return $oUser;
     }
 
     /**
@@ -205,7 +216,6 @@ class User
         if (!empty($sUserId)) {
             $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
             if ($oUser->load($sUserId)) {
-                $this->updateUserFromApplePayData($oUser);
                 return $oUser;
             }
         }
@@ -214,22 +224,32 @@ class User
 
     /**
      * Returns user for apple pay payment
+     * 1. Trys to use currently active shop user
+     * 2. Trys to load existing user by ApplePay email
+     * 3. Creates dummy user by given ApplePay information
      *
+     * @param  bool $blIsDeliveryMethodCall
      * @return \OxidEsales\Eshop\Application\Model\User
      */
-    public function getApplePayUser()
+    public function getApplePayUser($blIsDeliveryMethodCall = false)
     {
-        $oUser = false;
-        $sApplePayEmail = $this->getApplePayEmailAddress();
-        if ($sApplePayEmail !== false) {
-            $oUser = $this->getExistingUser($sApplePayEmail);
+        $oUser = Registry::getConfig()->getActiveView()->getUser();
+        if (!$oUser) {
+            $sApplePayEmail = $this->getApplePayEmailAddress();
+            if ($sApplePayEmail !== false) {
+                $oUser = $this->getExistingUser($sApplePayEmail);
+            }
         }
 
         if ($oUser === false) {
-            $oUser = Registry::getConfig()->getActiveView()->getUser();
             if (!$oUser || Registry::getRequest()->getRequestEscapedParameter('countryCode')) {
                 $oUser = $this->getDummyUser();
             }
+        } else {
+            if ($blIsDeliveryMethodCall === true) {
+                $this->setInitialDeliveryData($oUser);
+            }
+            $this->updateUserFromApplePayData($oUser);
         }
         return $oUser;
     }

@@ -68,4 +68,24 @@ class ViewConfig extends ViewConfig_parent
     {
         return rtrim(Registry::getConfig()->getSslShopUrl(), '/').'/';
     }
+
+    /**
+     * Returns if Apple Pay button should be shown on basket page
+     *
+     * @return bool
+     */
+    public function mollieShowApplePayButtonOnBasket()
+    {
+        return (bool)Registry::getConfig()->getShopConfVar('blMollieApplePayButtonOnBasket');
+    }
+
+    /**
+     * Returns if Apple Pay button should be shown on product details page
+     *
+     * @return bool
+     */
+    public function mollieShowApplePayButtonOnDetails()
+    {
+        return (bool)Registry::getConfig()->getShopConfVar('blMollieApplePayButtonOnDetails');
+    }
 }

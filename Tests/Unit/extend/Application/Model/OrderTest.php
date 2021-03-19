@@ -474,7 +474,7 @@ class OrderTest extends UnitTestCase
         Registry::set(Request::class, $oRequest);
 
         $oUser = $this->getMockBuilder(User::class)->disableOriginalConstructor()->getMock();
-        $oUser->method('__get')->willReturn('test');
+        $oUser->method('__get')->willReturn(new Field('test'));
 
         $oOrder = oxNew($this->getProxyClassName(\Mollie\Payment\extend\Application\Model\Order::class));
         $oOrder->setNonPublicVar('blMollieIsApplePayButtonMode', true);

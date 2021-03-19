@@ -58,6 +58,7 @@ class DeliverySetTest extends UnitTestCase
         $oBasket->method('getPriceForPayment')->willReturn(10);
         $oBasket->method('addToBasket')->willReturn($oBasketItem);
         $oBasket->method('getAdditionalServicesVatPercent')->willReturn(10);
+        $oBasket->method('getShippingId')->willReturn('delSetId');
 
         return $oBasket;
     }
@@ -120,7 +121,8 @@ class DeliverySetTest extends UnitTestCase
         Registry::set(\OxidEsales\Eshop\Application\Model\PaymentList::class, $this->getPaymentListMock());
         Registry::set(\OxidEsales\Eshop\Core\Request::class, $this->getRequestMock());
         Registry::set(\OxidEsales\Eshop\Application\Model\DeliverySetList::class, $this->getDeliverySetListMock());
-        Registry::set(\OxidEsales\Eshop\Application\Model\DeliveryList::class, $this->getDeliveryListMock());
+
+        UtilsObject::setClassInstance(\OxidEsales\Eshop\Application\Model\DeliveryList::class, $this->getDeliveryListMock());
 
         $oUser = $this->getMockBuilder(User::class)->disableOriginalConstructor()->getMock();
 

@@ -6,8 +6,10 @@ use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Helper\User as UserHelper;
 use Mollie\Payment\Application\Model\TransactionHandler;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Payment\Application\Helper\DeliverySet;
 use OxidEsales\Eshop\Core\Field;
@@ -38,25 +40,44 @@ class MollieApplePay extends FrontendController
     }
 
     /**
-     * Returns basket object
+     * Adds product to basket by request parameters
      *
+     * @param  \OxidEsales\Eshop\Application\Model\Basket $oBasket
      * @return \OxidEsales\Eshop\Application\Model\Basket
      */
-    protected function getApplePayBasket()
+    protected function addProductToBasket($oBasket)
     {
-        $oBasket = Registry::getSession()->getBasket();
-        $oBasket->setPayment('mollieapplepay');
-
-        Registry::getSession()->setVariable('paymentid', 'mollieapplepay');
-
         $sDetailsProductId = Registry::getRequest()->getRequestEscapedParameter('detailsProductId');
+        $iAmount = Registry::getRequest()->getRequestEscapedParameter('detailsProductAmount');
+        if (!$iAmount) {
+            $iAmount = 1;
+        }
         if (!empty($sDetailsProductId)) { // applies when Apple Pay button on details page is pressed, since product is not in basket yet
-            $oBasketItem = $oBasket->addToBasket($sDetailsProductId, 1);
+            $oBasketItem = $oBasket->addToBasket($sDetailsProductId, $iAmount);
             $oBasket->calculateBasket();
 
             $this->sDetailsProductBasketItemId = $oBasketItem->getBasketItemKey();
             Registry::getSession()->deleteVariable("blAddedNewItem");
         }
+        return $oBasket;
+    }
+
+    /**
+     * Returns basket object
+     *
+     * @param  bool $blInit
+     * @return \OxidEsales\Eshop\Application\Model\Basket
+     */
+    protected function getApplePayBasket($blInit = false)
+    {
+        $oBasket = Registry::getSession()->getBasket();
+        if ($blInit === true) {
+            $oBasket->deleteBasket();
+        }
+        $oBasket->setPayment('mollieapplepay');
+
+        Registry::getSession()->setVariable('paymentid', 'mollieapplepay');
+
         return $oBasket;
     }
 
@@ -70,16 +91,12 @@ class MollieApplePay extends FrontendController
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
         $oOrder->mollieSetApplePayButtonMode(true);
 
-        $sApplePayShipSet = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('sApplePayShipSet');
-        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable('sApplePayShipSet');
-
         $oUser = UserHelper::getInstance()->getApplePayUser();
 
         Registry::getConfig()->getActiveView()->setUser($oUser);
 
         $oBasket = $this->getApplePayBasket();
         $oBasket->setBasketUser($oUser);
-        $oBasket->setShipping($sApplePayShipSet);
         $oBasket->calculateBasket(true);
 
         //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
@@ -94,16 +111,12 @@ class MollieApplePay extends FrontendController
         }
 
         $mReturn = false;
-        if ($iSuccess == Order::ORDER_STATE_INVALIDPAYMENT && DeliverySet::getInstance()->isDeliverySetAvailableWithPaymentType($sApplePayShipSet, $oBasket, $oUser) === false) {
+        if ($iSuccess == Order::ORDER_STATE_INVALIDPAYMENT && DeliverySet::getInstance()->isDeliverySetAvailableWithPaymentType($oBasket->getShippingId(), $oBasket, $oUser) === false) {
             $mReturn = array(
                 'code' => 'billingContactInvalid',
                 'contactField' => 'country',
                 'message' => Registry::getLang()->translateString('MOLLIE_BILLING_APPLE_PAY_NOT_AVAILABLE'),
             );
-        }
-
-        if ($this->sDetailsProductBasketItemId !== null) {
-            $oBasket->removeItem($this->sDetailsProductBasketItemId);
         }
 
         return $mReturn;
@@ -145,13 +158,13 @@ class MollieApplePay extends FrontendController
         $aResponse = array();
         $blSuccess = false;
 
-        $oUser = UserHelper::getInstance()->getApplePayUser();
+        $oUser = UserHelper::getInstance()->getApplePayUser(true);
         $oBasket = $this->getApplePayBasket();
 
         $aDelMethods = DeliverySet::getInstance()->getDeliveryMethods($oUser, $oBasket);
         if (!empty($aDelMethods)) {
             // Apple Pay only sends a onshippingmethodselected event when the shipping method is changed, when only one is available its not sent, so we have to select the first one
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('sApplePayShipSet', $aDelMethods[0]['identifier']);
+            $oBasket->setShipping($aDelMethods[0]['identifier']);
 
             $blSuccess = true;
             $aResponse['shippingMethods'] = $aDelMethods;
@@ -170,7 +183,8 @@ class MollieApplePay extends FrontendController
     {
         $sShipSet = Registry::getRequest()->getRequestEscapedParameter('shipSet');
         if (!empty($sShipSet)) {
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('sApplePayShipSet', $sShipSet);
+            $oBasket = Registry::getSession()->getBasket();
+            $oBasket->setShipping($sShipSet);
         }
         Registry::getUtils()->showMessageAndExit("");
     }
@@ -193,6 +207,35 @@ class MollieApplePay extends FrontendController
             } elseif(is_array($mReturn)) {
                 $aResponse['error'] = $mReturn;
             }
+        } catch(\Exception $oExc) {
+            $aResponse['errormessage'] = $oExc->getMessage();
+        }
+        $aResponse['success'] = $blSuccess;
+        return Registry::getUtils()->showMessageAndExit(json_encode($aResponse));
+    }
+
+    /**
+     * Ajax controller function for getting the basket price for the product
+     * This is needed, because Oxid doesnt show the real basket price (i.e. with usergroup discounts) on details page
+     * Starts Apple Pay checkout from product details page
+     *
+     * @return void
+     */
+    public function getProductBasketPrice()
+    {
+        $aResponse = array();
+        $blSuccess = false;
+
+        try {
+            $oBasket = $this->getApplePayBasket(true);
+            $oBasket = $this->addProductToBasket($oBasket);
+            Registry::getSession()->setBasket($oBasket);
+
+            $blSuccess = true;
+            $aResponse['productBasketPrice'] = $oBasket->getDiscountedProductsBruttoPrice();
+        } catch(OutOfStockException $oExc) {
+            $aResponse['errormessage'] = Registry::getLang()->translateString($oExc->getMessage());
+            $aResponse['showexception'] = true;
         } catch(\Exception $oExc) {
             $aResponse['errormessage'] = $oExc->getMessage();
         }

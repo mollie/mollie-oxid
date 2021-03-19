@@ -481,6 +481,9 @@ class Order extends Order_parent
 
         // bill address
         $this->oxorder__oxbillemail = new Field($aShippingContact['emailAddress']);
+        if ($oUser->oxuser__oxusername->value) { // in case of user already being logged in
+            $this->oxorder__oxbillemail = new Field($oUser->oxuser__oxusername->value);
+        }
         $this->oxorder__oxbillfname = new Field($aBillingContact['givenName']);
         $this->oxorder__oxbilllname = new Field($aBillingContact['familyName']);
 

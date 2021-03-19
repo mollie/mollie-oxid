@@ -77,7 +77,7 @@ class DeliverySet
         $oDeliveryPrice->setVat($fDelVATPercent);
 
         // list of active delivery costs
-        $aDeliveryList = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\DeliveryList::class)->getDeliveryList(
+        $aDeliveryList = oxNew(\OxidEsales\Eshop\Application\Model\DeliveryList::class)->getDeliveryList(
             $oBasket,
             $oUser,
             $oUser->oxuser__oxcountryid->value,
@@ -111,6 +111,26 @@ class DeliverySet
     }
 
     /**
+     * Sorts the array to have the current shipping id first
+     *
+     * @param  array $aDelMethods
+     * @param  string $sShippingId
+     * @return array
+     */
+    protected function getSortedDeliveryMethods($aDelMethods, $sShippingId)
+    {
+        for ($i = 0; $i < count($aDelMethods); $i++) {
+            if ($aDelMethods[$i]['identifier'] == $sShippingId) {
+                $aSelectedDeliveryMethod = $aDelMethods[$i];
+                unset($aDelMethods[$i]);
+                $aDelMethods = array_merge([$aSelectedDeliveryMethod], $aDelMethods);
+                break;
+            }
+        }
+        return $aDelMethods;
+    }
+
+    /**
      * Returns array of all applying delivery methods
      *
      * @param  \OxidEsales\Eshop\Application\Model\User $oUser
@@ -119,15 +139,11 @@ class DeliverySet
      */
     public function getDeliveryMethods($oUser, $oBasket)
     {
-        $sDetailsProductId = Registry::getRequest()->getRequestEscapedParameter('detailsProductId');
-        if (!empty($sDetailsProductId)) { // applies when Apple Pay button on details page is pressed, since product is not in basket yet
-            $oBasketItem = $oBasket->addToBasket($sDetailsProductId, 1);
-            $oBasket->calculateBasket();
-        }
-
         // load sets, active set, and active set payment list
         list($aAllSets, $sActShipSet, $aPaymentList) =
             \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\DeliverySetList::class)->getDeliverySetData(null, $oUser, $oBasket);
+
+        $sShippingIdPre = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('sShipSet');
 
         $aDelMethods = array();
         foreach ($aAllSets as $oDelSet) {
@@ -141,8 +157,12 @@ class DeliverySet
             }
         }
 
-        if (!empty($sDetailsProductId)) { // remove details product from basket again
-            $oBasket->removeItem($oBasketItem->getBasketItemKey());
+        // ShipSet may be changed inside of  OxidCore function getDeliveryList used in calcDeliveryPrice
+        // this would have undesired sideeffects together with the ApplePay integration
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('sShipSet', $sShippingIdPre);
+
+        if ($oBasket->getShippingId()) {
+            $aDelMethods = $this->getSortedDeliveryMethods($aDelMethods, $oBasket->getShippingId());
         }
 
         return $aDelMethods;

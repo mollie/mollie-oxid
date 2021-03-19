@@ -104,7 +104,7 @@ class ViewConfigTest extends UnitTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testmollieGetShopUrl()
+    public function testMollieGetShopUrl()
     {
         $expected = "https://www.mollie.com/";
 
@@ -115,6 +115,36 @@ class ViewConfigTest extends UnitTestCase
 
         $oViewConfig = new \Mollie\Payment\extend\Core\ViewConfig();
         $result = $oViewConfig->mollieGetShopUrl();
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testMollieShowApplePayButtonOnBasket()
+    {
+        $expected = true;
+
+        $oConfig = $this->getMockBuilder(\OxidEsales\Eshop\Core\Config::class)->disableOriginalConstructor()->getMock();
+        $oConfig->method('getShopConfVar')->willReturn($expected);
+
+        Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
+
+        $oViewConfig = new \Mollie\Payment\extend\Core\ViewConfig();
+        $result = $oViewConfig->mollieShowApplePayButtonOnBasket();
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testMollieShowApplePayButtonOnDetails()
+    {
+        $expected = true;
+
+        $oConfig = $this->getMockBuilder(\OxidEsales\Eshop\Core\Config::class)->disableOriginalConstructor()->getMock();
+        $oConfig->method('getShopConfVar')->willReturn($expected);
+
+        Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
+
+        $oViewConfig = new \Mollie\Payment\extend\Core\ViewConfig();
+        $result = $oViewConfig->mollieShowApplePayButtonOnDetails();
 
         $this->assertEquals($expected, $result);
     }

@@ -81,7 +81,7 @@ class UserTest extends UnitTestCase
         UtilsObject::setClassInstance(\OxidEsales\Eshop\Application\Model\User::class, $oUser);
 
         $oUserHelper = User::getInstance();
-        $result = $oUserHelper->getApplePayUser();
+        $result = $oUserHelper->getApplePayUser(true);
 
         $this->assertInstanceOf(\OxidEsales\Eshop\Application\Model\User::class, $result);
     }

@@ -10,6 +10,7 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\BasketItem;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\Eshop\Core\UtilsObject;
@@ -294,5 +295,94 @@ class MollieApplePayTest extends UnitTestCase
 
         UtilsObject::resetClassInstances();
         \Mollie\Payment\Application\Helper\User::destroyInstance();
+    }
+
+    public function testGetProductBasketPrice()
+    {
+        $oBasketItem = $this->getMockBuilder(BasketItem::class)->disableOriginalConstructor()->getMock();
+        $oBasketItem->method('getBasketItemKey')->willReturn('test');
+
+        $oBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
+        $oBasket->method('addToBasket')->willReturn($oBasketItem);
+
+        $oSession = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $oSession->method('getBasket')->willReturn($oBasket);
+
+        Registry::set(Session::class, $oSession);
+
+        $oRequest = $this->getMockBuilder(\OxidEsales\Eshop\Core\Request::class)->disableOriginalConstructor()->getMock();
+        $oRequest->method('getRequestEscapedParameter')->willReturnMap([
+            ['detailsProductId', null, 'productId'],
+        ]);
+
+        Registry::set(\OxidEsales\Eshop\Core\Request::class, $oRequest);
+
+        $oUtils = $this->getMockBuilder(\OxidEsales\Eshop\Core\Utils::class)->disableOriginalConstructor()->getMock();
+        $oUtils->method('showMessageAndExit')->willReturn(null);
+
+        Registry::set(\OxidEsales\Eshop\Core\Utils::class, $oUtils);
+
+        $oController = new \Mollie\Payment\Application\Controller\MollieApplePay();
+        $result = $oController->getProductBasketPrice();
+
+        $this->assertNull($result);
+    }
+
+    public function testGetProductBasketPriceOutOfStock()
+    {
+        $oBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
+        $oBasket->method('addToBasket')->willThrowException(new OutOfStockException());
+
+        $oSession = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $oSession->method('getBasket')->willReturn($oBasket);
+
+        Registry::set(Session::class, $oSession);
+
+        $oRequest = $this->getMockBuilder(\OxidEsales\Eshop\Core\Request::class)->disableOriginalConstructor()->getMock();
+        $oRequest->method('getRequestEscapedParameter')->willReturnMap([
+            ['detailsProductId', null, 'productId'],
+            ['detailsProductAmount', null, 8],
+        ]);
+
+        Registry::set(\OxidEsales\Eshop\Core\Request::class, $oRequest);
+
+        $oUtils = $this->getMockBuilder(\OxidEsales\Eshop\Core\Utils::class)->disableOriginalConstructor()->getMock();
+        $oUtils->method('showMessageAndExit')->willReturn(null);
+
+        Registry::set(\OxidEsales\Eshop\Core\Utils::class, $oUtils);
+
+        $oController = new \Mollie\Payment\Application\Controller\MollieApplePay();
+        $result = $oController->getProductBasketPrice();
+
+        $this->assertNull($result);
+    }
+
+    public function testGetProductBasketPriceException()
+    {
+        $oBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
+        $oBasket->method('addToBasket')->willThrowException(new \Exception());
+
+        $oSession = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $oSession->method('getBasket')->willReturn($oBasket);
+
+        Registry::set(Session::class, $oSession);
+
+        $oRequest = $this->getMockBuilder(\OxidEsales\Eshop\Core\Request::class)->disableOriginalConstructor()->getMock();
+        $oRequest->method('getRequestEscapedParameter')->willReturnMap([
+            ['detailsProductId', null, 'productId'],
+            ['detailsProductAmount', null, 8],
+        ]);
+
+        Registry::set(\OxidEsales\Eshop\Core\Request::class, $oRequest);
+
+        $oUtils = $this->getMockBuilder(\OxidEsales\Eshop\Core\Utils::class)->disableOriginalConstructor()->getMock();
+        $oUtils->method('showMessageAndExit')->willReturn(null);
+
+        Registry::set(\OxidEsales\Eshop\Core\Utils::class, $oUtils);
+
+        $oController = new \Mollie\Payment\Application\Controller\MollieApplePay();
+        $result = $oController->getProductBasketPrice();
+
+        $this->assertNull($result);
     }
 }

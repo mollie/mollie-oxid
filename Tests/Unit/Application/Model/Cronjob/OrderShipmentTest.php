@@ -29,9 +29,7 @@ class OrderShipmentTest extends UnitTestCase
 
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("INSERT INTO oxorder (oxid, oxpaymenttype, oxsenddate, mollieshipmenthasbeenmarked) VALUE ('markShipmentTest', 'molliecreditcard', '2021-02-02 00:00:01', 0)");
 
-        $oCronjob = oxNew($this->getProxyClassName(OrderShipment::class));
-
-        $oCronjob->loadDbData();
+        $oCronjob = oxNew(OrderShipment::class);
         $result = $oCronjob->startCronjob();
 
         $this->assertTrue($result);
