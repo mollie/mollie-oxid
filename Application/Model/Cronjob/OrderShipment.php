@@ -33,10 +33,7 @@ class OrderShipment extends \Mollie\Payment\Application\Model\Cronjob\Base
     {
         $aOrders = [];
 
-        $sSendDateCheck = "!= '0000-00-00 00:00:00'";
-        if ($this->getLastRunDateTime() && $this->getLastRunDateTime() != '0000-00-00 00:00:00') {
-            $sSendDateCheck = ">= '".$this->getLastRunDateTime()."'";
-        }
+        $sMinSendDate = date('Y-m-d H:i:s', time() - (60 * 60 * 24)); // only look at orders in the last 24 hours
 
         $sQuery = " SELECT 
                         oxid 
@@ -44,9 +41,10 @@ class OrderShipment extends \Mollie\Payment\Application\Model\Cronjob\Base
                         oxorder 
                     WHERE 
                         oxpaymenttype LIKE '%mollie%' AND
-                        oxsenddate ".$sSendDateCheck." AND
+                        oxtransid LIKE '%ord_%' AND
+                        oxsenddate >= ? AND
                         mollieshipmenthasbeenmarked = 0;";
-        $aResult = DatabaseProvider::getDb()->getAll($sQuery);
+        $aResult = DatabaseProvider::getDb()->getAll($sQuery, [$sMinSendDate]);
         foreach ($aResult as $aRow) {
             $aOrders[] = $aRow[0];
         }
