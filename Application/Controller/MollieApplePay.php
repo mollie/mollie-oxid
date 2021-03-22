@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Controller;
 
+use Mollie\Payment\Application\Helper\Order as OrderHelper;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Helper\User as UserHelper;
 use Mollie\Payment\Application\Model\TransactionHandler;
@@ -88,6 +89,8 @@ class MollieApplePay extends FrontendController
      */
     protected function createOrder()
     {
+        Registry::getSession()->deleteVariable('sess_challenge'); // Reset whatever order process was active before
+
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
         $oOrder->mollieSetApplePayButtonMode(true);
 
@@ -109,6 +112,8 @@ class MollieApplePay extends FrontendController
             \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('sess_challenge', $oOrder->getId());
             return $oOrder;
         }
+
+        OrderHelper::getInstance()->cancelCurrentOrder();
 
         $mReturn = false;
         if ($iSuccess == Order::ORDER_STATE_INVALIDPAYMENT && DeliverySet::getInstance()->isDeliverySetAvailableWithPaymentType($oBasket->getShippingId(), $oBasket, $oUser) === false) {
