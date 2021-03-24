@@ -55,7 +55,7 @@ class MollieApplePay extends FrontendController
         }
         if (!empty($sDetailsProductId)) { // applies when Apple Pay button on details page is pressed, since product is not in basket yet
             $oBasketItem = $oBasket->addToBasket($sDetailsProductId, $iAmount);
-            $oBasket->calculateBasket();
+            $oBasket->calculateBasket(true);
 
             $this->sDetailsProductBasketItemId = $oBasketItem->getBasketItemKey();
             Registry::getSession()->deleteVariable("blAddedNewItem");
@@ -96,11 +96,11 @@ class MollieApplePay extends FrontendController
 
         $oUser = UserHelper::getInstance()->getApplePayUser();
 
-        Registry::getConfig()->getActiveView()->setUser($oUser);
-
         $oBasket = $this->getApplePayBasket();
-        $oBasket->setBasketUser($oUser);
         $oBasket->calculateBasket(true);
+
+        Registry::getConfig()->getActiveView()->setUser($oUser);
+        $oBasket->setBasketUser($oUser);
 
         //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
         $iSuccess = $oOrder->finalizeOrder($oBasket, $oUser);
@@ -165,6 +165,7 @@ class MollieApplePay extends FrontendController
 
         $oUser = UserHelper::getInstance()->getApplePayUser(true);
         $oBasket = $this->getApplePayBasket();
+        $oBasket->setBasketUser($oUser);
 
         $aDelMethods = DeliverySet::getInstance()->getDeliveryMethods($oUser, $oBasket);
         if (!empty($aDelMethods)) {
