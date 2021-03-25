@@ -88,4 +88,22 @@ class ViewConfig extends ViewConfig_parent
     {
         return (bool)Registry::getConfig()->getShopConfVar('blMollieApplePayButtonOnDetails');
     }
+
+    /**
+     * Functionality from Basket->getPriceForPayment() but without the delivery costs since they are added later
+     *
+     * @return double
+     */
+    public function mollieGetApplePayBasketSum()
+    {
+        $oBasket = Registry::getSession()->getBasket();
+
+        $dPrice = $oBasket->getDiscountedProductsBruttoPrice();
+        //#1905 not discounted products should be included in payment amount calculation
+        if ($oPriceList = $oBasket->getNotDiscountProductsPrice()) {
+            $dPrice += $oPriceList->getBruttoSum();
+        }
+
+        return $dPrice;
+    }
 }
