@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Controller;
 
+use Mollie\Payment\Application\Helper\Order as OrderHelper;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Helper\User as UserHelper;
 use Mollie\Payment\Application\Model\TransactionHandler;
@@ -54,7 +55,7 @@ class MollieApplePay extends FrontendController
         }
         if (!empty($sDetailsProductId)) { // applies when Apple Pay button on details page is pressed, since product is not in basket yet
             $oBasketItem = $oBasket->addToBasket($sDetailsProductId, $iAmount);
-            $oBasket->calculateBasket();
+            $oBasket->calculateBasket(true);
 
             $this->sDetailsProductBasketItemId = $oBasketItem->getBasketItemKey();
             Registry::getSession()->deleteVariable("blAddedNewItem");
@@ -88,16 +89,18 @@ class MollieApplePay extends FrontendController
      */
     protected function createOrder()
     {
+        Registry::getSession()->deleteVariable('sess_challenge'); // Reset whatever order process was active before
+
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
         $oOrder->mollieSetApplePayButtonMode(true);
 
         $oUser = UserHelper::getInstance()->getApplePayUser();
 
-        Registry::getConfig()->getActiveView()->setUser($oUser);
-
         $oBasket = $this->getApplePayBasket();
-        $oBasket->setBasketUser($oUser);
         $oBasket->calculateBasket(true);
+
+        Registry::getConfig()->getActiveView()->setUser($oUser);
+        $oBasket->setBasketUser($oUser);
 
         //finalizing ordering process (validating, storing order into DB, executing payment, setting status ...)
         $iSuccess = $oOrder->finalizeOrder($oBasket, $oUser);
@@ -109,6 +112,8 @@ class MollieApplePay extends FrontendController
             \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('sess_challenge', $oOrder->getId());
             return $oOrder;
         }
+
+        OrderHelper::getInstance()->cancelCurrentOrder();
 
         $mReturn = false;
         if ($iSuccess == Order::ORDER_STATE_INVALIDPAYMENT && DeliverySet::getInstance()->isDeliverySetAvailableWithPaymentType($oBasket->getShippingId(), $oBasket, $oUser) === false) {
@@ -160,6 +165,7 @@ class MollieApplePay extends FrontendController
 
         $oUser = UserHelper::getInstance()->getApplePayUser(true);
         $oBasket = $this->getApplePayBasket();
+        $oBasket->setBasketUser($oUser);
 
         $aDelMethods = DeliverySet::getInstance()->getDeliveryMethods($oUser, $oBasket);
         if (!empty($aDelMethods)) {
