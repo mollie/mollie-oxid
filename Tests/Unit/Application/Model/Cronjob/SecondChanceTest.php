@@ -37,7 +37,7 @@ class SecondChanceTest extends UnitTestCase
 
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("INSERT INTO oxorder (OXID, OXPAYMENTTYPE, OXORDERDATE, OXTRANSSTATUS, OXPAID, MOLLIESECONDCHANCEMAILSENT) VALUE ('secondChanceTest', 'molliecreditcard', ?, 'NOT_FINISHED', '0000-00-00 00:00:00', '0000-00-00 00:00:00')", array(date('Y-m-d H:i:s', (time() - (60 * 60 * 24 * $iDayDiff) - 60))));
 
-        $oCronjob = oxNew($this->getProxyClassName(SecondChance::class));
+        $oCronjob = oxNew($this->getProxyClassName(SecondChance::class), 1);
 
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("UPDATE molliecronjob SET LAST_RUN = ? WHERE OXID = 'mollie_second_chance'", array(date('Y-m-d H:i:s', time() - 60 * 5)));
 

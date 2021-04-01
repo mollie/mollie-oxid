@@ -36,12 +36,22 @@ class Base
     protected $aDbData = null;
 
     /**
+     * ShopId used for cronjob, false means no shopId restriction
+     *
+     * @var int|false
+     */
+    protected $iShopId = false;
+
+    /**
      * Base constructor.
      *
+     * @param int|false $iShopId
      * @return void
      */
-    public function __construct()
+    public function __construct($iShopId = false)
     {
+        $this->iShopId = $iShopId;
+
         $oCronjob = Cronjob::getInstance();
         if ($this->getCronjobId() !== null && $oCronjob->isCronjobAlreadyExisting($this->getCronjobId()) === false) {
             $oCronjob->addNewCronjob($this->getCronjobId(), $this->getDefaultMinuteInterval());
@@ -67,6 +77,16 @@ class Base
     public function getCronjobId()
     {
         return $this->sCronjobId;
+    }
+
+    /**
+     * Returns shop id set by cronjob call
+     *
+     * @return int|false
+     */
+    public function getShopId()
+    {
+        return $this->iShopId;
     }
 
     /**

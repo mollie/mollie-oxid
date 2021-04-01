@@ -3,7 +3,7 @@
         [{oxmultilang ident="MOLLIE_BANKTRANSFER_PENDING"}]
     </td>
     <td class="edittext">
-        <select name="mollie[pending_status]">
+        <select name="mollie[pending_status]" [{$readonly}]>
             [{foreach from=$oView->mollieGetOrderFolders() key=sFolder item=sColor}]
                 <option value="[{$sFolder}]" [{if $paymentModel->getConfigParam('pending_status') == $sFolder}]selected[{/if}]>[{ oxmultilang ident=$sFolder noerror=true }]</option>
             [{/foreach}]

@@ -54,9 +54,13 @@ class SecondChance extends \Mollie\Payment\Application\Model\Cronjob\Base
                         oxorderdate < ? AND 
                         oxtransstatus = 'NOT_FINISHED' AND  
                         oxpaid = '0000-00-00 00:00:00' AND
-                        molliesecondchancemailsent = '0000-00-00 00:00:00';";
-
-        $aResult = DatabaseProvider::getDb()->getAll($sQuery, array($sTriggerMinDate, $sTriggerDate));
+                        molliesecondchancemailsent = '0000-00-00 00:00:00'";
+        $aParams = [$sTriggerMinDate, $sTriggerDate];
+        if ($this->getShopId() !== false) {
+            $sQuery .= " AND oxshopid = ? ";
+            $aParams[] = $this->getShopId();
+        }
+        $aResult = DatabaseProvider::getDb()->getAll($sQuery, $aParams);
         foreach ($aResult as $aRow) {
             $aOrders[] = $aRow[0];
         }

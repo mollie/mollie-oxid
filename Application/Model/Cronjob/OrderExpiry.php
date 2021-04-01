@@ -61,8 +61,21 @@ class OrderExpiry extends \Mollie\Payment\Application\Model\Cronjob\Base
                 }
             }
 
-            $sQuery = "SELECT OXID FROM oxorder WHERE oxstorno = 0 AND oxpaymenttype = ? AND oxfolder IN ".Database::getInstance()->getPreparedInStatement($aFolders)." AND oxorderdate < DATE_ADD(NOW(), INTERVAL ? DAY)";
-            $aResult = DatabaseProvider::getDb()->getAll($sQuery, array_merge([$oPaymentModel->getOxidPaymentId()], $aFolders, ["-".$iExpiryDays]));
+            $sQuery = " SELECT 
+                            OXID 
+                        FROM 
+                            oxorder 
+                        WHERE 
+                            oxstorno = 0 AND 
+                            oxpaymenttype = ? AND 
+                            oxfolder IN ".Database::getInstance()->getPreparedInStatement($aFolders)." AND 
+                            oxorderdate < DATE_ADD(NOW(), INTERVAL ? DAY)";
+            $aParams = array_merge([$oPaymentModel->getOxidPaymentId()], $aFolders, ["-".$iExpiryDays]);
+            if ($this->getShopId() !== false) {
+                $sQuery .= " AND oxshopid = ? ";
+                $aParams[] = $this->getShopId();
+            }
+            $aResult = DatabaseProvider::getDb()->getAll($sQuery, $aParams);
             foreach ($aResult as $aRow) {
                 $aOrders[] = $aRow[0];
             }

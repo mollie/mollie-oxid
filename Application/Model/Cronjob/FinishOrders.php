@@ -47,8 +47,13 @@ class FinishOrders extends \Mollie\Payment\Application\Model\Cronjob\Base
                         oxtransstatus = 'NOT_FINISHED' AND 
                         oxfolder = ? AND 
                         oxpaid != '0000-00-00 00:00:00' AND
-                        oxpaid < ?;";
-        $aResult = DatabaseProvider::getDb()->getAll($sQuery, array($sTriggerDate, $sProcessingFolder, $sMinPaidDate));
+                        oxpaid < ?";
+        $aParams = [$sTriggerDate, $sProcessingFolder, $sMinPaidDate];
+        if ($this->getShopId() !== false) {
+            $sQuery .= " AND oxshopid = ? ";
+            $aParams[] = $this->getShopId();
+        }
+        $aResult = DatabaseProvider::getDb()->getAll($sQuery, $aParams);
         foreach ($aResult as $aRow) {
             $aOrders[] = $aRow[0];
         }

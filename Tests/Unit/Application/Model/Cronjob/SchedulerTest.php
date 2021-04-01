@@ -29,7 +29,7 @@ class SchedulerTest extends UnitTestCase
         UtilsObject::setClassInstance(SecondChance::class, $oCronSecondChance);
 
         $oScheduler = new \Mollie\Payment\Application\Model\Cronjob\Scheduler();
-        $result = $oScheduler->start();
+        $result = $oScheduler->start(2);
 
         $this->assertNull($result);
     }

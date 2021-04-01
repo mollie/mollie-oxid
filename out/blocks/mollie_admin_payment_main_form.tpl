@@ -44,7 +44,7 @@
                 }
                 -->
             </script>
-            <select name="mollie[api]" onchange="mollieHandleApiChange(this)">
+            <select name="mollie[api]" onchange="mollieHandleApiChange(this)" [{$readonly}]>
                 <option value="payment" [{if $paymentModel->getApiMethod() == 'payment'}]selected[{/if}]>Payment API</option>
                 <option value="order" [{if $paymentModel->getApiMethod() == 'order'}]selected[{/if}]>Order API</option>
             </select>
@@ -63,7 +63,7 @@
             [{oxmultilang ident="MOLLIE_ORDER_EXPIRY"}]
         </td>
         <td class="edittext">
-            <select name="mollie[expiryDays]">
+            <select name="mollie[expiryDays]" [{$readonly}]>
                 [{foreach from=$oView->mollieGetExpiryDayOptions() item=title key=days}]
                     <option value="[{$days}]" [{if $paymentModel->getExpiryDays() == $days}]selected[{/if}]>[{$title}]</option>
                 [{/foreach}]

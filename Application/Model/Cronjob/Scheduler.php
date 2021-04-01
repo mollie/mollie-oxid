@@ -4,6 +4,8 @@
 namespace Mollie\Payment\Application\Model\Cronjob;
 
 
+use OxidEsales\Eshop\Core\Registry;
+
 class Scheduler
 {
     /**
@@ -46,14 +48,21 @@ class Scheduler
     /**
      * Starts all cronjobs
      *
+     * @param  int|false $iShopId
      * @return void
      */
-    public function start()
+    public function start($iShopId = false)
     {
         Base::outputInfo("START MOLLIE CRONJOB EXECUTION");
 
+        if ($iShopId !== false) {
+            $oConfig = Registry::getConfig();
+            $oConfig->setShopId($iShopId);
+            Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
+        }
+
         foreach ($this->getCronjobs() as $sCronjobClass) {
-            $oCronjob = oxNew($sCronjobClass);
+            $oCronjob = oxNew($sCronjobClass, $iShopId);
             if ($oCronjob->isCronjobActivated() && $this->isCronjobDue($oCronjob)) {
                 $oCronjob->startCronjob();
             }

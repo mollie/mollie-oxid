@@ -43,8 +43,13 @@ class OrderShipment extends \Mollie\Payment\Application\Model\Cronjob\Base
                         oxpaymenttype LIKE '%mollie%' AND
                         oxtransid LIKE '%ord_%' AND
                         oxsenddate >= ? AND
-                        mollieshipmenthasbeenmarked = 0;";
-        $aResult = DatabaseProvider::getDb()->getAll($sQuery, [$sMinSendDate]);
+                        mollieshipmenthasbeenmarked = 0";
+        $aParams = [$sMinSendDate];
+        if ($this->getShopId() !== false) {
+            $sQuery .= " AND oxshopid = ? ";
+            $aParams[] = $this->getShopId();
+        }
+        $aResult = DatabaseProvider::getDb()->getAll($sQuery, $aParams);
         foreach ($aResult as $aRow) {
             $aOrders[] = $aRow[0];
         }

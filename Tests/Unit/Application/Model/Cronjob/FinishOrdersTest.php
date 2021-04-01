@@ -34,9 +34,9 @@ class FinishOrdersTest extends UnitTestCase
 
         Registry::set(Config::class, $oConfig);
 
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("INSERT INTO oxorder (OXID, OXSTORNO, OXPAYMENTTYPE, OXORDERDATE, OXTRANSSTATUS, OXFOLDER, OXPAID) VALUE ('finishOrdersTest', 0, 'molliecreditcard', ?, 'NOT_FINISHED', ?, ?)", array(date('Y-m-d H:i:s'), $sFolder, date('Y-m-d H:i:s', time() - (60 * 10))));
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("INSERT INTO oxorder (OXID, OXSHOPID, OXSTORNO, OXPAYMENTTYPE, OXORDERDATE, OXTRANSSTATUS, OXFOLDER, OXPAID) VALUE ('finishOrdersTest', 2, 0, 'molliecreditcard', ?, 'NOT_FINISHED', ?, ?)", array(date('Y-m-d H:i:s'), $sFolder, date('Y-m-d H:i:s', time() - (60 * 10))));
 
-        $oCronjob = new FinishOrders();
+        $oCronjob = new FinishOrders(2);
         $result = $oCronjob->startCronjob();
 
         $this->assertTrue($result);

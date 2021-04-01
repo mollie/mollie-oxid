@@ -27,9 +27,9 @@ class OrderShipmentTest extends UnitTestCase
 
         UtilsObject::setClassInstance(Order::class, $oOrder);
 
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("INSERT INTO oxorder (oxid, oxpaymenttype, oxtransid, oxsenddate, mollieshipmenthasbeenmarked) VALUE ('markShipmentTest', 'molliecreditcard', 'ord_test', '".date('Y-m-d H:i:s')."', 0)");
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("INSERT INTO oxorder (oxid, oxshopid, oxpaymenttype, oxtransid, oxsenddate, mollieshipmenthasbeenmarked) VALUE ('markShipmentTest', 3, 'molliecreditcard', 'ord_test', '".date('Y-m-d H:i:s')."', 0)");
 
-        $oCronjob = oxNew(OrderShipment::class);
+        $oCronjob = oxNew(OrderShipment::class, 3);
         $result = $oCronjob->startCronjob();
 
         $this->assertTrue($result);
