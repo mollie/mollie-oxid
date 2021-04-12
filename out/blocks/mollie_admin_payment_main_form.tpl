@@ -41,6 +41,12 @@
                             }
                         }
                     }
+
+                    if (oSelect.value === 'payment') {
+                        document.getElementById('mollie_payment_description').style.display = '';
+                    } else {
+                        document.getElementById('mollie_payment_description').style.display = 'none';
+                    }
                 }
                 -->
             </script>
@@ -54,6 +60,15 @@
             <span id="mollie_apihint_order" class="mollieApiHint" [{if $paymentModel->getApiMethod() != 'order'}]style="display:none;"[{/if}]>
                 [{oxmultilang ident="MOLLIE_ORDER_API_LINK_1"}] <a href="https://docs.mollie.com/orders/overview" target=”_blank” style="text-decoration: underline;">[{oxmultilang ident="MOLLIE_ORDER_API_LINK_2"}]</a>
             </span>
+        </td>
+    </tr>
+    <tr id="mollie_payment_description" [{if $paymentModel->getApiMethod() != 'payment'}]style="display:none;"[{/if}]>
+        <td class="edittext" width="70">
+            [{oxmultilang ident="MOLLIE_PAYMENT_DESCRIPTION"}]
+        </td>
+        <td class="edittext">
+            <input type="text" class="editinput" size="25" name="mollie[payment_description]" value="[{$paymentModel->getConfigParam('payment_description')}]" [{$readonly}]>
+            [{oxinputhelp ident="MOLLIE_PAYMENT_DESCRIPTION_HELP"}]
         </td>
     </tr>
     [{/if}]

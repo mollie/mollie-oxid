@@ -115,4 +115,6 @@ $aLang = array(
     'MOLLIE_SEND_SECOND_CHANCE_MAIL'                    => 'Second Chance Email versenden',
     'MOLLIE_SECOND_CHANCE_MAIL_ALREADY_SENT'            => 'Die Email wurde bereits versendet.',
     'MOLLIE_SUBSEQUENT_ORDER_COMPLETION'                => 'Nachtr&auml;glicher Bestellabschluss',
+    'MOLLIE_PAYMENT_DESCRIPTION'                        => 'Zahlungsbezeichnung',
+    'MOLLIE_PAYMENT_DESCRIPTION_HELP'                   => 'Dies wird auf dem Kontoauszug des Kunden angezeigt soweit m&ouml;glich.<br><br>Sie k&ouml;nnen die folgenden Parameter benutzen:<br>{orderId}<br>{orderNumber}<br>{storeName}<br>{customer.firstname}<br>{customer.lastname}<br>{customer.company}',
 );
