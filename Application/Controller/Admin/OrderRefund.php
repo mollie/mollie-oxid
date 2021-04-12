@@ -153,14 +153,31 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
+     * Checks if this order has had a free amount refund
+     *
+     * @return bool
+     */
+    public function hasHadFreeAmountRefund()
+    {
+        $oOrder = $this->getOrder();
+        foreach ($oOrder->getOrderArticles() as $oOrderArticle) {
+            if (((double)$oOrderArticle->oxorderarticles__mollieamountrefunded->value > 0 && $oOrderArticle->oxorderarticles__molliequantityrefunded->value == 0)
+                || ($oOrderArticle->oxorderarticles__molliequantityrefunded->value * $oOrderArticle->oxorderarticles__oxbprice->value != $oOrderArticle->oxorderarticles__mollieamountrefunded->value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get refund type - quantity or amount
      *
      * @return string
      */
-    protected function getRefundType()
+    public function getRefundType()
     {
         $sType = "amount"; // Payment API
-        if ($this->isMollieOrderApi() === true) {
+        if ($this->isMollieOrderApi() === true && $this->hasHadFreeAmountRefund() === false) {
             $sType = "quantity"; // Order API
         }
         return $sType;
@@ -457,6 +474,23 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
+     * Returns Mollie payment object or in case of Order API the method retrieves the payment object from the order object
+     *
+     * @return \Mollie\Api\Resources\Order|\Mollie\Api\Resources\Payment
+     */
+    protected function getMolliePaymentTransaction()
+    {
+        $oApiObject = $this->getMollieApiOrder();
+        if ($oApiObject instanceof \Mollie\Api\Resources\Order) {
+            $aPayments = $oApiObject->payments();
+            if (!empty($aPayments)) {
+                $oApiObject = $aPayments[0];
+            }
+        }
+        return $oApiObject;
+    }
+
+    /**
      * Execute full refund action
      *
      * @return void
@@ -469,7 +503,9 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
 
         $oRequestLog = oxNew(RequestLog::class);
         try {
-            $oResponse = $this->getMollieApiOrder()->refund($aParams);
+            $oPaymentTransaction = $this->getMolliePaymentTransaction();
+
+            $oResponse = $oPaymentTransaction->refund($aParams);
             $oRequestLog->logRequest($aParams, $oResponse, $this->getOrder()->getId(), $this->getConfig()->getShopId());
             $this->markOrderWithFreeAmount($dFreeAmount);
             $this->_blSuccessfulRefund = true;
@@ -523,10 +559,13 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oRequestLog = oxNew(RequestLog::class);
         try {
             $oMollieApiOrder = $this->getMollieApiOrder();
-            if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order) {
+            if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order && $this->hasHadFreeAmountRefund() === false) {
                 unset($aParams['amount']);
-            } elseif ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment) {
+            } else {
                 unset($aParams['lines']);
+                if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order) {
+                    $oMollieApiOrder = $this->getMolliePaymentTransaction();
+                }
             }
 
             $oResponse = $oMollieApiOrder->refund($aParams);
@@ -549,7 +588,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     protected function getMollieApiOrder($blRefresh = false)
     {
         if ($this->_oMollieApiOrder === null || $blRefresh === true) {
-            $this->_oMollieApiOrder = $this->getMollieApiRequestModel()->get($this->getOrder()->oxorder__oxtransid->value);
+            $this->_oMollieApiOrder = $this->getMollieApiRequestModel()->get($this->getOrder()->oxorder__oxtransid->value, ["embed" => "payments"]);
         }
         return $this->_oMollieApiOrder;
     }

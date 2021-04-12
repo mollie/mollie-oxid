@@ -89,7 +89,6 @@
             [{oxmultilang ident="MOLLIE_REFUND_SUCCESSFUL"}]
         </fieldset>
     [{/if}]
-
     [{if $oView->getErrorMessage() != false}]
         <fieldset class="refundError message">
             <strong>Error</strong>
@@ -143,7 +142,7 @@
                     <span>[{oxmultilang ident="MOLLIE_FULL_REFUND_TEXT"}]: [{$oView->getFormatedPrice($edit->oxorder__oxtotalordersum->value)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span><br><br>
                 [{else}]
                     <input type="hidden" name="refundRemaining" value="1">
-                    <span>[{oxmultilang ident="MOLLIE_REFUND_REMAINING"}]:: [{$oView->getFormatedPrice($oView->getRemainingRefundableAmount())}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span><br><br>
+                    <span>[{oxmultilang ident="MOLLIE_REFUND_REMAINING"}]: [{$oView->getFormatedPrice($oView->getRemainingRefundableAmount())}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span><br><br>
                 [{/if}]
                 <span><label for="refund_description">[{oxmultilang ident="MOLLIE_REFUND_DESCRIPTION"}]:</label></span>
                 <input type="text" name="refund_description" value="" placeholder="[{oxmultilang ident="MOLLIE_REFUND_DESCRIPTION_PLACEHOLDER"}]" maxlength="140" size="120"><br>
@@ -172,7 +171,7 @@
                 <td class="listheader" width="10%">[{oxmultilang ident="MOLLIE_HEADER_ORDERED"}]</td>
                 <td class="listheader" width="20%">[{oxmultilang ident="MOLLIE_HEADER_REFUNDED"}]</td>
                 [{if $blIsOrderRefundable == true}]
-                    [{if $oView->isMollieOrderApi()}]
+                    [{if $oView->getRefundType() == 'quantity'}]
                         <td class="listheader" width="5%">[{oxmultilang ident="MOLLIE_REFUND_QUANTITY"}]</td>
                     [{else}]
                         <td class="listheader" width="5%">[{oxmultilang ident="MOLLIE_REFUND_AMOUNT"}]</td>
@@ -195,21 +194,21 @@
                     <td valign="top" class="[{$listclass}][{$class}]">[{$oView->getFormatedPrice($listitem.totalPrice)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></td>
                     <td valign="top" class="[{$listclass}][{$class}]">[{$listitem.vat}]</td>
                     <td valign="top" class="[{$listclass}][{$class}]">
-                        [{if $oView->isMollieOrderApi()}]
+                        [{if $oView->getRefundType() == 'quantity'}]
                             <span class="refundQuantity">[{$listitem.quantity}]</span>
                         [{else}]
                             <span class="refundAmount">[{$oView->getFormatedPrice($listitem.totalPrice)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span>
                         [{/if}]
                     </td>
                     <td valign="top" class="[{$listclass}][{$class}]">
-                        [{if $oView->isMollieOrderApi()}]
+                        [{if $oView->getRefundType() == 'quantity'}]
                             <span class="refundQuantity">[{$listitem.quantityRefunded}]</span>
                         [{else}]
                             <span>[{$oView->getFormatedPrice($listitem.amountRefunded)}] <small>[{$edit->oxorder__oxcurrency->value}]</small></span>
                         [{/if}]
                     </td>
                     [{if $blIsOrderRefundable == true}]
-                        [{if $oView->isMollieOrderApi()}]
+                        [{if $oView->getRefundType() == 'quantity'}]
                             <td valign="top" class="[{$listclass}][{$class}]" nowrap>
                                 [{if $listitem.isOrderarticle == true}]
                                     <span class="refundQuantity">
@@ -253,7 +252,7 @@
                 [{/if}]
             [{/foreach}]
         </table><br>
-        [{if $blIsOrderRefundable == true && $oView->isMollieOrderApi() == false}]
+        [{if $blIsOrderRefundable == true}]
             <form id="free_refund" action="[{$oViewConf->getSelfLink()}]" method="post">
                 [{$oViewConf->getHiddenSid()}]
                 <input type="hidden" name="cl" value="mollie_order_refund">

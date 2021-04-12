@@ -729,4 +729,76 @@ class OrderTest extends UnitTestCase
 
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('DELETE FROM oxorder WHERE oxid = "webhookTest"');
     }
+
+    public function testMollieGetPaymentTransactionIdPayment()
+    {
+        Payment::destroyInstance();
+
+        $expected = 'tr_success';
+
+        $oPaymentTransaction = new \stdClass();
+        $oPaymentTransaction->id = $expected;
+
+        $oApiOrder = $this->getMockBuilder(\Mollie\Api\Resources\Order::class)->disableOriginalConstructor()->getMock();
+        $oApiOrder->_embedded = new \stdClass();
+        $oApiOrder->_embedded->payments = [$oPaymentTransaction];
+
+        $oApiEndpoint = $this->getMockBuilder(\Mollie\Api\Endpoints\OrderEndpoint::class)->disableOriginalConstructor()->getMock();
+        $oApiEndpoint->method('get')->willReturn($oApiOrder);
+
+        $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
+        $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+
+        $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
+        $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);
+
+        UtilsObject::setClassInstance(Payment::class, $oPaymentHelper);
+
+        $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
+        $oOrder->oxorder__oxtransid = new Field('ord_test');
+        $result = $oOrder->mollieGetPaymentTransactionId();
+
+        $this->assertEquals($expected, $result);
+
+        UtilsObject::resetClassInstances();
+        Payment::destroyInstance();
+    }
+
+    public function testMollieGetPaymentTransactionIdPaymentFalse()
+    {
+        Payment::destroyInstance();
+
+        $oApiOrder = $this->getMockBuilder(\Mollie\Api\Resources\Payment::class)->disableOriginalConstructor()->getMock();
+
+        $oApiEndpoint = $this->getMockBuilder(\Mollie\Api\Endpoints\OrderEndpoint::class)->disableOriginalConstructor()->getMock();
+        $oApiEndpoint->method('get')->willReturn($oApiOrder);
+
+        $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
+        $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+
+        $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
+        $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);
+
+        UtilsObject::setClassInstance(Payment::class, $oPaymentHelper);
+
+        $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
+        $oOrder->oxorder__oxtransid = new Field('ord_test');
+        $result = $oOrder->mollieGetPaymentTransactionId();
+
+        $this->assertFalse($result);
+
+        UtilsObject::resetClassInstances();
+        Payment::destroyInstance();
+    }
+
+    public function testMollieGetPaymentTransactionIdPaymentApi()
+    {
+        $expected = 'tr_test';
+
+        $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
+        $oOrder->oxorder__oxtransid = new Field($expected);
+        $result = $oOrder->mollieGetPaymentTransactionId();
+
+        $this->assertEquals($expected, $result);
+    }
 }

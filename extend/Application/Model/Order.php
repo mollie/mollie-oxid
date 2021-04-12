@@ -700,4 +700,24 @@ class Order extends Order_parent
         }
         return false;
     }
+
+    /**
+     * Returns Mollie payment transactionId for given order regardless of Payment-API or Order-API usage
+     *
+     * @return string|bool
+     */
+    public function mollieGetPaymentTransactionId()
+    {
+        if (stripos($this->oxorder__oxtransid->value, 'tr_') !== false) { // tr_ means it is already a transactionId
+            return $this->oxorder__oxtransid->value;
+        }
+
+        $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpoint();
+        $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value, ["embed" => "payments"]);
+        if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order && !empty($oMollieApiOrder->_embedded) && !empty($oMollieApiOrder->_embedded->payments)) {
+            $oPayment = array_shift($oMollieApiOrder->_embedded->payments);
+            return $oPayment->id;
+        }
+        return false;
+    }
 }
