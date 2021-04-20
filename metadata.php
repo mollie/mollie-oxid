@@ -40,7 +40,7 @@ not because a contract forces you!
 ",
     ],
     'thumbnail'    => 'mollie_logo.png',
-    'version'       => '1.0.21',
+    'version'       => '1.0.22',
     'author'        => 'Fatchip GmbH',
     'email'         => 'info@mollie.com',
     'url'          => 'https://www.mollie.com/',
