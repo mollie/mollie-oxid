@@ -639,8 +639,12 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oApiOrder = $this->getMollieApiOrder();
 
         $dPrice = 0;
-        if ($oApiOrder && !empty($oApiOrder->amountRemaining)) {
-            $dPrice = $oApiOrder->amountRemaining->value;
+        if ($oApiOrder) {
+            if (!empty($oApiOrder->amountRemaining)) {
+                $dPrice = $oApiOrder->amountRemaining->value;
+            } else {
+                $dPrice = $this->getRemainingRefundableAmount();
+            }
         }
         return $this->getFormatedPrice($dPrice);
     }
