@@ -12,7 +12,8 @@ $aModule = [
     'id'            => 'molliepayment',
     'title'         => [
         'de' => 'Mollie Payment',
-        'en' => 'Mollie Payment'
+        'en' => 'Mollie Payment',
+        'fr' => 'Mollie Payment'
     ],
     'description'   => [
         'de' => 'Steigern Sie Ihren Umsatz mit einer stressfreien Zahlungslösung. Mollie bietet alle relevanten Zahlungsarten,<br>
@@ -37,6 +38,18 @@ The onboarding process is quick and easy, and the Mollie dashboard and app let y
 a glance. You can choose for yourself how often you want to receive your payouts. With Mollie, you’ll never pay any monthly<br>
 fees or setup costs. You’ll only pay for successful transactions. And you’ll stay because you're happy with our service,<br>
 not because a contract forces you! 
+",
+        'fr' => "Dynamisez votre taux de conversion avec une solution de paiement sans souci. Mollie offre toutes les méthodes<br>
+de paiement populaires, ainsi qu'un encaissement optimisé et une prise en main très simple. Comment cela vous profitera-t-il?<br>
+La réponse est simple: taux de conversion plus élevé, clients satisfaits et une intégration simple dans votre boutique OXID.<br>
+Le paiment en ligne ne doit pas être compliqué!<br><br>
+Avec une solution Mollie intégrée, vous avez accès à toutes les plus importantes méthodes de paiement, notamment Klarna,<br>
+les cartes de crédit, les virements SEPA, Apple Pay et plus. Vous dynamiserez vos conversions avec une expérience en caisse améliorée<br>
+dans un environnement familier, sans redirection.<br>
+La prise en main est rapide et facile, le tableau de bord Mollie ainsi que l'application vous permettent de garder la trace<br>
+de toutes vos transactions en un coup d'oeil. Vous pouvez vous-même choisir à quelle fréquence vous voulez recevoir vos paiements.<br>
+Avec Mollie, vous ne paierez jamais de frais mensuels ou d'installation. Vous ne paierez que pour les transactions réussies.<br>
+Et vous resterez car satisfait de notre service, et non forcé par un contrat!
 ",
     ],
     'thumbnail'    => 'mollie_logo.png',
