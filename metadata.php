@@ -51,6 +51,17 @@ de toutes vos transactions en un coup d'oeil. Vous pouvez vous-même choisir à 
 Avec Mollie, vous ne paierez jamais de frais mensuels ou d'installation. Vous ne paierez que pour les transactions réussies.<br>
 Et vous resterez car satisfait de notre service, et non forcé par un contrat!
 ",
+        'nl' => "Verhoog je conversie met een probleemloze betalingsoplossing. Mollie biedt alle populaire betaalmethodes, <br>
+plus een geoptimaliseerde checkout en eenvoudige onboarding. Wat levert jou dat op? Het antwoord is simpel: hogere <br>
+conversieratio's, tevreden klanten en een eenvoudige integratie in je OXID-webshop. Online betalingen hoeven <br> niet
+ingewikkeld te zijn. <br> <br>
+AMet een geïntegreerde oplossing van Mollie krijg je toegang tot alle belangrijkste betaalmethodes, waaronder Klarna, <br>
+creditcards, SEPA-automatische incasso, Apple Pay en meer. Je geeft je conversie een boost met een verbeterde checkout-ervaring, allemaal <br>
+binnen een vertrouwde branded-omgeving, zonder omleidingen. <br>
+Het onboarding-proces is snel en eenvoudig, en met het Mollie Dashboard en de app volg je al je transacties <br>
+in een oogopslag. Je bepaalt zelf hoe vaak je jouw uitbetalingen wilt ontvangen. We willen dat je bij ons blijft omdat je blij bent met onze service, niet omdat het moet. <br> Daarom hebben we geen vaste contracten en rekenen we nooit maandelijkse <br> 
+fees op opstartkosten. Je betaalt alleen voor succesvolle transacties.
+",
     ],
     'thumbnail'    => 'mollie_logo.png',
     'version'       => '1.0.22',
