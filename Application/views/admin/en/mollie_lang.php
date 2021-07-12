@@ -117,4 +117,5 @@ $aLang = array(
     'MOLLIE_SUBSEQUENT_ORDER_COMPLETION'                => 'Subsequent order completion',
     'MOLLIE_PAYMENT_DESCRIPTION'                        => 'Payment description',
     'MOLLIE_PAYMENT_DESCRIPTION_HELP'                   => 'This will be shown to your customer on their card or bank statement when possible.<br><br>You can use the following parameters:<br>{orderId}<br>{orderNumber}<br>{storeName}<br>{customer.firstname}<br>{customer.lastname}<br>{customer.company}',
+    'MOLLIE_MODULE_VERSION_OUTDATED'                    => 'Caution! The current module version is',
 );

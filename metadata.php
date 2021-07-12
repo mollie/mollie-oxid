@@ -75,6 +75,7 @@ fees op opstartkosten. Je betaalt alleen voor succesvolle transacties.
         \OxidEsales\Eshop\Application\Model\Payment::class => Mollie\Payment\extend\Application\Model\Payment::class,
         \OxidEsales\Eshop\Application\Model\User::class => Mollie\Payment\extend\Application\Model\User::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => Mollie\Payment\extend\Application\Controller\Admin\ModuleConfiguration::class,
+        \OxidEsales\Eshop\Application\Controller\Admin\ModuleMain::class => Mollie\Payment\extend\Application\Controller\Admin\ModuleMain::class,
         \OxidEsales\Eshop\Application\Controller\Admin\PaymentMain::class => Mollie\Payment\extend\Application\Controller\Admin\PaymentMain::class,
         \OxidEsales\Eshop\Application\Controller\Admin\OrderMain::class => Mollie\Payment\extend\Application\Controller\Admin\OrderMain::class,
         \OxidEsales\Eshop\Application\Controller\Admin\OrderOverview::class => Mollie\Payment\extend\Application\Controller\Admin\OrderOverview::class,
@@ -108,6 +109,7 @@ fees op opstartkosten. Je betaalt alleen voor succesvolle transacties.
         'mollieapplepaybutton.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/mollieapplepaybutton.tpl',
         'mollie_order_refund.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/mollie_order_refund.tpl',
         'mollie_second_chance.tpl' => 'mollie/molliepayment/Application/views/email/tpl/mollie_second_chance.tpl',
+        'mollie_module_main.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/mollie_module_main.tpl',
     ],
     'events'        => [
         'onActivate' => \Mollie\Payment\Core\Events::class.'::onActivate',

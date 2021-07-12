@@ -117,4 +117,5 @@ $aLang = array(
     'MOLLIE_SUBSEQUENT_ORDER_COMPLETION'                => 'Nachtr&auml;glicher Bestellabschluss',
     'MOLLIE_PAYMENT_DESCRIPTION'                        => 'Zahlungsbezeichnung',
     'MOLLIE_PAYMENT_DESCRIPTION_HELP'                   => 'Dies wird auf dem Kontoauszug des Kunden angezeigt soweit m&ouml;glich.<br><br>Sie k&ouml;nnen die folgenden Parameter benutzen:<br>{orderId}<br>{orderNumber}<br>{storeName}<br>{customer.firstname}<br>{customer.lastname}<br>{customer.company}',
+    'MOLLIE_MODULE_VERSION_OUTDATED'                    => 'Achtung! Die aktuellste Modulversion ist',
 );
