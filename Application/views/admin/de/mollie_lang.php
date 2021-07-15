@@ -118,4 +118,13 @@ $aLang = array(
     'MOLLIE_PAYMENT_DESCRIPTION'                        => 'Zahlungsbezeichnung',
     'MOLLIE_PAYMENT_DESCRIPTION_HELP'                   => 'Dies wird auf dem Kontoauszug des Kunden angezeigt soweit m&ouml;glich.<br><br>Sie k&ouml;nnen die folgenden Parameter benutzen:<br>{orderId}<br>{orderNumber}<br>{storeName}<br>{customer.firstname}<br>{customer.lastname}<br>{customer.company}',
     'MOLLIE_MODULE_VERSION_OUTDATED'                    => 'Achtung! Die aktuellste Modulversion ist',
+    'MOLLIE_SUPPORT_HEADER'                             => 'Kontaktieren Sie uns - Technischer Support',
+    'MOLLIE_SUPPORT_REQUIRED_FIELDS'                    => 'Bitte f&uuml;llen Sie alle Pflichtfelder aus.',
+    'MOLLIE_SUPPORT_FORM_NAME'                          => 'Name',
+    'MOLLIE_SUPPORT_FORM_EMAIL'                         => 'E-mail',
+    'MOLLIE_SUPPORT_FORM_SUBJECT'                       => 'Betreff',
+    'MOLLIE_SUPPORT_FORM_ENQUIRY'                       => 'Anfrage',
+    'MOLLIE_SUPPORT_FORM_ENQUIRY_PLACEHOLDER'           => 'Wie k&ouml;nnen wir Ihnen helfen?',
+    'MOLLIE_SUPPORT_FORM_SUBMIT'                        => 'Absenden',
+    'MOLLIE_SUPPORT_EMAIL_SENT'                         => 'Ihre Anfrage wurde erfolgreich versendet. Sie werden eine Kopie der Email erhalten.',
 );

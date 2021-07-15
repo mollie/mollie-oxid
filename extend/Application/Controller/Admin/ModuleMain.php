@@ -11,6 +11,8 @@ class ModuleMain extends ModuleMain_parent
 {
     protected $_sMollieNewestVersion = null;
 
+    protected $_blMailHasBeenSent = false;
+
     /**
      * Collects currently newest release version number from github
      *
@@ -77,6 +79,80 @@ class ModuleMain extends ModuleMain_parent
             $sModuleId = $this->getEditObjectId();
         }
         return $sModuleId;
+    }
+
+    /**
+     * Returns representation of log entry for log file
+     *
+     * @param  array $aRow
+     * @return string|true
+     */
+    protected function getLogRepresentation($aRow)
+    {
+        if (!empty($aRow['REQUEST'])) {
+            $aRow['REQUEST'] = json_decode($aRow['REQUEST'], true);
+        }
+        if (!empty($aRow['RESPONSE'])) {
+            $aRow['RESPONSE'] = json_decode($aRow['RESPONSE'], true);
+        }
+        $sArrayPrint = print_r($aRow, true);
+        $sArrayPrint .= "###########################################################################################################################################################################\n";
+        return $sArrayPrint;
+    }
+
+    /**
+     * Generates log file and returns its path or false if no matching log entries are in the database
+     *
+     * @return string|false
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseErrorException
+     */
+    protected function createLogAttachmentFile()
+    {
+        $sQuery = "SELECT * FROM mollierequestlog WHERE timestamp > DATE_SUB(CURDATE(), INTERVAL 7 DAY) LIMIT 700";
+        $aResult = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sQuery);
+        if (!empty($aResult)) {
+            $sPath = dirname(__FILE__).DIRECTORY_SEPARATOR."mollie_logfile_".time().".log";
+            $oFile = fopen($sPath, "w");
+            foreach ($aResult as $aRow) {
+                fwrite($oFile, $this->getLogRepresentation($aRow));
+            }
+            fclose($oFile);
+            return $sPath;
+        }
+        return false;
+    }
+
+    /**
+     * Sends email to Mollie support
+     *
+     * @return void
+     */
+    public function mollieSendSupportEnquiry()
+    {
+        $aSupport = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("support");
+        if (!empty($aSupport)) {
+            $sMollieLogFilePath = $this->createLogAttachmentFile();
+
+            $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+            $oEmail->mollieSendSupportEmail($aSupport['name'], $aSupport['email'], $aSupport['subject'], $aSupport['enquiry'], $this->mollieGetUsedVersionNumber(), $sMollieLogFilePath);
+
+            if ($sMollieLogFilePath !== false) {
+                unlink($sMollieLogFilePath);
+            }
+
+            $this->_blMailHasBeenSent = true;
+        }
+    }
+
+    /**
+     * Returns if support email was sent successfully
+     *
+     * @return bool
+     */
+    public function mollieMailHasBeenSent()
+    {
+        return $this->_blMailHasBeenSent;
     }
 
     /**

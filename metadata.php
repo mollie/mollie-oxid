@@ -110,6 +110,7 @@ fees op opstartkosten. Je betaalt alleen voor succesvolle transacties.
         'mollie_order_refund.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/mollie_order_refund.tpl',
         'mollie_second_chance.tpl' => 'mollie/molliepayment/Application/views/email/tpl/mollie_second_chance.tpl',
         'mollie_module_main.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/mollie_module_main.tpl',
+        'mollie_support_email.tpl' => 'mollie/molliepayment/Application/views/email/tpl/mollie_support_email.tpl',
     ],
     'events'        => [
         'onActivate' => \Mollie\Payment\Core\Events::class.'::onActivate',

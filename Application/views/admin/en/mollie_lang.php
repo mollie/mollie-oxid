@@ -118,4 +118,13 @@ $aLang = array(
     'MOLLIE_PAYMENT_DESCRIPTION'                        => 'Payment description',
     'MOLLIE_PAYMENT_DESCRIPTION_HELP'                   => 'This will be shown to your customer on their card or bank statement when possible.<br><br>You can use the following parameters:<br>{orderId}<br>{orderNumber}<br>{storeName}<br>{customer.firstname}<br>{customer.lastname}<br>{customer.company}',
     'MOLLIE_MODULE_VERSION_OUTDATED'                    => 'Caution! The current module version is',
+    'MOLLIE_SUPPORT_HEADER'                             => 'Contact Us - Technical Support',
+    'MOLLIE_SUPPORT_REQUIRED_FIELDS'                    => 'Please fill in all required fields.',
+    'MOLLIE_SUPPORT_FORM_NAME'                          => 'Name',
+    'MOLLIE_SUPPORT_FORM_EMAIL'                         => 'E-mail',
+    'MOLLIE_SUPPORT_FORM_SUBJECT'                       => 'Subject',
+    'MOLLIE_SUPPORT_FORM_ENQUIRY'                       => 'Enquiry',
+    'MOLLIE_SUPPORT_FORM_ENQUIRY_PLACEHOLDER'           => 'How can we help you?',
+    'MOLLIE_SUPPORT_FORM_SUBMIT'                        => 'Submit',
+    'MOLLIE_SUPPORT_EMAIL_SENT'                         => 'Your support enquiry has been sent. You will receive a copy of the email.',
 );
