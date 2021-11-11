@@ -2,7 +2,7 @@
 
 namespace Mollie\Api\Resources;
 
-class OrderLineCollection extends \Mollie\Api\Resources\BaseCollection
+class OrderLineCollection extends BaseCollection
 {
     /**
      * @return string|null
@@ -11,6 +11,7 @@ class OrderLineCollection extends \Mollie\Api\Resources\BaseCollection
     {
         return null;
     }
+
     /**
      * Get a specific order line.
      * Returns null if the order line cannot be found.
@@ -25,6 +26,7 @@ class OrderLineCollection extends \Mollie\Api\Resources\BaseCollection
                 return $line;
             }
         }
+
         return null;
     }
 }

@@ -10,10 +10,12 @@ abstract class BaseCollection extends \ArrayObject
      * @var int
      */
     public $count;
+
     /**
      * @var \stdClass
      */
     public $_links;
+
     /**
      * @param int $count
      * @param \stdClass $_links
@@ -22,9 +24,11 @@ abstract class BaseCollection extends \ArrayObject
     {
         $this->count = $count;
         $this->_links = $_links;
+        parent::__construct();
     }
+
     /**
      * @return string|null
      */
-    public abstract function getCollectionResourceName();
+    abstract public function getCollectionResourceName();
 }

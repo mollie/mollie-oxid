@@ -5,9 +5,11 @@ namespace Mollie\Api\Endpoints;
 use Mollie\Api\Resources\Customer;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
-class CustomerPaymentsEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
+
+class CustomerPaymentsEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "customers_payments";
+
     /**
      * Get the object that is used by this API endpoint. Every API endpoint uses one type of object.
      *
@@ -15,8 +17,9 @@ class CustomerPaymentsEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointA
      */
     protected function getResourceObject()
     {
-        return new \Mollie\Api\Resources\Payment($this->client);
+        return new Payment($this->client);
     }
+
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -27,8 +30,9 @@ class CustomerPaymentsEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointA
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new \Mollie\Api\Resources\PaymentCollection($this->client, $count, $_links);
+        return new PaymentCollection($this->client, $count, $_links);
     }
+
     /**
      * Create a subscription for a Customer
      *
@@ -39,10 +43,11 @@ class CustomerPaymentsEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointA
      * @return Payment
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function createFor(\Mollie\Api\Resources\Customer $customer, array $options = [], array $filters = [])
+    public function createFor(Customer $customer, array $options = [], array $filters = [])
     {
         return $this->createForId($customer->id, $options, $filters);
     }
+
     /**
      * Create a subscription for a Customer ID
      *
@@ -56,8 +61,10 @@ class CustomerPaymentsEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointA
     public function createForId($customerId, array $options = [], array $filters = [])
     {
         $this->parentId = $customerId;
+
         return parent::rest_create($options, $filters);
     }
+
     /**
      * @param Customer $customer
      * @param string $from The first resource ID you want to include in your list.
@@ -67,10 +74,11 @@ class CustomerPaymentsEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointA
      * @return PaymentCollection
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function listFor(\Mollie\Api\Resources\Customer $customer, $from = null, $limit = null, array $parameters = [])
+    public function listFor(Customer $customer, $from = null, $limit = null, array $parameters = [])
     {
         return $this->listForId($customer->id, $from, $limit, $parameters);
     }
+
     /**
      * @param string $customerId
      * @param string $from The first resource ID you want to include in your list.
@@ -83,6 +91,7 @@ class CustomerPaymentsEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointA
     public function listForId($customerId, $from = null, $limit = null, array $parameters = [])
     {
         $this->parentId = $customerId;
+
         return parent::rest_list($from, $limit, $parameters);
     }
 }

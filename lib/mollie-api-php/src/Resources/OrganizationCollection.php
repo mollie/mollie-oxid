@@ -2,7 +2,7 @@
 
 namespace Mollie\Api\Resources;
 
-class OrganizationCollection extends \Mollie\Api\Resources\CursorCollection
+class OrganizationCollection extends CursorCollection
 {
     /**
      * @return string
@@ -11,11 +11,12 @@ class OrganizationCollection extends \Mollie\Api\Resources\CursorCollection
     {
         return "organizations";
     }
+
     /**
      * @return BaseResource
      */
     protected function createResourceObject()
     {
-        return new \Mollie\Api\Resources\Organization($this->client);
+        return new Organization($this->client);
     }
 }
