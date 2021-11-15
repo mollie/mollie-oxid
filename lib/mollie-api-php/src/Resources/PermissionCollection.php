@@ -2,7 +2,7 @@
 
 namespace Mollie\Api\Resources;
 
-class PermissionCollection extends \Mollie\Api\Resources\BaseCollection
+class PermissionCollection extends BaseCollection
 {
     /**
      * @return string
