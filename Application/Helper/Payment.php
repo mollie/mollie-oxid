@@ -36,6 +36,7 @@ class Payment
         'mollieideal'           => array('title' => 'iDeal',            'model' => \Mollie\Payment\Application\Model\Payment\Ideal::class),
         'molliekbc'             => array('title' => 'KBC',              'model' => \Mollie\Payment\Application\Model\Payment\Kbc::class),
         'mollieklarnapaylater'  => array('title' => 'Klarna Pay Later', 'model' => \Mollie\Payment\Application\Model\Payment\KlarnaPayLater::class),
+        'mollieklarnapaynow'    => array('title' => 'Klarna Pay Now',   'model' => \Mollie\Payment\Application\Model\Payment\KlarnaPayNow::class),
         'mollieklarnasliceit'   => array('title' => 'Klarna Slice It',  'model' => \Mollie\Payment\Application\Model\Payment\KlarnaSliceIt::class),
         'molliepaypal'          => array('title' => 'Paypal',           'model' => \Mollie\Payment\Application\Model\Payment\PayPal::class),
         'molliepaysafecard'     => array('title' => 'Paysafecard',      'model' => \Mollie\Payment\Application\Model\Payment\Paysafecard::class),

@@ -52,6 +52,23 @@ class ModuleMain extends ModuleMain_parent
     }
 
     /**
+     * Check if mollie module is active
+     *
+     * @return bool
+     */
+    public function mollieisModuleActive()
+    {
+        $sModuleId = $this->mollieGetCurrentModuleId();
+        if ($sModuleId) {
+            $oModule = oxNew(\OxidEsales\Eshop\Core\Module\Module::class);
+            if ($oModule->load($sModuleId)) {
+                return $oModule->isActive();
+            }
+        }
+        return false;
+    }
+
+    /**
      * Checks if old version warning has to be shown
      *
      * @return bool
@@ -167,7 +184,7 @@ class ModuleMain extends ModuleMain_parent
     {
         $sReturn = parent::render();
 
-        if ($this->mollieGetCurrentModuleId() == "molliepayment") {
+        if ($this->mollieGetCurrentModuleId() == "molliepayment" && $this->mollieisModuleActive()) {
             // Return Mollie template
             return "mollie_module_main.tpl";
         }
