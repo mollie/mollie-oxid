@@ -132,8 +132,8 @@ class RequestLog
         if ($sStoreId === null) {
             $sStoreId = isset($aRequest['metadata']['store_id']) ? $aRequest['metadata']['store_id'] : '';
         }
-        $sRequestType = !is_null($oResponse->resource) ? $oResponse->resource : '';
-        $sResponseStatus = !is_null($oResponse->status) ? $oResponse->status : '';
+        $sRequestType = (property_exists($oResponse, "resource") && !is_null($oResponse->resource)) ? $oResponse->resource : '';
+        $sResponseStatus = (property_exists($oResponse, "status") && !is_null($oResponse->status)) ? $oResponse->status : '';
 
         $sSavedRequest = $this->encodeData($aRequest);
         $sSavedResponse = $this->encodeData($this->formatResponse($oResponse));

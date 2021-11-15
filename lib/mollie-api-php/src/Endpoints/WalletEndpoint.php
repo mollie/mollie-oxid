@@ -3,21 +3,41 @@
 namespace Mollie\Api\Endpoints;
 
 use Mollie\Api\Resources\BaseResource;
-class WalletEndpoint extends \Mollie\Api\Endpoints\EndpointAbstract
+
+class WalletEndpoint extends EndpointAbstract
 {
     /**
      * Get the object that is used by this API endpoint. Every API endpoint uses one type of object.
      *
-     * @return BaseResource
+     * @return BaseResource|null
      */
     protected function getResourceObject()
     {
         // Not used
     }
-    public function requestApplePayPaymentSession($domain, $validationUrl)
+
+    /**
+     * Obtain a new ApplePay payment session.
+     *
+     * @param $domain
+     * @param $validationUrl
+     * @param array $parameters
+     * @return false|string|void
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function requestApplePayPaymentSession($domain, $validationUrl, $parameters = [])
     {
-        $body = $this->parseRequestBody(['domain' => $domain, 'validationUrl' => $validationUrl]);
-        $response = $this->client->performHttpCall(self::REST_CREATE, 'wallets/applepay/sessions', $body);
-        return \json_encode($response);
+        $body = $this->parseRequestBody(array_merge([
+            'domain' => $domain,
+            'validationUrl' => $validationUrl,
+        ], $parameters));
+
+        $response = $this->client->performHttpCall(
+            self::REST_CREATE,
+            'wallets/applepay/sessions',
+            $body
+        );
+
+        return json_encode($response);
     }
 }

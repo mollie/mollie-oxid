@@ -16,8 +16,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Mollie\\Payment\\": "./"
-    },
-    "files": ["./lib/mollie-api-php/vendor/autoload.php"]
+      "Mollie\\Payment\\": "./",
+      "Mollie\\Api\\": "./lib/mollie-api-php/src/"
+    }
   }
 }

@@ -2,13 +2,13 @@
 
 namespace Mollie\Api\Resources;
 
-use Mollie\Api\MollieApiClient;
-class Shipment extends \Mollie\Api\Resources\BaseResource
+class Shipment extends BaseResource
 {
     /**
      * @var string
      */
     public $resource;
+
     /**
      * The shipment’s unique identifier,
      *
@@ -16,6 +16,7 @@ class Shipment extends \Mollie\Api\Resources\BaseResource
      * @var string
      */
     public $id;
+
     /**
      * Id of the order.
      *
@@ -23,6 +24,7 @@ class Shipment extends \Mollie\Api\Resources\BaseResource
      * @var string
      */
     public $orderId;
+
     /**
      * UTC datetime the shipment was created in ISO-8601 format.
      *
@@ -30,21 +32,25 @@ class Shipment extends \Mollie\Api\Resources\BaseResource
      * @var string|null
      */
     public $createdAt;
+
     /**
      * The order object lines contain the actual things the customer bought.
      * @var array|object[]
      */
     public $lines;
+
     /**
      * An object containing tracking details for the shipment, if available.
      * @var \stdClass|null
      */
     public $tracking;
+
     /**
      * An object with several URL objects relevant to the customer. Every URL object will contain an href and a type field.
      * @var \stdClass
      */
     public $_links;
+
     /**
      * Does this shipment offer track and trace?
      *
@@ -54,6 +60,7 @@ class Shipment extends \Mollie\Api\Resources\BaseResource
     {
         return $this->tracking !== null;
     }
+
     /**
      * Does this shipment offer a track and trace code?
      *
@@ -61,8 +68,9 @@ class Shipment extends \Mollie\Api\Resources\BaseResource
      */
     public function hasTrackingUrl()
     {
-        return $this->hasTracking() && !empty($this->tracking->url);
+        return $this->hasTracking() && ! empty($this->tracking->url);
     }
+
     /**
      * Retrieve the track and trace url. Returns null if there is no url available.
      *
@@ -70,11 +78,13 @@ class Shipment extends \Mollie\Api\Resources\BaseResource
      */
     public function getTrackingUrl()
     {
-        if (!$this->hasTrackingUrl()) {
+        if (! $this->hasTrackingUrl()) {
             return null;
         }
+
         return $this->tracking->url;
     }
+
     /**
      * Get the line value objects
      *
@@ -82,8 +92,13 @@ class Shipment extends \Mollie\Api\Resources\BaseResource
      */
     public function lines()
     {
-        return \Mollie\Api\Resources\ResourceFactory::createBaseResourceCollection($this->client, $this->lines, \Mollie\Api\Resources\OrderLine::class);
+        return ResourceFactory::createBaseResourceCollection(
+            $this->client,
+            OrderLine::class,
+            $this->lines
+        );
     }
+
     /**
      * Get the Order object for this shipment
      *
@@ -94,6 +109,7 @@ class Shipment extends \Mollie\Api\Resources\BaseResource
     {
         return $this->client->orders->get($this->orderId);
     }
+
     /**
      * Save changes made to this shipment.
      *
@@ -102,11 +118,12 @@ class Shipment extends \Mollie\Api\Resources\BaseResource
      */
     public function update()
     {
-        if (!isset($this->_links->self->href)) {
-            return $this;
-        }
-        $body = \json_encode(["tracking" => $this->tracking]);
-        $result = $this->client->performHttpCallToFullUrl(\Mollie\Api\MollieApiClient::HTTP_PATCH, $this->_links->self->href, $body);
-        return \Mollie\Api\Resources\ResourceFactory::createFromApiResult($result, new \Mollie\Api\Resources\Shipment($this->client));
+        $body = [
+            "tracking" => $this->tracking,
+        ];
+
+        $result = $this->client->shipments->update($this->orderId, $this->id, $body);
+
+        return ResourceFactory::createFromApiResult($result, new Shipment($this->client));
     }
 }

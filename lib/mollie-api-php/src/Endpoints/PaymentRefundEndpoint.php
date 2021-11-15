@@ -5,9 +5,11 @@ namespace Mollie\Api\Endpoints;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Refund;
 use Mollie\Api\Resources\RefundCollection;
-class PaymentRefundEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
+
+class PaymentRefundEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "payments_refunds";
+
     /**
      * Get the object that is used by this API endpoint. Every API endpoint uses one type of object.
      *
@@ -15,8 +17,9 @@ class PaymentRefundEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbst
      */
     protected function getResourceObject()
     {
-        return new \Mollie\Api\Resources\Refund($this->client);
+        return new Refund($this->client);
     }
+
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -27,8 +30,9 @@ class PaymentRefundEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbst
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new \Mollie\Api\Resources\RefundCollection($this->client, $count, $_links);
+        return new RefundCollection($this->client, $count, $_links);
     }
+
     /**
      * @param Payment $payment
      * @param string $refundId
@@ -37,10 +41,11 @@ class PaymentRefundEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbst
      * @return Refund
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function getFor(\Mollie\Api\Resources\Payment $payment, $refundId, array $parameters = [])
+    public function getFor(Payment $payment, $refundId, array $parameters = [])
     {
         return $this->getForId($payment->id, $refundId, $parameters);
     }
+
     /**
      * @param string $paymentId
      * @param string $refundId
@@ -52,6 +57,33 @@ class PaymentRefundEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbst
     public function getForId($paymentId, $refundId, array $parameters = [])
     {
         $this->parentId = $paymentId;
+
         return parent::rest_read($refundId, $parameters);
+    }
+
+    /**
+     * @param Payment $payment
+     * @param array $parameters
+     *
+     * @return Refund
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function listFor(Payment $payment, array $parameters = [])
+    {
+        return $this->listForId($payment->id, $parameters);
+    }
+
+    /**
+     * @param string $paymentId
+     * @param array $parameters
+     *
+     * @return \Mollie\Api\Resources\BaseCollection|\Mollie\Api\Resources\Refund
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function listForId($paymentId, array $parameters = [])
+    {
+        $this->parentId = $paymentId;
+
+        return parent::rest_list(null, null, $parameters);
     }
 }
