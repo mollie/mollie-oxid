@@ -27,6 +27,7 @@ $aLang = array(
     'SHOP_MODULE_sMollieCronSecondChanceActive'         => 'Cronjob "Versand einer Zahlungs-Erinnerungs-Email" aktiv',
     'SHOP_MODULE_iMollieCronSecondChanceTimeDiff'       => 'Zeitfenster nach dem Zahlungs-Erinnerungs-Email versendet wird',
     'SHOP_MODULE_sMollieCronOrderShipmentActive'        => 'Cronjob "&Uuml;bermittlung von Versandstatus an Mollie" aktiv',
+    'SHOP_MODULE_sMollieCronSecureKey'                  => 'Cronjob Sicherheits-Schlüssel',
     'SHOP_MODULE_GROUP_MOLLIE_PAYMENTLOGOS'             => 'Alternative Zahlart Logos',
     'SHOP_MODULE_GROUP_MOLLIE_APPLEPAY'                 => 'Apple Pay',
     'SHOP_MODULE_blMollieApplePayButtonOnBasket'        => 'Apple Pay Button auf Warenkorb Seite anzeigen',
@@ -42,6 +43,7 @@ $aLang = array(
     'HELP_SHOP_MODULE_sMollieCronFinishOrdersActive'    => 'Dieser Cronjob hat zur Aufgabe Bestellungen abzuschließen, bei denen der Kunde erfolgreich bezahlt hat, aber scheinbar nicht wieder in den Shop zurückgekehrt ist für den Abschluss des Bestellvorgangs. Der Cronjob finalisiert nur Bestellungen aus den letzten 24 Stunden, um keine Bestellungen zu ver&auml;ndern die wahrscheinlich schon manuell bearbeitet wurden.<br><br>Damit dieser Cronjob arbeitet, m&uuml;ssen Sie zus&auml;tzlich zu dieser Checkbox noch sicherstellen dass der Mollie Cronjob eingerichtet ist. Mehr dazu erfahren Sie in der README.md Datei des Moduls.',
     'HELP_SHOP_MODULE_sMollieCronSecondChanceActive'    => 'Damit dieser Cronjob arbeitet, m&uuml;ssen Sie zus&auml;tzlich zu dieser Checkbox noch sicherstellen dass der Mollie Cronjob eingerichtet ist. Mehr dazu erfahren Sie in der README.md Datei des Moduls.',
     'HELP_SHOP_MODULE_sMollieCronOrderShipmentActive'   => 'Dieser Cronjob ist nur notwendig, wenn der Versandstatus in Ihrem Shop &uuml;ber ein externes System gesetzt wird und NICHT &uuml;ber den "Jetzt versenden" Button im Oxid-Admin. Damit dieser Cronjob arbeitet, m&uuml;ssen Sie zus&auml;tzlich zu dieser Checkbox noch sicherstellen dass der Mollie Cronjob eingerichtet ist. Mehr dazu erfahren Sie in der README.md Datei des Moduls.',
+    'HELP_SHOP_MODULE_sMollieCronSecureKey'             => 'Diese Option ben&ouml;tigen Sie nur, wenn Sie den Cronjob per URL aufrufen m&uuml;ssen anstelle von dem Aufruf über die php cli. Konfigurieren Sie hier einen Sicherheitsschlüssel, den Sie über den GET-Parameter "secureKey" an den Aufruf des Cronjobs anf&uuml;gen. Bsp.: https://YOUR-SHOP-URL-HERE/modules/mollie/molliepayment/cron.php?secureKey=YOUR-SECURE-KEY',
 
     'MOLLIE_YES'                                        => 'Ja',
     'MOLLIE_NO'                                         => 'Nein',

@@ -142,6 +142,7 @@ fees op opstartkosten. Je betaalt alleen voor succesvolle transacties.
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronSecondChanceActive',      'type' => 'bool',       'value' => '0',         'position' => 90],
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'iMollieCronSecondChanceTimeDiff',    'type' => 'select',     'value' => '1',         'position' => 100],
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronOrderShipmentActive',     'type' => 'bool',       'value' => '0',         'position' => 110],
+        ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronSecureKey',               'type' => 'str',        'value' => '',          'position' => 120],
         ['group' => 'MOLLIE_APPLEPAY',          'name' => 'blMollieApplePayButtonOnBasket',     'type' => 'bool',       'value' => '1',         'position' => 200],
         ['group' => 'MOLLIE_APPLEPAY',          'name' => 'blMollieApplePayButtonOnDetails',    'type' => 'bool',       'value' => '1',         'position' => 210],
         ['group' => 'MOLLIE_PAYMENTLOGOS',      'name' => 'sMolliePaymentLogosPlaceholder',     'type' => 'str',        'value' => '',          'position' => 500],
