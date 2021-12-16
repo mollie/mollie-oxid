@@ -90,6 +90,31 @@
     [{if $paymentModel->getCustomConfigTemplate() !== false}]
         [{include file=$paymentModel->getCustomConfigTemplate()}]
     [{/if}]
-    <tr><td class="edittext" colspan="2">&nbsp;</td></tr>
+    <tr>
+        <td class="edittext" colspan="2">
+            &nbsp;<div style="display: none;" id="mollie_payment_min_max">
+                [{assign var="oFrom" value=$paymentModel->getMollieFromAmount() }]
+                [{assign var="oTo" value=$paymentModel->getMollieToAmount() }]
+                [{if $oFrom}]<br>
+                    [{oxmultilang ident="MOLLIE_PAYMENT_LIMITATION"}]:<br>
+                    [{oxmultilang ident="MOLLIE_PAYMENT_LIMITATION_FROM"}] [{$oFrom->value}] [{$oFrom->currency}] [{oxmultilang ident="MOLLIE_PAYMENT_LIMITATION_TO"}]
+                    [{if $oTo != false}]
+                        [{$oTo->value}] [{$oTo->currency}]
+                    [{else}]
+                        [{oxmultilang ident="MOLLIE_PAYMENT_LIMITATION_UNLIMITED"}]
+                    [{/if}]
+                [{/if}]
+            </div>
+            <script>
+                function appendMinMaxInfo() {
+                    var minMaxInfo = document.getElementById("mollie_payment_min_max");
+                    var clone = minMaxInfo.cloneNode(true);
+                    clone.style.display = "";
+                    document.getElementById("helpText_HELP_PAYMENT_MAIN_AMOUNT").parentNode.appendChild(clone);
+                }
+                setTimeout(appendMinMaxInfo, 100);
+            </script>
+        </td>
+    </tr>
 [{/if}]
 [{$smarty.block.parent}]
