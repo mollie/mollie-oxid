@@ -29,7 +29,10 @@ class ViewConfig extends ViewConfig_parent
         $oApplePay = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
         if (Payment::getInstance()->getMollieMode() == 'live' && $oApplePay->load('mollieapplepay')) { // Apple Pay only available in live mode
             if ($oApplePay->oxpayments__oxactive->value == 1 && ($oApplePay->oxpayments__oxfromamount->value <= $dPrice && $oApplePay->oxpayments__oxtoamount->value >= $dPrice)) {
-                return true;
+                $oMolliePayment = $oApplePay->getMolliePaymentModel();
+                if ($oMolliePayment && $oMolliePayment->isMolliePaymentActive() && $oMolliePayment->mollieIsBasketSumInLimits($dPrice) === true) {
+                    return true;
+                }
             }
         }
         return false;

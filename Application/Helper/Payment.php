@@ -164,6 +164,8 @@ class Payment
                     $aPaymentInfo[$oItem->id] = [
                         'title' => $oItem->description,
                         'pic' => $oItem->image->size2x,
+                        'minAmount' => $oItem->minimumAmount,
+                        'maxAmount' => $oItem->maximumAmount,
                     ];
                 }
             } catch (\Exception $exc) {

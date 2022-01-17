@@ -321,6 +321,54 @@ abstract class Base
     }
 
     /**
+     * Returnes minimum order sum for Mollie payment type to be usable
+     *
+     * @return object|false
+     */
+    public function getMollieFromAmount()
+    {
+        $aInfo = Payment::getInstance()->getMolliePaymentInfo();
+        if (isset($aInfo[$this->sMolliePaymentCode]['minAmount'])) {
+            return $aInfo[$this->sMolliePaymentCode]['minAmount'];
+        }
+        return false;
+    }
+
+    /**
+     * Returnes maximum order sum for Mollie payment type to be usable
+     *
+     * @return object|false
+     */
+    public function getMollieToAmount()
+    {
+        $aInfo = Payment::getInstance()->getMolliePaymentInfo();
+        if (!empty(isset($aInfo[$this->sMolliePaymentCode]['maxAmount']))) {
+            return $aInfo[$this->sMolliePaymentCode]['maxAmount'];
+        }
+        return false;
+    }
+
+    /**
+     * Checks if given basket brutto price is withing the payment sum limitations of the current Mollie payment type
+     *
+     * @param double $dBasketBruttoPrice
+     * @return bool
+     */
+    public function mollieIsBasketSumInLimits($dBasketBruttoPrice)
+    {
+        $oFrom = $this->getMollieFromAmount();
+        if ($oFrom && $dBasketBruttoPrice < $oFrom->value) {
+            return false;
+        }
+
+        $oTo = $this->getMollieToAmount();
+        if ($oTo && $dBasketBruttoPrice > $oTo->value) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Returns alternative logo url
      *
      * @return string

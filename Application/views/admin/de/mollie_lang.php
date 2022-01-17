@@ -129,4 +129,8 @@ $aLang = array(
     'MOLLIE_SUPPORT_FORM_ENQUIRY_PLACEHOLDER'           => 'Wie k&ouml;nnen wir Ihnen helfen?',
     'MOLLIE_SUPPORT_FORM_SUBMIT'                        => 'Absenden',
     'MOLLIE_SUPPORT_EMAIL_SENT'                         => 'Ihre Anfrage wurde erfolgreich versendet. Sie werden eine Kopie der Email erhalten.',
+    'MOLLIE_PAYMENT_LIMITATION'                         => 'Mollie Beschr&auml;nkung',
+    'MOLLIE_PAYMENT_LIMITATION_FROM'                    => 'Von',
+    'MOLLIE_PAYMENT_LIMITATION_TO'                      => 'bis',
+    'MOLLIE_PAYMENT_LIMITATION_UNLIMITED'               => 'unbegrenzt',
 );

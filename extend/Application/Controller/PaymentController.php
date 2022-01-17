@@ -32,7 +32,7 @@ class PaymentController extends PaymentController_parent
             if (method_exists($oPayment, 'isMolliePaymentMethod') && $oPayment->isMolliePaymentMethod() === true) {
                 $oBasket = Registry::getSession()->getBasket();
                 $oMolliePayment = $oPayment->getMolliePaymentModel($oBasket->getPrice()->getBruttoPrice(), $oBasket->getBasketCurrency()->name);
-                if ($oMolliePayment->isMolliePaymentActive() === false) {
+                if ($oMolliePayment->isMolliePaymentActive() === false || $oMolliePayment->mollieIsBasketSumInLimits($oBasket->getPrice()->getBruttoPrice()) === false) {
                     unset($this->_oPaymentList[$oPayment->getId()]);
                 }
             }
