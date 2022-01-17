@@ -64,7 +64,7 @@ fees op opstartkosten. Je betaalt alleen voor succesvolle transacties.
 ",
     ],
     'thumbnail'    => 'mollie_logo.png',
-    'version'       => '1.0.24',
+    'version'       => '1.0.25',
     'author'        => 'Fatchip GmbH',
     'email'         => 'info@mollie.com',
     'url'          => 'https://www.mollie.com/',
