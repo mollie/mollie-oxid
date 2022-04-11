@@ -80,6 +80,14 @@ abstract class Base
     protected $blIsMethodHiddenInitially = false;
 
     /**
+     * Array with country-codes the payment method is restricted to
+     * If property is set to false it is available to all countries
+     *
+     * @var array|false
+     */
+    protected $aBillingCountryRestrictedTo = false;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -107,6 +115,16 @@ abstract class Base
     public function isOnlyOrderApiSupported()
     {
         return $this->blIsOnlyOrderApiSupported;
+    }
+
+    /**
+     * Returns array of billing country restrictions
+     *
+     * @return bool
+     */
+    public function getBillingCountryRestrictedCountries()
+    {
+        return $this->aBillingCountryRestrictedTo;
     }
 
     /**
@@ -366,6 +384,21 @@ abstract class Base
             return false;
         }
         return true;
+    }
+
+    /**
+     * Checks if the payment method is available for the current billing country
+     *
+     * @param  string $sBillingCountryCode
+     * @return bool
+     */
+    public function mollieIsMethodAvailableForCountry($sBillingCountryCode)
+    {
+        $aCountryRestrictions = $this->getBillingCountryRestrictedCountries();
+        if ($aCountryRestrictions === false || in_array($sBillingCountryCode, $aCountryRestrictions) === true) {
+            return true;
+        }
+        return false;
     }
 
     /**
