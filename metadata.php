@@ -62,6 +62,30 @@ Het onboarding-proces is snel en eenvoudig, en met het Mollie Dashboard en de ap
 in een oogopslag. Je bepaalt zelf hoe vaak je jouw uitbetalingen wilt ontvangen. We willen dat je bij ons blijft omdat je blij bent met onze service, niet omdat het moet. <br> Daarom hebben we geen vaste contracten en rekenen we nooit maandelijkse <br> 
 fees op opstartkosten. Je betaalt alleen voor succesvolle transacties.
 ",
+        'it' => "Aumentate il vostro tasso di conversione con una soluzione di pagamento senza problemi. Mollie offre tutti i metodi di pagamento popolari,<br>
+oltre a un checkout ottimizzato e a un onboarding semplicissimo. Quali sono i vantaggi? La risposta è semplice: <br>
+tassi di conversione più elevati, clienti soddisfatti e una semplice integrazione nel vostro webshop OXID. I pagamenti online non <br>
+devono essere complicati.<br><br>
+Con una soluzione integrata di Mollie, avrete accesso a tutti i principali metodi di pagamento, inclusi Klarna,<br>
+carte di credito, addebito diretto SEPA, Apple Pay e altro. Potenzierete il vostro tasso di conversione con un’esperienza di checkout migliorata, il tutto<br>
+all’interno di un ambiente brandizzato e familiare, senza reindirizzamento. <br>
+Il processo di onboarding è rapido e semplice e la dashboard e l’app Mollie vi consentono di tenere traccia di tutte le vostre transazioni<br>
+a colpo d’occhio. Potete scegliere con quale frequenza desiderate ricevere i vostri pagamenti. Con Mollie, non pagherete mai tariffe mensili<br>
+ o costi di configurazione. Pagherete solo per le transazioni andate a buon fine. E rimarrete con noi perché siete soddisfatti del nostro servizio,<br>
+non perché costretti da un contratto!
+",
+        'es' => "Aumente su conversión con una solución de pago sin complicaciones. Mollie ofrece todos los métodos de pago habituales,<br>
+además de un proceso de compra optimizado y una integración muy sencilla. ¿Cómo le beneficia a usted? La respuesta es muy sencilla: mayores<br>
+tasas de conversión, clientes satisfechos y una integración sencilla en su tienda web OXID. Los pagos en línea no <br>
+tienen por qué ser complicados.<br><br>
+Con una solución integrada de Mollie, obtendrá acceso a los principales métodos de pago, incluyendo Klarna,<br>
+tarjetas de crédito, adeudo directo SEPA, Apple Pay y muchos más. Multiplicará su conversión con una experiencia de compra mejorada, todo<br>
+dentro de un entorno conocido y personalizado, sin redireccionamientos. <br>
+El proceso de incorporación es rápido y sencillo, y el panel de control y la aplicación de Mollie le permiten hacer un seguimiento de todas sus transacciones<br>
+de un vistazo. Usted elige la frecuencia con la que quiere recibir sus pagos. Con Mollie, nunca pagará una cuota mensual<br>
+ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y se va a quedar porque estará contento con nuestro servicio,<br>
+¡no porque un contrato le obligue!
+",
     ],
     'thumbnail'    => 'mollie_logo.png',
     'version'       => '1.0.25',
