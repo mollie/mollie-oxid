@@ -91,6 +91,7 @@ $aLang = array(
     'MOLLIE_REFUND_REMAINING'                           => 'Rembourser la somme restante',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'Cette commande comprend des coupons ou des rabais. Ceux-ci ne peuvent pas être remboursés partiellement, ils doivent être traités via le remboursement total ou restant.',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Données de carte de crédit',
+    'MOLLIE_CREDITCARD_DATA_INPUT_HELP'                 => 'Ce paramètre indique où le client doit saisir les informations de carte bancaire.<br>La méthode recommandée est "Saisie sur la boutique avec un formulaire Iframe".',
     'MOLLIE_CC_HOSTED_CHECKOUT'                         => 'Saisie sur le site externe Mollie',
     'MOLLIE_CC_CHECKOUT_INTEGRATION'                    => 'Saisie sur la boutique avec un formulaire Iframe',
     'MOLLIE_APPLE_PAY_BUTTON_ONLY_LIVE_MODE'            => 'Veuillez noter: Le paiement avec le bouton Apple Pay est disponible uniquement en mode Live.',

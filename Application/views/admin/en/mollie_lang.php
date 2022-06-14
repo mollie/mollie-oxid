@@ -93,6 +93,7 @@ $aLang = array(
     'MOLLIE_REFUND_REMAINING'                           => 'Refund remaining sum',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'This order includes vouchers or discount. These cant be refunded partially, they must be handled with the full or remaining refund.',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Creditcard data',
+    'MOLLIE_CREDITCARD_DATA_INPUT_HELP'                 => 'This option defines where the customer must enter the credit card information.<br>The recommended method is "Input in shop checkout with iframe form inputs".',
     'MOLLIE_CC_HOSTED_CHECKOUT'                         => 'Input on external Mollie website',
     'MOLLIE_CC_CHECKOUT_INTEGRATION'                    => 'Input in shop checkout with iframe form inputs',
     'MOLLIE_APPLE_PAY_BUTTON_ONLY_LIVE_MODE'            => 'Please note: Payment with the Apple Pay Button is only available in live-mode.',

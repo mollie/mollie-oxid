@@ -91,6 +91,7 @@ $aLang = array(
     'MOLLIE_REFUND_REMAINING'                           => 'Reembolso de la suma restante',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'Este pedido incluye vales o descuentos. Estos no pueden ser reembolsados parcialmente, sino que deben ser gestionados con el reembolso total o restante.',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Datos de la tarjeta de crédito',
+    'MOLLIE_CREDITCARD_DATA_INPUT_HELP'                 => 'Esta opción define dónde el cliente debe introducir los datos de la tarjeta de crédito.<br>El método recomendado es "Entrada en el checkout de la tienda con entradas de formulario iframe".',
     'MOLLIE_CC_HOSTED_CHECKOUT'                         => 'Entrada en sitio web externo de Mollie',
     'MOLLIE_CC_CHECKOUT_INTEGRATION'                    => 'Entrada en el checkout de la tienda con entradas de formulario iframe',
     'MOLLIE_APPLE_PAY_BUTTON_ONLY_LIVE_MODE'            => 'Nota: el pago con el botón de Apple Pay solo está disponible en el modo live.',

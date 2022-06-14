@@ -91,6 +91,7 @@ $aLang = array(
     'MOLLIE_REFUND_REMAINING'                           => 'Betaal resterend bedrag terug',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'Deze bestelling is inclusief vouchers of korting. Die kunnen niet gedeeltelijk worden terugbetaald. Ze moeten worden afgehandeld met de volledige of resterende terugbetaling',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Creditcard data',
+    'MOLLIE_CREDITCARD_DATA_INPUT_HELP'                 => 'Deze optie bepaalt waar de klant de creditcardgegevens moet invoeren.<br>De aanbevolen methode is "Invoer in shop checkout met iframe-formulierinvoer".',
     'MOLLIE_CC_HOSTED_CHECKOUT'                         => 'Input op externe Mollie website',
     'MOLLIE_CC_CHECKOUT_INTEGRATION'                    => 'Invoer in shop checkout met iframe-formulierinvoer',
     'MOLLIE_APPLE_PAY_BUTTON_ONLY_LIVE_MODE'            => 'Let op: betaling met de Apple Pay button is alleen beschikbaar in live-modus',
