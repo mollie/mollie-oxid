@@ -148,15 +148,19 @@ class Payment
      *
      * @param double|bool $dAmount
      * @param string|bool $sCurrency
+     * @param string|bool $sBillingCountryCode
      * @return array
      */
-    public function getMolliePaymentInfo($dAmount = false, $sCurrency = false)
+    public function getMolliePaymentInfo($dAmount = false, $sCurrency = false, $sBillingCountryCode = false)
     {
         if ($this->aPaymentInfo === null || ($dAmount !== false && $sCurrency !== false)) {
             $aParams = ['resource' => 'orders', 'includeWallets' => 'applepay'];
             if ($dAmount !== false && $sCurrency !== false) {
                 $aParams['amount[value]'] = number_format($dAmount, 2, '.', '');
                 $aParams['amount[currency]'] = $sCurrency;
+            }
+            if ($sBillingCountryCode !== false) {
+                $aParams['billingCountry'] = $sBillingCountryCode;
             }
             $aPaymentInfo = [];
             try {

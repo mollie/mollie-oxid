@@ -42,20 +42,23 @@ class PaymentController extends PaymentController_parent
     /**
      * Removes Mollie payment methods which are not available for the current basket situation. The limiting factors can be:
      * 1. Config option "blMollieRemoveDeactivatedMethods" activated AND payment method not activated in the Mollie dashboard
-     * 2. BasketSum is outside of the min-/max-limits of the payment method
-     * 3. Payment method has a billing country restriction and customer is not from that country
+     * 2. Config option "blMollieRemoveByBillingCountry" activated AND payment method is not available for given billing country
+     * 3. BasketSum is outside of the min-/max-limits of the payment method
+     * 4. Payment method has a billing country restriction and customer is not from that country
      *
      * @return void
      */
     protected function mollieRemoveUnavailablePaymentMethods()
     {
         $blRemoveDeactivated = (bool)Registry::getConfig()->getShopConfVar('blMollieRemoveDeactivatedMethods');
+        $blRemoveByBillingCountry = (bool)Registry::getConfig()->getShopConfVar('blMollieRemoveByBillingCountry');
         $oBasket = Registry::getSession()->getBasket();
         $sBillingCountryCode = $this->mollieGetBillingCountry($oBasket);
         foreach ($this->_oPaymentList as $oPayment) {
             if (method_exists($oPayment, 'isMolliePaymentMethod') && $oPayment->isMolliePaymentMethod() === true) {
                 $oMolliePayment = $oPayment->getMolliePaymentModel($oBasket->getPrice()->getBruttoPrice(), $oBasket->getBasketCurrency()->name);
                 if (($blRemoveDeactivated === true && $oMolliePayment->isMolliePaymentActive() === false) ||
+                    ($blRemoveByBillingCountry === true && $oMolliePayment->isMolliePaymentActive($sBillingCountryCode) === false) ||
                     $oMolliePayment->mollieIsBasketSumInLimits($oBasket->getPrice()->getBruttoPrice()) === false ||
                     $oMolliePayment->mollieIsMethodAvailableForCountry($sBillingCountryCode) === false
                 ) {
