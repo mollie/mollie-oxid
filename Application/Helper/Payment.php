@@ -216,7 +216,8 @@ class Payment
      */
     protected function getShopVersion()
     {
-        return Registry::getConfig()->getActiveShop()->oxshops__oxversion->value;
+        $oShop = Registry::getConfig()->getActiveShop();
+        return $oShop->oxshops__oxedition->value."_".$oShop->oxshops__oxversion->value;
     }
 
     /**
