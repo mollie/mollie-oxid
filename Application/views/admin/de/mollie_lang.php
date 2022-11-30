@@ -136,4 +136,6 @@ $aLang = array(
     'MOLLIE_PAYMENT_LIMITATION_FROM'                    => 'Von',
     'MOLLIE_PAYMENT_LIMITATION_TO'                      => 'bis',
     'MOLLIE_PAYMENT_LIMITATION_UNLIMITED'               => 'unbegrenzt',
+    'MOLLIE_TRANSACTION_ID'                             => 'Mollie Transaktions ID',
+    'MOLLIE_EXTERNAL_TRANSACTION_ID'                    => 'Externe Transaktions ID',
 );

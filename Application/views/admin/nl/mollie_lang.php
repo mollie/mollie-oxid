@@ -120,4 +120,6 @@ $aLang = array(
     'MOLLIE_SUBSEQUENT_ORDER_COMPLETION'                => 'Nagekomen voltooiing van de bestelling',
     'MOLLIE_PAYMENT_DESCRIPTION'                        => 'Betalingsomschrijving',
     'MOLLIE_PAYMENT_DESCRIPTION_HELP'                   => 'Indien mogelijk wordt dit aan je klant getoond op zijn kaart- of bankafschrift. <br> <br> Je kunt de volgende parameters gebruiken: <br> {orderId} <br> {orderNumber} <br> {storeName} <br> {customer.firstname} <br> {customer.lastname} <br> {customer.company}',
+    'MOLLIE_TRANSACTION_ID'                             => 'Mollie Transaction ID',
+    'MOLLIE_EXTERNAL_TRANSACTION_ID'                    => 'External Transaction ID',
 );

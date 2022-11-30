@@ -71,6 +71,11 @@ class Order extends Base
         if ($oTransaction->isCompleted()) {
             $blSuccess = true;
         }
+
+        if (!empty($oLastPayment)) {
+            $this->handleExternalTransId($oLastPayment, $oOrder);
+        }
+
         return ['success' => $blSuccess, 'status' => $oTransaction->status];
     }
 }

@@ -255,6 +255,19 @@ class Order extends Order_parent
     }
 
     /**
+     * Save external transaction id in order object
+     *
+     * @param  string $sTransactionId
+     * @return void
+     */
+    public function mollieSetExternalTransactionId($sTransactionId)
+    {
+        DatabaseProvider::getDb()->execute('UPDATE oxorder SET mollieexternaltransid = ? WHERE oxid = ?', array($sTransactionId, $this->getId()));
+
+        $this->oxorder__mollieexternaltransid = new Field($sTransactionId);
+    }
+
+    /**
      * Determines if the current call is a return from a redirect payment
      *
      * @return bool

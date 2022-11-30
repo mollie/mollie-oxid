@@ -36,6 +36,29 @@ abstract class Base
     }
 
     /**
+     * Check for given external trans id
+     *
+     * @param object $oTransaction
+     * @param Order $oOrder
+     * @return array
+     */
+    protected function handleExternalTransId($oTransaction, Order $oOrder)
+    {
+        $sExternalTransactionId = false;
+        if (isset($oTransaction, $oTransaction->details, $oTransaction->details->paypalReference)) {
+            $sExternalTransactionId = $oTransaction->details->paypalReference;
+        }
+
+        if (isset($oTransaction, $oTransaction->details, $oTransaction->details->transferReference)) {
+            $sExternalTransactionId = $oTransaction->details->transferReference;
+        }
+
+        if ($sExternalTransactionId !== false) {
+            $oOrder->mollieSetExternalTransactionId($sExternalTransactionId);
+        }
+    }
+
+    /**
      * Process transaction status after payment and in the webhook
      *
      * @param Order $oOrder

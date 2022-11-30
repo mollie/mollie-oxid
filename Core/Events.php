@@ -207,6 +207,7 @@ class Events
         self::addColumnIfNotExists('oxorder', 'MOLLIEDISCOUNTREFUNDED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEDISCOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
         self::addColumnIfNotExists('oxorder', 'MOLLIEMODE', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEMODE` VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;");
         self::addColumnIfNotExists('oxorder', 'MOLLIESECONDCHANCEMAILSENT', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIESECONDCHANCEMAILSENT` datetime NOT NULL default '0000-00-00 00:00:00';");
+        self::addColumnIfNotExists('oxorder', 'MOLLIEEXTERNALTRANSID', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIEEXTERNALTRANSID` VARCHAR(64) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;");
         self::addColumnIfNotExists('oxorderarticles', 'MOLLIEQUANTITYREFUNDED', "ALTER TABLE `oxorderarticles` ADD COLUMN `MOLLIEQUANTITYREFUNDED` INT(11) NOT NULL DEFAULT '0';");
         self::addColumnIfNotExists('oxorderarticles', 'MOLLIEAMOUNTREFUNDED', "ALTER TABLE `oxorderarticles` ADD COLUMN `MOLLIEAMOUNTREFUNDED` DOUBLE NOT NULL DEFAULT '0';");
 

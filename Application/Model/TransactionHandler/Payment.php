@@ -61,6 +61,9 @@ class Payment extends Base
             $blSuccess = true;
             $sStatus = 'pending';
         }
+
+        $this->handleExternalTransId($oTransaction, $oOrder);
+
         return ['success' => $blSuccess, 'status' => $sStatus];
     }
 }
