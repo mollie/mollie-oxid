@@ -120,6 +120,8 @@ $aLang = array(
     'MOLLIE_SUBSEQUENT_ORDER_COMPLETION'                => 'Achèvement de la commande ultérieure',
     'MOLLIE_PAYMENT_DESCRIPTION'                        => 'Description du paiement',
     'MOLLIE_PAYMENT_DESCRIPTION_HELP'                   => 'Ceci sera affiché à vos clients sur leurs recus de carte ou bancaires, si possible.<br><br>Vous pouveu utiliser les paramètres suivants:<br>{orderId}<br>{orderNumber}<br>{storeName}<br>{customer.firstname}<br>{customer.lastname}<br>{customer.company}',
+    'MOLLIE_PAYMENT_DETAILS'                            => 'Payment details',
+    'MOLLIE_PAYMENT_TYPE'                               => 'Payment type',
     'MOLLIE_TRANSACTION_ID'                             => 'Mollie Transaction ID',
     'MOLLIE_EXTERNAL_TRANSACTION_ID'                    => 'External Transaction ID',
 );

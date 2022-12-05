@@ -112,6 +112,42 @@
     [{/if}]
 
     [{assign var="order" value=$oView->getOrder()}]
+    [{assign var="paymentType" value=$order->getPaymentType()}]
+    <fieldset>
+        <legend>[{oxmultilang ident="MOLLIE_PAYMENT_DETAILS"}]</legend>
+        <table>
+            <tr>
+                <td class="edittext">
+                    [{oxmultilang ident="MOLLIE_PAYMENT_TYPE"}]:
+                </td>
+                <td class="edittext">
+                    [{$paymentType->oxpayments__oxdesc->value}]
+                </td>
+                <td class="edittext"></td>
+            </tr>
+            <tr>
+                <td class="edittext">
+                    [{oxmultilang ident="MOLLIE_TRANSACTION_ID"}]:
+                </td>
+                <td class="edittext">
+                    [{$order->oxorder__oxtransid->value}]
+                </td>
+                <td class="edittext"></td>
+            </tr>
+            [{if $order->oxorder__mollieexternaltransid->value != ""}]
+                <tr>
+                    <td class="edittext">
+                        [{oxmultilang ident="MOLLIE_EXTERNAL_TRANSACTION_ID"}]:
+                    </td>
+                    <td class="edittext">
+                        [{$order->oxorder__mollieexternaltransid->value}]
+                    </td>
+                    <td class="edittext"></td>
+                </tr>
+            [{/if}]
+        </table>
+    </fieldset>
+
     [{if $order->mollieIsEligibleForPaymentFinish()}]
         <fieldset>
             <legend>[{oxmultilang ident="MOLLIE_SUBSEQUENT_ORDER_COMPLETION"}]</legend>

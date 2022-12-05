@@ -143,7 +143,6 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
     'blocks'        => [
         ['template' => 'module_config.tpl',                     'block' => 'admin_module_config_var',       'file' => 'mollie_module_config_var.tpl'],
         ['template' => 'payment_main.tpl',                      'block' => 'admin_payment_main_form',       'file' => 'mollie_admin_payment_main_form.tpl'],
-        ['template' => 'order_main.tpl',                        'block' => 'admin_order_main_form_payment', 'file' => 'mollie_admin_order_main_form_payment.tpl'],
         ['template' => 'page/checkout/inc/payment_other.tpl',   'block' => 'checkout_payment_longdesc',     'file' => 'mollie_checkout_payment_longdesc.tpl'],
         ['template' => 'mollie_payment_showicons.tpl',          'block' => 'checkout_payment_longdesc',     'file' => 'mollie_checkout_payment_longdesc.tpl'],
         ['template' => 'page/checkout/payment.tpl',             'block' => 'select_payment',                'file' => 'mollie_select_payment.tpl'],
