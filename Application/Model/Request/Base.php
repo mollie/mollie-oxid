@@ -201,6 +201,21 @@ abstract class Base
     }
 
     /**
+     * Returns vat value based on currency configuration
+     *
+     * @param  OrderArticle $oOrderarticle
+     * @return float|mixed
+     */
+    protected function getVatValueForOrderarticle($oOrderarticle)
+    {
+        $oCur = Registry::getConfig()->getActShopCurrencyObject();
+        if ($oCur && $oCur->decimal == 0) {
+            return $this->getVatValueManual($oOrderarticle->oxorderarticles__oxbrutprice->value, $oOrderarticle->oxorderarticles__oxvat->value);
+        }
+        return $oOrderarticle->oxorderarticles__oxvatprice->value;
+    }
+
+    /**
      * Returns vat value for given brut price
      *
      * @param double $dBrutPrice
@@ -214,6 +229,18 @@ abstract class Base
         $oPrice->setPrice($dBrutPrice);
         $oPrice->setVat($dVat);
         return $oPrice->getVatValue();
+    }
+
+    /**
+     * When a currency with 0 decimals is configured, Oxid saves invalid vat values by throwing away the decimals
+     * In this case it has to be calculated manually with this method
+     *
+     * @return double
+     */
+    protected function getVatValueManual($dPrice, $dVat)
+    {
+        $dVatValue = $dPrice * $dVat / (100 + $dVat);
+        return round($dVatValue, 2);
     }
 
     /**
@@ -327,7 +354,7 @@ abstract class Base
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrderarticle->oxorderarticles__oxbrutprice->value, $sCurrency),
                 'vatRate' => $oOrderarticle->oxorderarticles__oxvat->value,
-                'vatAmount' => $this->getAmountArray($oOrderarticle->oxorderarticles__oxvatprice->value, $sCurrency),
+                'vatAmount' => $this->getAmountArray($this->getVatValueForOrderarticle($oOrderarticle), $sCurrency),
                 'productUrl' => $oArticle->getLink(),
             ];
 
