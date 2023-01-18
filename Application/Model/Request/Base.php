@@ -201,18 +201,20 @@ abstract class Base
     }
 
     /**
-     * Returns vat value based on currency configuration
+     * Returns vat value based on currency configuration (currency config with 0 decimals creates problems)
      *
-     * @param  OrderArticle $oOrderarticle
+     * @param  double $dBrutPrice
+     * @param  double $dVatAmount
+     * @param  double $dVatPercent
      * @return float|mixed
      */
-    protected function getVatValueForOrderarticle($oOrderarticle)
+    protected function getRealVatValue($dBrutPrice, $dVatAmount, $dVatPercent)
     {
         $oCur = Registry::getConfig()->getActShopCurrencyObject();
         if ($oCur && $oCur->decimal == 0) {
-            return $this->getVatValueManual($oOrderarticle->oxorderarticles__oxbrutprice->value, $oOrderarticle->oxorderarticles__oxvat->value);
+            return $this->getVatValueManual($dBrutPrice, $dVatPercent);
         }
-        return $oOrderarticle->oxorderarticles__oxvatprice->value;
+        return $dVatAmount;
     }
 
     /**
@@ -354,7 +356,7 @@ abstract class Base
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrderarticle->oxorderarticles__oxbrutprice->value, $sCurrency),
                 'vatRate' => $oOrderarticle->oxorderarticles__oxvat->value,
-                'vatAmount' => $this->getAmountArray($this->getVatValueForOrderarticle($oOrderarticle), $sCurrency),
+                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrderarticle->oxorderarticles__oxbrutprice->value, $oOrderarticle->oxorderarticles__oxvatprice->value, $oOrderarticle->oxorderarticles__oxvat->value), $sCurrency),
                 'productUrl' => $oArticle->getLink(),
             ];
 
@@ -402,7 +404,7 @@ abstract class Base
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrder->oxorder__oxdelcost->value, $sCurrency),
                 'vatRate' => $oOrder->oxorder__oxdelvat->value,
-                'vatAmount' => $this->getAmountArray($oOrder->getOrderDeliveryPrice()->getVatValue(), $sCurrency),
+                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxdelcost->value, $oOrder->getOrderDeliveryPrice()->getVatValue(), $oOrder->oxorder__oxdelvat->value), $sCurrency),
             ];
         }
 
@@ -416,7 +418,7 @@ abstract class Base
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrder->oxorder__oxpaycost->value, $sCurrency),
                 'vatRate' => $oOrder->oxorder__oxpayvat->value,
-                'vatAmount' => $this->getAmountArray($oOrder->getOrderPaymentPrice()->getVatValue(), $sCurrency),
+                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxpaycost->value, $oOrder->getOrderPaymentPrice()->getVatValue(), $oOrder->oxorder__oxpayvat->value), $sCurrency),
             ];
         }
 
@@ -433,7 +435,7 @@ abstract class Base
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrder->oxorder__oxwrapcost->value, $sCurrency),
                 'vatRate' => $iFixedVat,
-                'vatAmount' => $this->getAmountArray($dWrapVatValue, $sCurrency),
+                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxwrapcost->value, $dWrapVatValue, $iFixedVat), $sCurrency),
             ];
         }
 
@@ -447,7 +449,7 @@ abstract class Base
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrder->oxorder__oxgiftcardcost->value, $sCurrency),
                 'vatRate' => $oOrder->oxorder__oxgiftcardvat->value,
-                'vatAmount' => $this->getAmountArray($oOrder->getOrderGiftCardPrice()->getVatValue(), $sCurrency),
+                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxgiftcardcost->value, $oOrder->getOrderGiftCardPrice()->getVatValue(), $oOrder->oxorder__oxgiftcardvat->value), $sCurrency),
             ];
         }
 
@@ -461,7 +463,7 @@ abstract class Base
                 'discountAmount' => $this->getAmountArray($oVoucherDiscount->getBruttoPrice(), $sCurrency),
                 'totalAmount' => $this->getAmountArray($oVoucherDiscount->getBruttoPrice() * -1, $sCurrency),
                 'vatRate' => $oOrder->oxorder__oxartvat1->value,
-                'vatAmount' => $this->getAmountArray($oVoucherDiscount->getVatValue() * -1, $sCurrency),
+                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oVoucherDiscount->getBruttoPrice() * -1, $oVoucherDiscount->getVatValue() * -1, $oOrder->oxorder__oxartvat1->value), $sCurrency),
             ];
         }
 
@@ -475,7 +477,7 @@ abstract class Base
                 'discountAmount' => $this->getAmountArray($oDiscount->getBruttoPrice(), $sCurrency),
                 'totalAmount' => $this->getAmountArray($oDiscount->getBruttoPrice() * -1, $sCurrency),
                 'vatRate' => $oOrder->oxorder__oxartvat1->value,
-                'vatAmount' => $this->getAmountArray($oDiscount->getVatValue() * -1, $sCurrency),
+                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oDiscount->getBruttoPrice() * -1, $oDiscount->getVatValue() * -1, $oOrder->oxorder__oxartvat1->value), $sCurrency),
             ];
         }
 
