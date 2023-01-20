@@ -71,7 +71,7 @@ abstract class Base
         $oPaymentModel = $oOrder->mollieGetPaymentModel();
 
         try {
-            $oTransaction = $oPaymentModel->getApiEndpoint()->get($oOrder->oxorder__oxtransid->value, ["embed" => "payments"]);
+            $oTransaction = $oPaymentModel->getApiEndpointByOrder($oOrder)->get($oOrder->oxorder__oxtransid->value, ["embed" => "payments"]);
 
             $aResult = $this->handleTransactionStatus($oTransaction, $oOrder, $sType);
         } catch(\Exception $exc) {

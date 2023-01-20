@@ -212,13 +212,33 @@ abstract class Base
     }
 
     /**
+     * Returns matching api endpoint the given order was created in
+     *
+     * @param  Order $oOrder
+     * @return \Mollie\Api\Endpoints\EndpointAbstract
+     */
+    public function getApiEndpointByOrder($oOrder)
+    {
+        $sMode = $oOrder->oxorder__molliemode->value;
+        if (empty($sMode)) {
+            $sMode = false;
+        }
+        $sApi = $oOrder->oxorder__mollieapi->value;
+        if (empty($sApi)) {
+            $sApi = false;
+        }
+        return $this->getApiEndpoint($sMode, $sApi);
+    }
+
+    /**
      * Return request model based in the configured api method
      *
+     * @param  Order $oOrder
      * @return \Mollie\Payment\Application\Model\Request\Base
      */
-    public function getApiRequestModel()
+    public function getApiRequestModel($oOrder = false)
     {
-        if ($this->getApiMethod() == 'order') {
+        if ($this->getApiMethod($oOrder) == 'order') {
             return oxNew(\Mollie\Payment\Application\Model\Request\Order::class);
         }
         return oxNew(\Mollie\Payment\Application\Model\Request\Payment::class);
@@ -227,11 +247,12 @@ abstract class Base
     /**
      * Return request model based in the configured api method
      *
+     * @param  Order $oOrder
      * @return \Mollie\Payment\Application\Model\TransactionHandler\Base
      */
-    public function getTransactionHandler()
+    public function getTransactionHandler($oOrder = false)
     {
-        if ($this->getApiMethod() == 'order') {
+        if ($this->getApiMethod($oOrder) == 'order') {
             return oxNew(\Mollie\Payment\Application\Model\TransactionHandler\Order::class);
         }
         return oxNew(\Mollie\Payment\Application\Model\TransactionHandler\Payment::class);
@@ -240,10 +261,15 @@ abstract class Base
     /**
      * Return configured api method or default value if not yet configured
      *
+     * @param  Order $oOrder
      * @return string
      */
-    public function getApiMethod()
+    public function getApiMethod($oOrder = false)
     {
+        if ($oOrder !== false && !empty($oOrder->oxorder__mollieapi->value)) {
+            return $oOrder->oxorder__mollieapi->value;
+        }
+
         $sApiMethod = $this->getConfigParam('api');
         if (empty($sApiMethod)) {
             $sApiMethod = $this->sDefaultApi;

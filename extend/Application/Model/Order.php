@@ -125,7 +125,7 @@ class Order extends Order_parent
         $oRequestLog = oxNew(RequestLog::class);
 
         try {
-            $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpoint();
+            $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpointByOrder($this);
             $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value);
             if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order) {
                 $aOptions = [];
@@ -151,7 +151,7 @@ class Order extends Order_parent
     public function mollieUpdateShippingTrackingCode($sTrackingCode)
     {
         try {
-            $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpoint();
+            $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpointByOrder($this);
             $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value);
             if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order) {
                 $oResponse = $oMollieApiOrder->shipments();
@@ -562,7 +562,7 @@ class Order extends Order_parent
                 $this->mollieSetFolder($sCancelledFolder);
             }
 
-            $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpoint();
+            $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpointByOrder($this);
             $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value);
             if ($oMollieApiOrder->isCancelable) {
                 $oApiEndpoint->cancel($this->oxorder__oxtransid->value);
@@ -627,7 +627,7 @@ class Order extends Order_parent
             return false;
         }
 
-        $aStatus = $this->mollieGetPaymentModel()->getTransactionHandler()->processTransaction($this, 'success');
+        $aStatus = $this->mollieGetPaymentModel()->getTransactionHandler($oOrder)->processTransaction($this, 'success');
 
         $aStatusBlacklist = ['paid'];
         if ($blSecondChanceEmail === true) {
@@ -725,7 +725,7 @@ class Order extends Order_parent
             return $this->oxorder__oxtransid->value;
         }
 
-        $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpoint();
+        $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpointByOrder($this);
         $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value, ["embed" => "payments"]);
         if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order && !empty($oMollieApiOrder->_embedded) && !empty($oMollieApiOrder->_embedded->payments)) {
             $oPayment = array_shift($oMollieApiOrder->_embedded->payments);

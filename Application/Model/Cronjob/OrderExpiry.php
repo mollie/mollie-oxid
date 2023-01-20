@@ -66,7 +66,9 @@ class OrderExpiry extends \Mollie\Payment\Application\Model\Cronjob\Base
                         FROM 
                             oxorder 
                         WHERE 
+                            oxpaid = '0000-00-00 00:00:00' AND
                             oxstorno = 0 AND 
+                            oxtransid != '' AND 
                             oxpaymenttype = ? AND 
                             oxfolder IN ".Database::getInstance()->getPreparedInStatement($aFolders)." AND 
                             oxorderdate < DATE_ADD(NOW(), INTERVAL ? DAY)";

@@ -74,7 +74,7 @@ class OrderController extends OrderController_parent
                 return $this->redirectWithError('MOLLIE_ERROR_TRANSACTIONID_NOT_FOUND');
             }
 
-            $aResult = $oOrder->mollieGetPaymentModel()->getTransactionHandler()->processTransaction($oOrder, 'success');
+            $aResult = $oOrder->mollieGetPaymentModel()->getTransactionHandler($oOrder)->processTransaction($oOrder, 'success');
 
             if ($aResult['success'] === false) {
                 Registry::getSession()->deleteVariable('sess_challenge');

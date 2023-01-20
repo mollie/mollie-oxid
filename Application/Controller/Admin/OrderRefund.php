@@ -776,15 +776,8 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     protected function getMollieApiRequestModel()
     {
-        $sMode = $this->getOrder()->oxorder__molliemode->value;
-        if (empty($sMode)) {
-            $sMode = false;
-        }
-        $sApi = $this->getOrder()->oxorder__mollieapi->value;
-        if (empty($sApi)) {
-            $sApi = false;
-        }
-        return $this->getOrder()->mollieGetPaymentModel()->getApiEndpoint($sMode, $sApi);
+        $oOrder = $this->getOrder();
+        return $oOrder->mollieGetPaymentModel()->getApiEndpointByOrder($oOrder);
     }
 
     /**
@@ -796,8 +789,9 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     {
         $aItems = array();
 
-        $oRequestModel = $this->getOrder()->mollieGetPaymentModel()->getApiRequestModel();
-        $aBasketItems = $oRequestModel->getBasketItems($this->getOrder());
+        $oOrder = $this->getOrder();
+        $oRequestModel = $oOrder->mollieGetPaymentModel()->getApiRequestModel($oOrder);
+        $aBasketItems = $oRequestModel->getBasketItems($oOrder);
         foreach ($aBasketItems as $aBasketItem) {
             if (in_array($aBasketItem['type'], array('physical', 'digital'))) {
                 continue; // skip order articles
