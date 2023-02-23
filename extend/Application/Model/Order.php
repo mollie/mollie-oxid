@@ -627,7 +627,7 @@ class Order extends Order_parent
             return false;
         }
 
-        $aStatus = $this->mollieGetPaymentModel()->getTransactionHandler($oOrder)->processTransaction($this, 'success');
+        $aStatus = $this->mollieGetPaymentModel()->getTransactionHandler($this)->processTransaction($this, 'success');
 
         $aStatusBlacklist = ['paid'];
         if ($blSecondChanceEmail === true) {
