@@ -88,6 +88,14 @@ abstract class Base
     protected $aBillingCountryRestrictedTo = false;
 
     /**
+     * Determines if the payment method is only available for B2B orders
+     * B2B mode is assumed when the company field in the billing address is filled
+     *
+     * @var bool
+     */
+    protected $blIsOnlyB2BSupported = false;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -135,6 +143,16 @@ abstract class Base
     public function isOrderExpirySupported()
     {
         return $this->blIsOrderExpirySupported;
+    }
+
+    /**
+     * Returns if the payment method only supports B2B orders
+     *
+     * @return bool
+     */
+    public function isOnlyB2BSupported()
+    {
+        return $this->blIsOnlyB2BSupported;
     }
 
     /**

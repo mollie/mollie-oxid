@@ -40,6 +40,21 @@ class PaymentController extends PaymentController_parent
     }
 
     /**
+     * Returns if current order is being considered as a B2B order
+     *
+     * @param  Basket $oBasket
+     * @return bool
+     */
+    protected function mollieIsB2BOrder($oBasket)
+    {
+        $oUser = $oBasket->getBasketUser();
+        if (!empty($oUser->oxuser__oxcompany->value)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Removes Mollie payment methods which are not available for the current basket situation. The limiting factors can be:
      * 1. Config option "blMollieRemoveDeactivatedMethods" activated AND payment method not activated in the Mollie dashboard
      * 2. Config option "blMollieRemoveByBillingCountry" activated AND payment method is not available for given billing country
@@ -60,7 +75,8 @@ class PaymentController extends PaymentController_parent
                 if (($blRemoveDeactivated === true && $oMolliePayment->isMolliePaymentActive() === false) ||
                     ($blRemoveByBillingCountry === true && $oMolliePayment->isMolliePaymentActive($sBillingCountryCode) === false) ||
                     $oMolliePayment->mollieIsBasketSumInLimits($oBasket->getPrice()->getBruttoPrice()) === false ||
-                    $oMolliePayment->mollieIsMethodAvailableForCountry($sBillingCountryCode) === false
+                    $oMolliePayment->mollieIsMethodAvailableForCountry($sBillingCountryCode) === false ||
+                    ($oMolliePayment->isOnlyB2BSupported() === true && $this->mollieIsB2BOrder($oBasket) === false)
                 ) {
                     unset($this->_oPaymentList[$oPayment->getId()]);
                 }

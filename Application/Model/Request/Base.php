@@ -108,6 +108,9 @@ abstract class Base
         if (!empty((string)$oOrder->oxorder__oxbillstateid->value)) {
             $aReturn['region'] = $this->getRegionTitle($oOrder->oxorder__oxbillstateid->value);
         }
+        if (!empty((string)$oOrder->oxorder__oxbillcompany->value)) {
+            $aReturn['organizationName'] = $oOrder->oxorder__oxbillcompany->value;
+        }
         if ($this->blNeedsExtendedAddress === true) {
             $sTranslatedSalutation = Registry::getLang()->translateString($oOrder->oxorder__oxbillsal->value);
             if (!empty($sTranslatedSalutation)) {
@@ -134,8 +137,11 @@ abstract class Base
             'city' => $oOrder->oxorder__oxdelcity->value,
             'country' => $this->getCountryCode($oOrder->oxorder__oxdelcountryid->value),
         ];
-        if (!empty((string)$oOrder->oxorder__oxbillstateid->value)) {
+        if (!empty((string)$oOrder->oxorder__oxdelstateid->value)) {
             $aReturn['region'] = $this->getRegionTitle($oOrder->oxorder__oxdelstateid->value);
+        }
+        if (!empty((string)$oOrder->oxorder__oxdelcompany->value)) {
+            $aReturn['organizationName'] = $oOrder->oxorder__oxdelcompany->value;
         }
         if ($this->blNeedsExtendedAddress === true) {
             $sTranslatedSalutation = Registry::getLang()->translateString($oOrder->oxorder__oxdelsal->value);
