@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Controller;
 
+use Mollie\Payment\Application\Helper\Logger;
 use Mollie\Payment\Application\Helper\Order as OrderHelper;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Helper\User as UserHelper;
@@ -145,7 +146,7 @@ class MollieApplePay extends FrontendController
                 $aResponse['merchantSession'] = $sJsonResponse;
                 $blSuccess = true;
             } catch(\Exception $e) {
-                error_log($e->getMessage());
+                Logger::logMessage($e->getMessage());
             }
         }
 

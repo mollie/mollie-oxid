@@ -175,7 +175,7 @@ class Payment
                     ];
                 }
             } catch (\Exception $exc) {
-                error_log($exc->getMessage());
+                Logger::logMessage($exc->getMessage());
             }
             $this->aPaymentInfo = $aPaymentInfo;
         }
@@ -250,7 +250,7 @@ class Payment
                 throw new \Exception('Class Mollie\Api\MollieApiClient does not exist');
             }
         } catch(\Exception $e) {
-            error_log($e->getMessage());
+            Logger::logMessage($e->getMessage());
             throw $e;
         }
     }
