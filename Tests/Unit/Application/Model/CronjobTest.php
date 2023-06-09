@@ -9,7 +9,7 @@ use Mollie\Payment\Application\Model\Cronjob;
 
 class CronjobTest extends UnitTestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('TRUNCATE TABLE `'.Cronjob::$sTableName.'`');
 

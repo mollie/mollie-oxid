@@ -34,6 +34,7 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
         $oPaymentModel->method('getConfigParam')->willReturn('status');
 
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
@@ -68,6 +69,7 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
         $oPaymentModel->method('getConfigParam')->willReturn('status');
 
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
@@ -98,6 +100,7 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
         $oPaymentModel->method('getConfigParam')->willReturn('status');
 
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();

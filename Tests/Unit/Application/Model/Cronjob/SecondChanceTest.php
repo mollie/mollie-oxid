@@ -12,7 +12,7 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class SecondChanceTest extends UnitTestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('DELETE FROM oxorder WHERE oxid = "secondChanceTest"');
 

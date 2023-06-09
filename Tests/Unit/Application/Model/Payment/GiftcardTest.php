@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Mollie\Payment\Tests\Unit\Application\Model\Payment;
-
 
 use Mollie\Api\Endpoints\MethodEndpoint;
 use Mollie\Payment\Application\Helper\Payment;
@@ -70,6 +68,16 @@ class GiftcardTest extends UnitTestCase
         $oPaymentConfig->method('getPaymentConfig')->willReturn(['add_qr' => true, 'issuer_list_type' => 'radiobutton']);
 
         UtilsObject::setClassInstance(PaymentConfig::class, $oPaymentConfig);
+
+        $oConfig = $this->getMockBuilder(\OxidEsales\Eshop\Core\Config::class)->disableOriginalConstructor()->getMock();
+        $oConfig->method('getShopConfVar')->willReturn("tokenxy");
+
+        Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
+
+        $oModule = $this->getMockBuilder(\OxidEsales\EshopCommunity\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
+        $oModule->method('getInfo')->willReturn('1.2.3');
+
+        UtilsObject::setClassInstance(\OxidEsales\EshopCommunity\Core\Module\Module::class, $oModule);
 
         $oPayment = new \Mollie\Payment\Application\Model\Payment\Giftcard();
         $result = $oPayment->getIssuers([], '');

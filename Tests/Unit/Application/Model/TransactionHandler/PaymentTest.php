@@ -32,6 +32,7 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
         $oPaymentModel->method('getConfigParam')->willReturn('status');
 
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
@@ -66,6 +67,7 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
 
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $oOrder->method('getId')->willReturn("testId");
@@ -102,6 +104,7 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
 
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $oOrder->method('getId')->willReturn("testId");
@@ -125,6 +128,7 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
 
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $oOrder->method('getId')->willReturn("testId");

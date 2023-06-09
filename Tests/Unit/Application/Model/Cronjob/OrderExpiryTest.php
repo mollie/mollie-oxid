@@ -13,14 +13,14 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class OrderExpiryTest extends UnitTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDB()->execute("DELETE FROM molliecronjob WHERE OXID = 'mollie_order_expiry'");
 
         parent::setUp();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('DELETE FROM oxorder WHERE oxid = "orderExpiryTest"');
 

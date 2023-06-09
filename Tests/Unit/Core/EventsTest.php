@@ -9,25 +9,13 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class EventsTest extends UnitTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
-        // Dropping order payments table
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDB()->execute("DROP TABLE IF EXISTS `molliepaymentconfig`");
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDB()->execute("DROP TABLE IF EXISTS `mollierequestlog`");
-
         \OxidEsales\Eshop\Core\DatabaseProvider::getDB()->execute("DELETE FROM oxpayments WHERE oxid LIKE '%mollie%'");
         \OxidEsales\Eshop\Core\DatabaseProvider::getDB()->execute("DELETE FROM oxobject2group WHERE oxobjectid LIKE '%mollie%'");
         \OxidEsales\Eshop\Core\DatabaseProvider::getDB()->execute("DELETE FROM oxobject2payment WHERE oxpaymentid LIKE '%mollie%'");
 
         parent::setUp();
-    }
-
-    public function tearDown()
-    {
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('DROP TABLE IF EXISTS `molliepaymentconfig`');
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('DROP TABLE IF EXISTS `mollierequestlog`');
-
-        parent::tearDown();
     }
 
     public function testOnActivate()

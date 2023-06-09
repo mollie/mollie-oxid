@@ -9,12 +9,12 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class PaymentTest extends UnitTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('TRUNCATE TABLE `oxobject2group`');
     }
 
-    protected function tearDown()
+    public function tearDown(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('TRUNCATE TABLE `oxobject2group`');
     }

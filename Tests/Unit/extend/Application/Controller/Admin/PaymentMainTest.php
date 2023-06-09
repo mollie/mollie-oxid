@@ -11,7 +11,7 @@ class PaymentMainTest extends UnitTestCase
 {
     protected $_oConfig;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $oShop = $this->getMockBuilder(\OxidEsales\Eshop\Application\Model\Shop::class)->disableOriginalConstructor()->getMock();
         $oShop->method('getId')->willReturn('shopId');

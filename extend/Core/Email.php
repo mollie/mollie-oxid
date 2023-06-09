@@ -53,6 +53,10 @@ class Email extends Email_parent
      */
     public function mollieSendSecondChanceEmail($oOrder, $sFinishPaymentUrl)
     {
+        if (defined('OXID_PHP_UNIT')) { // dont send email when unittesting
+            return true;
+        }
+
         // add user defined stuff if there is any
         #$user = $this->_addUserRegisterEmail($user);
 
@@ -87,10 +91,6 @@ class Email extends Email_parent
 
         $this->setRecipient($oOrder->oxorder__oxbillemail->value, $fullName);
         $this->setReplyTo($shop->oxshops__oxorderemail->value, $shop->oxshops__oxname->getRawValue());
-
-        if (defined('OXID_PHP_UNIT')) { // dont send email when unittesting
-            return true;
-        }
 
         return $this->send();
     }

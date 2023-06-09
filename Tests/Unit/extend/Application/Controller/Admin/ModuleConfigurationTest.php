@@ -12,7 +12,7 @@ class ModuleConfigurationTest extends UnitTestCase
 {
     protected $_oConfig;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $oShop = $this->getMockBuilder(\OxidEsales\Eshop\Application\Model\Shop::class)->disableOriginalConstructor()->getMock();
         $oShop->method('getId')->willReturn('shopId');
@@ -118,7 +118,7 @@ class ModuleConfigurationTest extends UnitTestCase
         $oModuleConfigController = new \Mollie\Payment\extend\Application\Controller\Admin\ModuleConfiguration();
         $result = $oModuleConfigController->molliePaymentMethods();
 
-        $this->assertCount(17, $result);
+        $this->assertCount(20, $result);
     }
 
     public function testMollieIsApiKeyUsable()

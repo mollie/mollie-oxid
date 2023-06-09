@@ -9,7 +9,7 @@ use Mollie\Payment\Application\Model\PaymentConfig;
 
 class PaymentConfigTest extends UnitTestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('TRUNCATE TABLE `'.PaymentConfig::$sTableName.'`');
 

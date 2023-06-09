@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Mollie\Payment\Tests\Unit\Application\Helper;
-
 
 use Mollie\Api\Endpoints\MethodEndpoint;
 use Mollie\Payment\Application\Helper\Payment;
@@ -123,12 +121,22 @@ class PaymentTest extends UnitTestCase
         $oPayment = oxNew($this->getProxyClassName(Payment::class));
         $result = $oPayment->getShopVersion();
 
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected."_".$expected, $result);
     }
 
     public function testGetProfileId()
     {
         $expected = "ProfileId";
+
+        $oConfig = $this->getMockBuilder(\OxidEsales\Eshop\Core\Config::class)->disableOriginalConstructor()->getMock();
+        $oConfig->method('getShopConfVar')->willReturn("token");
+
+        Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
+
+        $oModule = $this->getMockBuilder(\OxidEsales\EshopCommunity\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
+        $oModule->method('getInfo')->willReturn('1.2.3');
+
+        UtilsObject::setClassInstance(\OxidEsales\EshopCommunity\Core\Module\Module::class, $oModule);
 
         $oProfile = $this->getMockBuilder(\Mollie\Api\Resources\CurrentProfile::class)->disableOriginalConstructor()->getMock();
         $oProfile->id = $expected;

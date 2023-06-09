@@ -33,6 +33,16 @@ class CreditcardTest extends UnitTestCase
 
         UtilsObject::setClassInstance(\Mollie\Api\MollieApiClient::class, $oMollieApi);
 
+        $oConfig = $this->getMockBuilder(\OxidEsales\Eshop\Core\Config::class)->disableOriginalConstructor()->getMock();
+        $oConfig->method('getShopConfVar')->willReturn("token");
+
+        Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
+
+        $oModule = $this->getMockBuilder(\OxidEsales\EshopCommunity\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
+        $oModule->method('getInfo')->willReturn('1.2.3');
+
+        UtilsObject::setClassInstance(\OxidEsales\EshopCommunity\Core\Module\Module::class, $oModule);
+
         $oPayment = new \Mollie\Payment\Application\Model\Payment\Creditcard();
         $result = $oPayment->getProfileId();
 

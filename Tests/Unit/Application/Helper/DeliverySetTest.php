@@ -15,7 +15,7 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class DeliverySetTest extends UnitTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         UtilsObject::resetClassInstances();
         DeliverySet::destroyInstance();

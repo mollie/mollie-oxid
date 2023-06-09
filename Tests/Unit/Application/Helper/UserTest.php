@@ -13,7 +13,7 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class UserTest extends UnitTestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('DELETE FROM oxstates WHERE oxid = "unitTestState"');
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('DELETE FROM oxuser WHERE oxid = "unitTestUser"');
@@ -161,6 +161,16 @@ class UserTest extends UnitTestCase
             ->getMock();
         $oCustomers->id = "test";
         $oCustomers->method('create')->willReturn($oCustomers);
+
+        $oConfig = $this->getMockBuilder(\OxidEsales\Eshop\Core\Config::class)->disableOriginalConstructor()->getMock();
+        $oConfig->method('getShopConfVar')->willReturn("token");
+
+        Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
+
+        $oModule = $this->getMockBuilder(\OxidEsales\EshopCommunity\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
+        $oModule->method('getInfo')->willReturn('1.2.3');
+
+        UtilsObject::setClassInstance(\OxidEsales\EshopCommunity\Core\Module\Module::class, $oModule);
 
         $oMollieApi = $this->getMockBuilder(\Mollie\Api\MollieApiClient::class)->disableOriginalConstructor()->getMock();
         $oMollieApi->customers = $oCustomers;

@@ -64,6 +64,7 @@ class OrderTest extends UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
 
         $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
         $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);
@@ -100,6 +101,7 @@ class OrderTest extends UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
 
         $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
         $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);
@@ -132,6 +134,7 @@ class OrderTest extends UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
 
         $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
         $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);
@@ -156,6 +159,7 @@ class OrderTest extends UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
 
         $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
         $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);
@@ -533,6 +537,7 @@ class OrderTest extends UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
 
         $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
         $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);
@@ -554,6 +559,10 @@ class OrderTest extends UnitTestCase
         $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
         $result = $oOrder->mollieGetPaymentFinishUrl();
 
+        if (method_exists($this, 'assertStringContainsString')) {
+            $this->assertStringContainsString("mollieFinishPayment", $result);
+            return;
+        }
         $this->assertContains("mollieFinishPayment", $result);
     }
 
@@ -748,6 +757,7 @@ class OrderTest extends UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
 
         $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
         $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);
@@ -775,6 +785,7 @@ class OrderTest extends UnitTestCase
 
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
+        $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
 
         $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
         $oPaymentHelper->method('getMolliePaymentModel')->willReturn($oPaymentModel);

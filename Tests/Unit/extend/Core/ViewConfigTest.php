@@ -4,6 +4,7 @@
 namespace Mollie\Payment\Tests\Unit\extend\Core;
 
 
+use Mollie\Payment\Application\Model\Payment\Banktransfer;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsObject;
 use OxidEsales\TestingLibrary\UnitTestCase;
@@ -32,6 +33,10 @@ class ViewConfigTest extends UnitTestCase
 
         Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
 
+        $oPaymentModel = $this->getMockBuilder(Banktransfer::class)->disableOriginalConstructor()->getMock();
+        $oPaymentModel->method('isMolliePaymentActive')->willReturn(true);
+        $oPaymentModel->method('mollieIsBasketSumInLimits')->willReturn(true);
+
         $oPayment = $this->getMockBuilder(\OxidEsales\Eshop\Application\Model\Payment::class)->disableOriginalConstructor()->getMock();
         $oPayment->method('load')->willReturn(true);
         $oPayment->method('__get')->willReturnMap([
@@ -39,6 +44,7 @@ class ViewConfigTest extends UnitTestCase
             ['oxpayments__oxfromamount', new \OxidEsales\Eshop\Core\Field(20)],
             ['oxpayments__oxtoamount', new \OxidEsales\Eshop\Core\Field(100000)],
         ]);
+        $oPayment->method('getMolliePaymentModel')->willReturn($oPaymentModel);
 
         UtilsObject::setClassInstance(\OxidEsales\Eshop\Application\Model\Payment::class, $oPayment);
 

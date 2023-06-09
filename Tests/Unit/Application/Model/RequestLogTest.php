@@ -9,7 +9,7 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class RequestLogTest extends UnitTestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('TRUNCATE TABLE `'.RequestLog::$sTableName.'`');
 

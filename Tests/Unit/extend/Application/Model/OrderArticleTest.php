@@ -8,12 +8,12 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class OrderArticleTest extends UnitTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('TRUNCATE TABLE `oxarticles`');
     }
 
-    protected function tearDown()
+    public function tearDown(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('TRUNCATE TABLE `oxarticles`');
     }

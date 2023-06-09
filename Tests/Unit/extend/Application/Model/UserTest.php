@@ -8,12 +8,12 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class UserTest extends UnitTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('TRUNCATE TABLE `oxobject2group`');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('TRUNCATE TABLE `oxobject2group`');
     }
