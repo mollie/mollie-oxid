@@ -1,8 +1,10 @@
 <?php
+
+namespace _PhpScoperf7c63b60b99d;
+
 /*
  * How to update an order with the Mollie API
  */
-
 try {
     /*
      * Initialize the Mollie API library with your API key.
@@ -10,7 +12,6 @@ try {
      * See: https://www.mollie.com/dashboard/developers/api-keys
      */
     require "../initialize.php";
-
     /*
      * Order parameters:
      *   billingAddress   The billing person and address for the order.
@@ -19,8 +20,6 @@ try {
      *   redirectUrl      The URL your customer will be redirected to after the payment process.
      *   webhookUrl       Set the webhook URL, where we will send order status changes to.
      */
-
-
     $order = $mollie->orders->get("ord_kEn1PlbGa");
     $order->billingAddress->organizationName = "Mollie B.V.";
     $order->billingAddress->streetAndNumber = "Keizersgracht 126";
@@ -34,12 +33,11 @@ try {
     $order->billingAddress->email = "piet@mondriaan.com";
     $order->billingAddress->phone = "+31208202070";
     $order->update();
-
     /*
      * Send the customer off to complete the order payment.
      * This request should always be a GET, thus we enforce 303 http response code
      */
-    header("Location: " . $order->getCheckoutUrl(), true, 303);
+    \header("Location: " . $order->getCheckoutUrl(), \true, 303);
 } catch (\Mollie\Api\Exceptions\ApiException $e) {
-    echo "API call failed: " . htmlspecialchars($e->getMessage());
+    echo "API call failed: " . \htmlspecialchars($e->getMessage());
 }

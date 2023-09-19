@@ -14,6 +14,7 @@ class Scheduler
      * @var array
      */
     protected $aCronjobs = [
+        OrderCapture::class,
         OrderExpiry::class,
         FinishOrders::class,
         SecondChance::class,

@@ -6,17 +6,14 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\CurrentProfile;
 use Mollie\Api\Resources\Profile;
 use Mollie\Api\Resources\ProfileCollection;
-
-class ProfileEndpoint extends CollectionEndpointAbstract
+class ProfileEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     protected $resourcePath = "profiles";
-
-    protected $resourceClass = Profile::class;
-
+    protected $resourceClass = \Mollie\Api\Resources\Profile::class;
     /**
      * @var string
      */
-    const RESOURCE_ID_PREFIX = 'pfl_';
+    public const RESOURCE_ID_PREFIX = 'pfl_';
     /**
      * Get the object that is used by this API endpoint. Every API endpoint uses one type of object.
      *
@@ -26,7 +23,6 @@ class ProfileEndpoint extends CollectionEndpointAbstract
     {
         return new $this->resourceClass($this->client);
     }
-
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -37,23 +33,21 @@ class ProfileEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new ProfileCollection($this->client, $count, $_links);
+        return new \Mollie\Api\Resources\ProfileCollection($this->client, $count, $_links);
     }
-
     /**
      * Creates a Profile in Mollie.
      *
      * @param array $data An array containing details on the profile.
      * @param array $filters
      *
-     * @return \Mollie\Api\Resources\BaseResource|\Mollie\Api\Resources\Profile
+     * @return Profile
      * @throws ApiException
      */
     public function create(array $data = [], array $filters = [])
     {
         return $this->rest_create($data, $filters);
     }
-
     /**
      * Retrieve a Profile from Mollie.
      *
@@ -62,7 +56,7 @@ class ProfileEndpoint extends CollectionEndpointAbstract
      * @param string $profileId
      * @param array $parameters
      *
-     * @return \Mollie\Api\Resources\BaseResource|\Mollie\Api\Resources\Profile
+     * @return Profile
      * @throws ApiException
      */
     public function get($profileId, array $parameters = [])
@@ -70,10 +64,8 @@ class ProfileEndpoint extends CollectionEndpointAbstract
         if ($profileId === 'me') {
             return $this->getCurrent($parameters);
         }
-
         return $this->rest_read($profileId, $parameters);
     }
-
     /**
      * Update a specific Profile resource.
      *
@@ -87,28 +79,24 @@ class ProfileEndpoint extends CollectionEndpointAbstract
      */
     public function update($profileId, array $data = [])
     {
-        if (empty($profileId) || strpos($profileId, self::RESOURCE_ID_PREFIX) !== 0) {
-            throw new ApiException("Invalid profile id: '{$profileId}'. An profile id should start with '".self::RESOURCE_ID_PREFIX."'.");
+        if (empty($profileId) || \strpos($profileId, self::RESOURCE_ID_PREFIX) !== 0) {
+            throw new \Mollie\Api\Exceptions\ApiException("Invalid profile id: '{$profileId}'. An profile id should start with '" . self::RESOURCE_ID_PREFIX . "'.");
         }
-
         return parent::rest_update($profileId, $data);
     }
-
     /**
      * Retrieve the current Profile from Mollie.
      *
      * @param array $parameters
      *
-     * @return \Mollie\Api\Resources\BaseResource|\Mollie\Api\Resources\CurrentProfile
+     * @return CurrentProfile
      * @throws ApiException
      */
     public function getCurrent(array $parameters = [])
     {
-        $this->resourceClass = CurrentProfile::class;
-
+        $this->resourceClass = \Mollie\Api\Resources\CurrentProfile::class;
         return $this->rest_read('me', $parameters);
     }
-
     /**
      * Delete a Profile from Mollie.
      *
@@ -118,14 +106,13 @@ class ProfileEndpoint extends CollectionEndpointAbstract
      * @param string $profileId
      *
      * @param array $data
-     * @return \Mollie\Api\Resources\BaseResource|\Mollie\Api\Resources\Profile
+     * @return Profile
      * @throws ApiException
      */
     public function delete($profileId, array $data = [])
     {
         return $this->rest_delete($profileId, $data);
     }
-
     /**
      * Retrieves a collection of Profiles from Mollie.
      *
@@ -133,7 +120,7 @@ class ProfileEndpoint extends CollectionEndpointAbstract
      * @param int $limit
      * @param array $parameters
      *
-     * @return \Mollie\Api\Resources\BaseCollection|\Mollie\Api\Resources\ProfileCollection
+     * @return ProfileCollection
      * @throws ApiException
      */
     public function page($from = null, $limit = null, array $parameters = [])

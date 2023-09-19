@@ -1,8 +1,10 @@
 <?php
+
+namespace _PhpScoperf7c63b60b99d;
+
 /*
  * How to update an order line with the Mollie API
  */
-
 try {
     /*
      * Initialize the Mollie API library with your API key.
@@ -10,7 +12,6 @@ try {
      * See: https://www.mollie.com/dashboard/developers/api-keys
      */
     require "../initialize.php";
-
     /*
      * Order line parameters:
      *   name        A description of the order line, for example LEGO 4440 Forest Police Station..
@@ -25,20 +26,15 @@ try {
      *   vatAmount  The amount of value-added tax on the line. The totalAmount field includes VAT, so the vatAmount can be calculated with the formula totalAmount × (vatRate / (100 + vatRate)).
      *   vatRate    The VAT rate applied to the order line, for example "21.00" for 21%. The vatRate should be passed as a string and not as a float to ensure the correct number of decimals are passed.
      */
-
-
     $order = $mollie->orders->get("ord_kEn1PlbGa");
     $line = $order->lines()->get('odl_1.uh5oen');
-
     $line->name = "Update line name description";
-
     $orderWithNewLineName = $line->update();
-
     /*
      * Send the customer off to complete the order payment.
      * This request should always be a GET, thus we enforce 303 http response code
      */
-    header("Location: " . $orderWithNewLineName->getCheckoutUrl(), true, 303);
+    \header("Location: " . $orderWithNewLineName->getCheckoutUrl(), \true, 303);
 } catch (\Mollie\Api\Exceptions\ApiException $e) {
-    echo "API call failed: " . htmlspecialchars($e->getMessage());
+    echo "API call failed: " . \htmlspecialchars($e->getMessage());
 }

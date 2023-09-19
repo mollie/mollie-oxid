@@ -85,12 +85,35 @@ class Creditcard extends Base
             }
             $aParams['customerId'] = (string)$oUser->oxuser__molliecustomerid->value;
         }
-
+        $method = $this->getCaptureMethod();
+        if ($this->getCaptureMethod() !== false) {
+            $oOrder->mollieSetCaptureMode($method);
+            $aParams['captureMode'] = $method;
+            if ($method === 'automatic') {
+                $days = $this->getCaptureDays();
+                $aParams['captureDelay'] = $days.' days';
+            }
+        }
         $sCCToken = $this->getDynValueParameter('mollieCCToken');
         if (!empty($sCCToken)) {
             $aParams['cardToken'] = $sCCToken;
         }
 
         return $aParams;
+    }
+
+    protected function getCaptureMethod() {
+        $aPaymentConfig = $this->getPaymentConfig();
+        if (isset($aPaymentConfig['creditcard_capture_method'])) {
+            switch ($aPaymentConfig['creditcard_capture_method']) {
+                case 'creditcard_authorize_capture':
+                    return 'manual';
+                case 'creditcard_automatic_capture':
+                    return 'automatic';
+                default:
+                    return false;
+            }
+        }
+        return false;
     }
 }

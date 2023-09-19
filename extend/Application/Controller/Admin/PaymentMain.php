@@ -59,4 +59,16 @@ class PaymentMain extends PaymentMain_parent
         }
         return $aOptions;
     }
+
+    /**
+     * @return array
+     */
+    public function mollieGetAutomaticCaptureDays()
+    {
+        $aOptions = ['deactivated' => Registry::getLang()->translateString('MOLLIE_DEACTIVATED')];
+        for($i = 1; $i <= 7; $i++) {
+            $aOptions[$i] = $i.' '.Registry::getLang()->translateString('MOLLIE_ORDER_EXPIRY_DAYS');
+        }
+        return $aOptions;
+    }
 }
