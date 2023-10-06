@@ -596,11 +596,35 @@ class Order extends Order_parent
 
             $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpointByOrder($this);
             $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value);
-            $blub = $oMollieApiOrder->isCancelable;
-            if ($oMollieApiOrder->isCancelable) {
-                $oApiEndpoint->cancel($this->oxorder__oxtransid->value);
+            if ($this->isMolliePaymentCancelable($oMollieApiOrder)) {
+                try {
+                    $oApiEndpoint->cancel($this->oxorder__oxtransid->value);
+                } catch (\Throwable $exc) {
+                    // cancel call can throw an exception but still lead to the desired behaviour
+                }
             }
         }
+    }
+
+    /**
+     * Returns if the mollie payment can be cancelled
+     * Checks special cases, since the isCancelable is not always a correct indicator
+     *
+     * @param $oMollieApiOrder
+     * @return bool
+     */
+    protected function isMolliePaymentCancelable($oMollieApiOrder)
+    {
+        if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment && // Merchant capture only available in Payment API
+            !$oMollieApiOrder->isCancelable && // Order will say it is not cancelable - thats normal
+            $oMollieApiOrder->status == 'authorized' && // authorized means it isn't paid yet
+            $oMollieApiOrder->captureMode == 'automatic' && // automatic means that the payment will be captured after a certain amount of days
+            !empty($oMollieApiOrder->captureBefore) && // captureBefore will be empty when it was cancelled, before that it will have a date as value (format: YYYY-MM-DD)
+            strtotime(date('Y-m-d')) <= strtotime($oMollieApiOrder->captureBefore) // check if todays date is the same or lower than the captureBefore date
+        ) {
+            return true;
+        }
+        return $oMollieApiOrder->isCancelable;
     }
 
     /**
