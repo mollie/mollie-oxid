@@ -43,9 +43,21 @@
                     }
 
                     if (oSelect.value === 'payment') {
-                        document.getElementById('mollie_payment_description').style.display = '';
+                        mollieToggleDisplayByClass('mollieOnlyPaymentApi', '');
+                        mollieToggleDisplayByClass('mollieOnlyOrderApi', 'none');
                     } else {
-                        document.getElementById('mollie_payment_description').style.display = 'none';
+                        mollieToggleDisplayByClass('mollieOnlyPaymentApi', 'none');
+                        mollieToggleDisplayByClass('mollieOnlyOrderApi', '');
+                    }
+                }
+
+                function mollieToggleDisplayByClass(class, display)
+                {
+                    var aElements = document.getElementsByClassName(class);
+                    if (typeof aElements !== undefined && aElements.length > 0) {
+                        for (var i = 0; i < aElements.length; i++) {
+                            aElements[i].style.display = display;
+                        }
                     }
                 }
                 -->
@@ -62,7 +74,7 @@
             </span>
         </td>
     </tr>
-    <tr id="mollie_payment_description" [{if $paymentModel->getApiMethod() != 'payment'}]style="display:none;"[{/if}]>
+    <tr class="mollieOnlyPaymentApi" [{if $paymentModel->getApiMethod() != 'payment'}]style="display:none;"[{/if}]>
         <td class="edittext" width="70">
             [{oxmultilang ident="MOLLIE_PAYMENT_DESCRIPTION"}]
         </td>
