@@ -29,6 +29,11 @@
         <td class="edittext">
             <script type="text/javascript">
                 <!--
+                function mollieCustomApiChange()
+                {
+                    /* Can be redefined with custom functionality in a paymentconfig template */
+                }
+
                 function mollieHandleApiChange(oSelect)
                 {
                     var aElements = document.getElementsByClassName("mollieApiHint");
@@ -49,11 +54,13 @@
                         mollieToggleDisplayByClass('mollieOnlyPaymentApi', 'none');
                         mollieToggleDisplayByClass('mollieOnlyOrderApi', '');
                     }
+
+                    mollieCustomApiChange(oSelect.value);
                 }
 
-                function mollieToggleDisplayByClass(class, display)
+                function mollieToggleDisplayByClass(className, display)
                 {
-                    var aElements = document.getElementsByClassName(class);
+                    var aElements = document.getElementsByClassName(className);
                     if (typeof aElements !== undefined && aElements.length > 0) {
                         for (var i = 0; i < aElements.length; i++) {
                             aElements[i].style.display = display;
