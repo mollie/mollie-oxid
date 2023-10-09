@@ -2,10 +2,9 @@
 
 namespace Mollie\Payment\Application\Model\Cronjob;
 
-use Mollie\Payment\Application\Helper\Payment;
 use OxidEsales\Eshop\Application\Model\Order;
-use Mollie\Payment\Application\Model\Payment\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 
 class OrderCapture extends \Mollie\Payment\Application\Model\Cronjob\Base
@@ -48,6 +47,8 @@ class OrderCapture extends \Mollie\Payment\Application\Model\Cronjob\Base
                         oxfolder = ? AND
                         OXSENDDATE != '0000-00-00 00:00:00' AND
                         mollieshipmenthasbeenmarked != '0' AND
+                        MOLLIEWASCAPTURED = '0' AND
+                        MOLLIECAPTUREMETHOD = 'manual' AND
                         oxpaid < ?";
         $aParams = [$sTriggerDate, $sProcessingFolder, $sMinPaidDate];
         if ($this->getShopId() !== false) {
@@ -73,11 +74,30 @@ class OrderCapture extends \Mollie\Payment\Application\Model\Cronjob\Base
         foreach ($aUnfinishedOrders as $sUnfinishedOrderId) {
             $oOrder = oxNew(Order::class);
             if ($oOrder->load($sUnfinishedOrderId) ) {
-                $oOrder->captureOrder();
-                $this->outputInfo("Finished Order with ID ".$oOrder->getId());
+                $dAmount = (double)$oOrder->oxorder__oxtotalordersum->value;
+                $aParams['amount'] = [
+                    "currency" => $oOrder->oxorder__oxcurrency->value,
+                    "value" => $this->formatPrice($dAmount)
+                ];
+                $result = $oOrder->captureOrder($aParams);
+                if ($result) {
+                    $this->outputInfo("Finished Order with ID ".$oOrder->getId());
+                    $oOrder->oxorder__molliewascaptured = new Field(1);
+                    $oOrder->save();
+                }
             }
         }
         return true;
+    }
+    /**
+     * Format prices to always have 2 decimal places
+     *
+     * @param double $dPrice
+     * @return string
+     */
+    protected function formatPrice($dPrice)
+    {
+        return number_format($dPrice, 2, '.', '');
     }
 
 }

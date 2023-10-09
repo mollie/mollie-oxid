@@ -28,6 +28,7 @@ $aLang = array(
     'SHOP_MODULE_sMollieCronSecondChanceActive'         => 'Cronjob "Dispatch of payment reminder email" aktiv',
     'SHOP_MODULE_iMollieCronSecondChanceTimeDiff'       => 'Timeframe after which payment reminder email is sent',
     'SHOP_MODULE_sMollieCronOrderShipmentActive'        => 'Cronjob "Transmission of shipping status to Mollie" active',
+    'SHOP_MODULE_sMollieCronCaptureOrdersActive'        => 'Cronjob "Capture of payments" active',
     'SHOP_MODULE_sMollieCronSecureKey'                  => 'Cronjob secure key',
     'SHOP_MODULE_GROUP_MOLLIE_PAYMENTLOGOS'             => 'Alternative payment logos',
     'SHOP_MODULE_GROUP_MOLLIE_APPLEPAY'                 => 'Apple Pay',
@@ -150,4 +151,5 @@ $aLang = array(
     'MOLLIE_CAPTURE_DAYS'                               => 'Automatically capture after',
     'MOLLIE_CAPTURE_ID'                                 => 'Mollie Capture ID',
     'MOLLIE_CAPTURE_SUCCESSFUL'                         => 'Amount captured successfully.',
+    'MOLLIE_CREDITCARD_CAPTURE'                         => '',
 );

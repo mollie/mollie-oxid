@@ -28,6 +28,7 @@ $aLang = array(
     'SHOP_MODULE_sMollieCronSecondChanceActive'         => 'Cronjob "Verzending van betalingsherinnering per e-mail" actief',
     'SHOP_MODULE_iMollieCronSecondChanceTimeDiff'       => 'Termijn waarna de betalingsherinnerings per e-mail wordt verzonden',
     'SHOP_MODULE_sMollieCronOrderShipmentActive'        => 'Cronjob "Cronjob 2Overdragen van verzendstatus naar Mollie2 actief',
+    'SHOP_MODULE_sMollieCronCaptureOrdersActive'        => 'Cronjob "Innen van betalingen" actief',
     'SHOP_MODULE_GROUP_MOLLIE_PAYMENTLOGOS'             => 'Alternatief betalingslogo',
     'SHOP_MODULE_GROUP_MOLLIE_APPLEPAY'                 => 'Apple Pay',
     'SHOP_MODULE_blMollieApplePayButtonOnBasket'        => 'Toon Apple Pay button op pagina winkelmandje',
@@ -134,4 +135,6 @@ $aLang = array(
     'MOLLIE_CAPTURE_DAYS'                               => 'CAutomatisch innen na',
     'MOLLIE_CAPTURE_ID'                                 => 'Mollie Capture ID',
     'MOLLIE_CAPTURE_SUCCESSFUL'                         => 'Bedrag succesvol geïnd',
+    'MOLLIE_CREDITCARD_CAPTURE'                         => '',
+    'sMollieCronCaptureOrdersActive'        => 'Cronjob "Einzug der Zahlungen" aktiv',
 );
