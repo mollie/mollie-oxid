@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/." isTestSource="false" packagePrefix="Mollie\Payment\" />
+      <sourceFolder url="file://$MODULE_DIR$/./lib/mollie-api-php/src" isTestSource="false" packagePrefix="Mollie\Api\" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/mollie-api-php/src" isTestSource="false" packagePrefix="Mollie\Api\" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/mollie-api-php/tests" isTestSource="true" packagePrefix="Tests\" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/mollie-api-php/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/mollie-api-php/tests/Mollie/API" isTestSource="true" packagePrefix="Tests\Mollie\Api\" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
