@@ -34,7 +34,6 @@ class OrderCapture extends \Mollie\Payment\Application\Model\Cronjob\Base
 
         $sProcessingFolder = Registry::getConfig()->getShopConfVar('sMollieStatusProcessing');
         $sTriggerDate = date('Y-m-d H:i:s', time() - (60 * 60 * 24));
-        $sMinPaidDate = date('Y-m-d H:i:s', time() - (60 * 2)); // This will prevent finishing legit orders before the customer does
         $sQuery = " SELECT
                         OXID
                     FROM
@@ -46,11 +45,9 @@ class OrderCapture extends \Mollie\Payment\Application\Model\Cronjob\Base
                         oxtransstatus = 'OK' AND
                         oxfolder = ? AND
                         OXSENDDATE != '0000-00-00 00:00:00' AND
-                        mollieshipmenthasbeenmarked != '0' AND
                         MOLLIEWASCAPTURED = '0' AND
-                        MOLLIECAPTUREMETHOD = 'manual' AND
-                        oxpaid < ?";
-        $aParams = [$sTriggerDate, $sProcessingFolder, $sMinPaidDate];
+                        MOLLIECAPTUREMETHOD = 'manual'";
+        $aParams = [$sTriggerDate, $sProcessingFolder];
         if ($this->getShopId() !== false) {
             $sQuery .= " AND oxshopid = ? ";
             $aParams[] = $this->getShopId();
