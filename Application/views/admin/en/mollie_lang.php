@@ -47,6 +47,7 @@ $aLang = array(
     'HELP_SHOP_MODULE_sMollieCronSecondChanceActive'    => 'For this cronjob to work, in addition to this checkbox you have to ensure that the Mollie cronjob is set up properly. You can find information on how to set up the cronjob in the README.md of this module.',
     'HELP_SHOP_MODULE_sMollieCronOrderShipmentActive'   => 'This cronjob is only needed if the shipping status in your shop is set by an external service and NOT by the "Ship Now" button. For this cronjob to work, in addition to this checkbox you have to ensure that the Mollie cronjob is set up properly. You can find information on how to set up the cronjob in the README.md of this module.',
     'HELP_SHOP_MODULE_sMollieCronSecureKey'             => 'This option is only needed if you have to call the cronjob via URL instead of the php cli. Configure your secure key here, which you have to add to the cronjob call as the GET parameter "secureKey". Example: https://YOUR-SHOP-URL-HERE/modules/mollie/molliepayment/cron.php?secureKey=YOUR-SECURE-KEY',
+    'HELP_SHOP_MODULE_sMollieCronCaptureOrdersActive'   => 'This option works only if you have <strong>Authenticate credit card before capture</strong> as capture method selected. This cronjob captures orders which are fullfilled and you normally would need to capture manually.',
 
     'MOLLIE_YES'                                        => 'Yes',
     'MOLLIE_NO'                                         => 'No',
@@ -151,5 +152,6 @@ $aLang = array(
     'MOLLIE_CAPTURE_DAYS'                               => 'Automatically capture after',
     'MOLLIE_CAPTURE_ID'                                 => 'Mollie Capture ID',
     'MOLLIE_CAPTURE_SUCCESSFUL'                         => 'Amount captured successfully.',
-    'MOLLIE_CREDITCARD_CAPTURE'                         => '',
+    'MOLLIE_CREDITCARD_CAPTURE'                         => 'Capture Method',
+    'MOLLIE_CREDITCARD_CAPTURE_METHOD_HELP'             => 'This option defines which capture method is used.<br><strong>Authenticate credit card before capture</strong>:The amount will be authorized and you have to manually capture the amount via the mollie tab within the order or via provided cron job<br><strong>Directly capture credit card amounts:</strong> The amount will be directly captured<br><strong>Automatically capture credit card amounts:</strong> The amount will be automatically captured by mollie after X days',
 );

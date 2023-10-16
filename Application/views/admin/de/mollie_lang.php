@@ -47,6 +47,7 @@ $aLang = array(
     'HELP_SHOP_MODULE_sMollieCronSecondChanceActive'    => 'Damit dieser Cronjob arbeitet, m&uuml;ssen Sie zus&auml;tzlich zu dieser Checkbox noch sicherstellen dass der Mollie Cronjob eingerichtet ist. Mehr dazu erfahren Sie in der README.md Datei des Moduls.',
     'HELP_SHOP_MODULE_sMollieCronOrderShipmentActive'   => 'Dieser Cronjob ist nur notwendig, wenn der Versandstatus in Ihrem Shop &uuml;ber ein externes System gesetzt wird und NICHT &uuml;ber den "Jetzt versenden" Button im Oxid-Admin. Damit dieser Cronjob arbeitet, m&uuml;ssen Sie zus&auml;tzlich zu dieser Checkbox noch sicherstellen dass der Mollie Cronjob eingerichtet ist. Mehr dazu erfahren Sie in der README.md Datei des Moduls.',
     'HELP_SHOP_MODULE_sMollieCronSecureKey'             => 'Diese Option ben&ouml;tigen Sie nur, wenn Sie den Cronjob per URL aufrufen m&uuml;ssen anstelle von dem Aufruf über die php cli. Konfigurieren Sie hier einen Sicherheitsschlüssel, den Sie über den GET-Parameter "secureKey" an den Aufruf des Cronjobs anf&uuml;gen. Bsp.: https://YOUR-SHOP-URL-HERE/modules/mollie/molliepayment/cron.php?secureKey=YOUR-SECURE-KEY',
+    'HELP_SHOP_MODULE_sMollieCronCaptureOrdersActive'   => 'Dieser Cronjob funktioniert nur, wenn Sie <strong>Kreditkarte vor Erfassung authentifizieren</strong> als Erfassungsmethode ausgewählt haben. Dieser Cronjob captured Bestellungen, die versandt sind und die Sie normalerweise manuell einziehen müssten.',
 
     'MOLLIE_YES'                                        => 'Ja',
     'MOLLIE_NO'                                         => 'Nein',
@@ -152,4 +153,5 @@ $aLang = array(
     'MOLLIE_TRANSACTION_ID'                             => 'Mollie Transaktions ID',
     'MOLLIE_CAPTURE_ID'                                 => 'Mollie Capture ID',
     'MOLLIE_EXTERNAL_TRANSACTION_ID'                    => 'Externe Transaktions ID',
+    'MOLLIE_CREDITCARD_CAPTURE_METHOD_HELP'             => 'Diese Option bestimmt, welche Capture Methode verwendet wird<br><strong>Kreditkartbeträge erst Autorisieren</strong>:Der Betrag wird autorisiert und Sie müssen den Betrag manuell einziehen, entweder über das Mollie-Tab bei den Bestellungen oder via bereitgestellten Cronjob.<br><strong>Kreditkartbeträge direkt einziehen:</strong> Der Betrag wird dirkt eingezogen.<br><strong>Kreditkartbeträge automatisch einziehen:</strong> Der Betrag wird automatisch nach x Tagen von Mollie eingezogen.',
 );

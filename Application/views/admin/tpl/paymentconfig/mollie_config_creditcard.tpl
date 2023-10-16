@@ -40,7 +40,7 @@
             <option value="creditcard_direct_capture"    [{if $paymentModel->getConfigParam('creditcard_capture_method') == 'creditcard_direct_capture'    }]selected[{/if}]>[{oxmultilang ident="MOLLIE_CC_CAPTURE_DIRECT"}]</option>
             <option value="creditcard_automatic_capture" [{if $paymentModel->getConfigParam('creditcard_capture_method') == 'creditcard_automatic_capture' }]selected[{/if}]>[{oxmultilang ident="MOLLIE_CC_CAPTURE_AUTOMATIC"}]</option>
         </select>
-        [{oxinputhelp ident="MOLLIE_CREDITCARD_DATA_INPUT_HELP"}]
+        [{oxinputhelp ident="MOLLIE_CREDITCARD_CAPTURE_METHOD_HELP"}]
     </td>
 
 </tr>
