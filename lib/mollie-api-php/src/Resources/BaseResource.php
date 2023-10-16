@@ -3,18 +3,25 @@
 namespace Mollie\Api\Resources;
 
 use Mollie\Api\MollieApiClient;
-
+#[\AllowDynamicProperties]
 abstract class BaseResource
 {
     /**
      * @var MollieApiClient
      */
     protected $client;
-
     /**
-     * @param $client
+     * Indicates the type of resource.
+     *
+     * @example payment
+     *
+     * @var string
      */
-    public function __construct(MollieApiClient $client)
+    public $resource;
+    /**
+     * @param MollieApiClient $client
+     */
+    public function __construct(\Mollie\Api\MollieApiClient $client)
     {
         $this->client = $client;
     }

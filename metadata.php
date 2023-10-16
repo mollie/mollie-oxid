@@ -25,7 +25,7 @@ SEPA Lastschrift, Apple Pay & mehr. Eine höhere Conversion erzielen Sie durch e
 markengerecht und in vertrauter Umgebung, ohne Weiterleitung.<br>
 Das Onboarding ist einfach und schnell, mit dem Dashboard und der Mollie-App haben Sie alle Angaben zum Wachstum<br>
 immer zur Hand. Die Auszahlungsfrequenz bestimmen Sie selbst. Mit Mollie kommen keine monatlichen Kosten oder<br>
-Einrichtungsgebühren auf Sie zu. Sie zahlen nur pro Transaktion. Sie bleiben Kunde, weil Sie zufrieden sind. 
+Einrichtungsgebühren auf Sie zu. Sie zahlen nur pro Transaktion. Sie bleiben Kunde, weil Sie zufrieden sind.
 ',
         'en' => "Boost your conversion with a hassle-free payment solution. Mollie offers all popular payment methods,<br>
 plus optimized checkout and super easy onboarding. How does it benefit you? The answer is simple: higher<br>
@@ -37,7 +37,7 @@ inside a familiar, branded environment, with no redirecting. <br>
 The onboarding process is quick and easy, and the Mollie dashboard and app let you keep track of all your transactions at<br>
 a glance. You can choose for yourself how often you want to receive your payouts. With Mollie, you’ll never pay any monthly<br>
 fees or setup costs. You’ll only pay for successful transactions. And you’ll stay because you're happy with our service,<br>
-not because a contract forces you! 
+not because a contract forces you!
 ",
         'fr' => "Dynamisez votre taux de conversion avec une solution de paiement sans souci. Mollie offre toutes les méthodes<br>
 de paiement populaires, ainsi qu'un encaissement optimisé et une prise en main très simple. Comment cela vous profitera-t-il?<br>
@@ -59,7 +59,7 @@ AMet een geïntegreerde oplossing van Mollie krijg je toegang tot alle belangrij
 creditcards, SEPA-automatische incasso, Apple Pay en meer. Je geeft je conversie een boost met een verbeterde checkout-ervaring, allemaal <br>
 binnen een vertrouwde branded-omgeving, zonder omleidingen. <br>
 Het onboarding-proces is snel en eenvoudig, en met het Mollie Dashboard en de app volg je al je transacties <br>
-in een oogopslag. Je bepaalt zelf hoe vaak je jouw uitbetalingen wilt ontvangen. We willen dat je bij ons blijft omdat je blij bent met onze service, niet omdat het moet. <br> Daarom hebben we geen vaste contracten en rekenen we nooit maandelijkse <br> 
+in een oogopslag. Je bepaalt zelf hoe vaak je jouw uitbetalingen wilt ontvangen. We willen dat je bij ons blijft omdat je blij bent met onze service, niet omdat het moet. <br> Daarom hebben we geen vaste contracten en rekenen we nooit maandelijkse <br>
 fees op opstartkosten. Je betaalt alleen voor succesvolle transacties.
 ",
         'it' => "Aumentate il vostro tasso di conversione con una soluzione di pagamento senza problemi. Mollie offre tutti i metodi di pagamento popolari,<br>
@@ -114,6 +114,7 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
         'MollieApplePay' => Mollie\Payment\Application\Controller\MollieApplePay::class,
         'MollieFinishPayment' => Mollie\Payment\Application\Controller\MollieFinishPayment::class,
         'mollie_order_refund' => Mollie\Payment\Application\Controller\Admin\OrderRefund::class,
+        'mollie_order_capture' => Mollie\Payment\Application\Controller\Admin\OrderCapture::class,
     ],
     'templates'     => [
         'molliewebhook.tpl' => 'mollie/molliepayment/Application/views/hook/tpl/molliewebhook.tpl',
@@ -167,6 +168,7 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronSecondChanceActive',      'type' => 'bool',       'value' => '0',         'position' => 90],
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'iMollieCronSecondChanceTimeDiff',    'type' => 'select',     'value' => '1',         'position' => 100],
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronOrderShipmentActive',     'type' => 'bool',       'value' => '0',         'position' => 110],
+        ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronCaptureOrdersActive',      'type' => 'bool',       'value' => '0',         'position' => 110],
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronSecureKey',               'type' => 'str',        'value' => '',          'position' => 120],
         ['group' => 'MOLLIE_APPLEPAY',          'name' => 'blMollieApplePayButtonOnBasket',     'type' => 'bool',       'value' => '1',         'position' => 200],
         ['group' => 'MOLLIE_APPLEPAY',          'name' => 'blMollieApplePayButtonOnDetails',    'type' => 'bool',       'value' => '1',         'position' => 210],

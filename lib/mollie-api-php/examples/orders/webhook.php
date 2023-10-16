@@ -1,14 +1,15 @@
 <?php
+
+namespace _PhpScoperf7c63b60b99d;
+
 /*
  * Handle an order status change using the Mollie API.
  */
-
 try {
     /*
      * Initialize the Mollie API library with your API key or OAuth access token.
      */
     require "../initialize.php";
-
     /*
      * After your webhook has been called with the order ID in its body, you'd like
      * to handle the order's status change. This is how you can do that.
@@ -17,12 +18,10 @@ try {
      */
     $order = $mollie->orders->get($_POST["id"]);
     $orderId = $order->metadata->order_id;
-
     /*
      * Update the order in the database.
      */
-    database_write($orderId, $order->status);
-
+    \_PhpScoperf7c63b60b99d\database_write($orderId, $order->status);
     if ($order->isPaid() || $order->isAuthorized()) {
         /*
          * The order is paid or authorized
@@ -46,5 +45,5 @@ try {
          */
     }
 } catch (\Mollie\Api\Exceptions\ApiException $e) {
-    echo "API call failed: " . htmlspecialchars($e->getMessage());
+    echo "API call failed: " . \htmlspecialchars($e->getMessage());
 }

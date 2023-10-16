@@ -2,13 +2,24 @@
 
 namespace Mollie\Payment\extend\Application\Model;
 
+use Exception;
+use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Resources\Capture;
+use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
+use Mollie\Payment\Application\Model\Payment\Base;
 use Mollie\Payment\Application\Model\RequestLog;
+use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\UserPayment;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Application\Model\Country;
 use Mollie\Payment\Application\Helper\User as UserHelper;
+use ReflectionMethod;
 
 class Order extends Order_parent
 {
@@ -91,7 +102,7 @@ class Order extends Order_parent
     /**
      * Generate Mollie payment model from paymentId
      *
-     * @return \Mollie\Payment\Application\Model\Payment\Base
+     * @return Base
      */
     public function mollieGetPaymentModel()
     {
@@ -137,7 +148,7 @@ class Order extends Order_parent
 
                 DatabaseProvider::getDb()->Execute("UPDATE oxorder SET mollieshipmenthasbeenmarked = 1 WHERE oxid = ?", array($this->getId()));
             }
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             $oRequestLog->logExceptionResponse([], $exc->getCode(), $exc->getMessage(), 'shipAll', $this->getId(), $this->getConfig()->getShopId());
         }
     }
@@ -160,7 +171,7 @@ class Order extends Order_parent
                     $oResponse[0]->update();
                 }
             }
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             $oRequestLog = oxNew(RequestLog::class);
             $oRequestLog->logExceptionResponse([], $exc->getCode(), $exc->getMessage(), 'updateTracking', $this->getId(), $this->getConfig()->getShopId());
         }
@@ -174,7 +185,7 @@ class Order extends Order_parent
     public function mollieUncancelOrder()
     {
         if ($this->oxorder__oxstorno->value == 1) {
-            $this->oxorder__oxstorno = new \OxidEsales\Eshop\Core\Field(0);
+            $this->oxorder__oxstorno = new Field(0);
             if ($this->save()) {
                 // canceling ordered products
                 foreach ($this->getOrderArticles() as $oOrderArticle) {
@@ -268,6 +279,27 @@ class Order extends Order_parent
     }
 
     /**
+     * @param $sCaptureMode
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    public function mollieSetCaptureMode($sCaptureMode)
+    {
+        DatabaseProvider::getDb()->execute('UPDATE oxorder SET MOLLIECAPTUREMETHOD = ? WHERE oxid = ?', array($sCaptureMode, $this->getId()));
+
+        $this->oxorder__molliecapturemethod = new Field($sCaptureMode);
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function mollieIsManualCaptureMethod() {
+        $orderCaptureMethod = $this->oxorder__molliecapturemethod->value;
+        return $orderCaptureMethod === 'manual';
+    }
+    /**
      * Determines if the current call is a return from a redirect payment
      *
      * @return bool
@@ -299,7 +331,7 @@ class Order extends Order_parent
      *
      * @param \OxidEsales\EshopCommunity\Application\Model\Basket $oBasket Shopping basket object
      */
-    protected function _loadFromBasket(\OxidEsales\Eshop\Application\Model\Basket $oBasket)
+    protected function _loadFromBasket(Basket $oBasket)
     {
         if ($this->blMollieFinalizeReturnMode === false) {
             return parent::_loadFromBasket($oBasket);
@@ -311,7 +343,7 @@ class Order extends Order_parent
      * Extension: In return mode load existing userpayment instead of creating a new one
      *
      * @param string $sPaymentid used payment id
-     * @return \OxidEsales\Eshop\Application\Model\UserPayment
+     * @return UserPayment
      */
     protected function _setPayment($sPaymentid)
     {
@@ -324,7 +356,7 @@ class Order extends Order_parent
             }
             return $mParentReturn;
         }
-        $oUserpayment = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
+        $oUserpayment = oxNew(UserPayment::class);
         $oUserpayment->load($this->oxorder__oxpaymentid->value);
         return $oUserpayment;
     }
@@ -336,7 +368,7 @@ class Order extends Order_parent
      * @param object                                              $oUserpayment user payment object
      * @return  integer 2 or an error code
      */
-    protected function _executePayment(\OxidEsales\Eshop\Application\Model\Basket $oBasket, $oUserpayment)
+    protected function _executePayment(Basket $oBasket, $oUserpayment)
     {
         if ($this->blMollieFinalizeReturnMode === false) {
             return parent::_executePayment($oBasket, $oUserpayment);
@@ -415,7 +447,7 @@ class Order extends Order_parent
      * Validates order parameters like stock, delivery and payment
      * parameters
      *
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket basket object
+     * @param Basket $oBasket basket object
      * @param \OxidEsales\Eshop\Application\Model\User   $oUser   order user
      *
      * @return null
@@ -431,7 +463,7 @@ class Order extends Order_parent
      * Checks if payment used for current order is available and active.
      * Throws exception if not available
      *
-     * @param \OxidEsales\Eshop\Application\Model\Basket    $oBasket basket object
+     * @param Basket    $oBasket basket object
      * @param \OxidEsales\Eshop\Application\Model\User|null $oUser   user object
      *
      * @return null
@@ -439,7 +471,7 @@ class Order extends Order_parent
     public function validatePayment($oBasket, $oUser = null)
     {
         if ($this->blMollieReinitializePaymentMode === false) {
-            $oReflection = new \ReflectionMethod(\OxidEsales\Eshop\Application\Model\Order::class, 'validatePayment');
+            $oReflection = new ReflectionMethod(\OxidEsales\Eshop\Application\Model\Order::class, 'validatePayment');
             $aParams = $oReflection->getParameters();
             if (count($aParams) == 1) {
                 return parent::validatePayment($oBasket); // Oxid 6.1 didnt have the $oUser parameter yet
@@ -452,12 +484,12 @@ class Order extends Order_parent
      * This overloaded method sets the return mode flag so that the behaviour of some methods is changed when the customer
      * returns after successful payment from Mollie
      *
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket              Basket object
+     * @param Basket $oBasket              Basket object
      * @param object                                     $oUser                Current User object
      * @param bool                                       $blRecalculatingOrder Order recalculation
      * @return integer
      */
-    public function finalizeOrder(\OxidEsales\Eshop\Application\Model\Basket $oBasket, $oUser, $blRecalculatingOrder = false)
+    public function finalizeOrder(Basket $oBasket, $oUser, $blRecalculatingOrder = false)
     {
         $this->mollieRecalculateOrder = $blRecalculatingOrder;
         if (PaymentHelper::getInstance()->isMolliePaymentMethod($oBasket->getPaymentId()) === true && $this->mollieIsReturnAfterPayment() === true) {
@@ -485,7 +517,7 @@ class Order extends Order_parent
         $aShippingContact = $oRequest->getRequestEscapedParameter('shippingContact');
 
         if (empty($aBillingContact) || empty($aShippingContact)) {
-            throw new \Exception('Address information is missing');
+            throw new Exception('Address information is missing');
         }
 
         $oCountry = oxNew(Country::class);
@@ -564,12 +596,74 @@ class Order extends Order_parent
 
             $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpointByOrder($this);
             $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value);
-            if ($oMollieApiOrder->isCancelable) {
-                $oApiEndpoint->cancel($this->oxorder__oxtransid->value);
+            if ($this->isMolliePaymentCancelable($oMollieApiOrder)) {
+                try {
+                    $oApiEndpoint->cancel($this->oxorder__oxtransid->value);
+                } catch (\Throwable $exc) {
+                    // cancel call can throw an exception but still lead to the desired behaviour
+                }
             }
         }
     }
 
+    /**
+     * Returns if the mollie payment can be cancelled
+     * Checks special cases, since the isCancelable is not always a correct indicator
+     *
+     * @param $oMollieApiOrder
+     * @return bool
+     */
+    protected function isMolliePaymentCancelable($oMollieApiOrder)
+    {
+        if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment && // Merchant capture only available in Payment API
+            !$oMollieApiOrder->isCancelable && // Order will say it is not cancelable - thats normal
+            $oMollieApiOrder->status == 'authorized' && // authorized means it isn't paid yet
+            $oMollieApiOrder->captureMode == 'automatic' && // automatic means that the payment will be captured after a certain amount of days
+            !empty($oMollieApiOrder->captureBefore) && // captureBefore will be empty when it was cancelled, before that it will have a date as value (format: YYYY-MM-DD)
+            strtotime(date('Y-m-d')) <= strtotime($oMollieApiOrder->captureBefore) // check if todays date is the same or lower than the captureBefore date
+        ) {
+            return true;
+        }
+        return $oMollieApiOrder->isCancelable;
+    }
+
+    /**
+     * @param $aParams
+     * @return Exception|ApiException|Capture|void
+     * @throws ApiException
+     */
+    public function captureOrder($aParams = null)
+    {
+        if ($this->mollieIsMolliePaymentUsed() === true) {
+            $api  = Payment::getInstance()->loadMollieApi($this->oxorder__molliemode->value);
+            if ($aParams === null) {
+                    return $api->paymentCaptures->createForId($this->oxorder__oxtransid->value);
+            } else {
+                    return $api->paymentCaptures->createForId($this->oxorder__oxtransid->value, $aParams);
+            }
+        }
+    }
+
+    /**
+     * @return array
+     * @throws ApiException
+     */
+    public function getCaptures() {
+
+        $api  = Payment::getInstance()->loadMollieApi($this->oxorder__molliemode->value);
+        $payment = $api->payments->get($this->oxorder__oxtransid->value);
+        $captures = $payment->captures();
+        $aOrderCaptures = [];
+
+        foreach ($captures as $key => $capture) {
+            $aOrderCaptures[$key]['amount'] =  $capture->amount->value;
+            $aOrderCaptures[$key]['paymentId'] = $payment->id;
+            $aOrderCaptures[$key]['captureId'] = $capture->id;
+            $aOrderCaptures[$key]['mode'] = $capture->mode;
+            $aOrderCaptures[$key]['status'] = $capture->status;
+        }
+        return $aOrderCaptures;
+    }
     /**
      * Returns finish payment url
      *
@@ -646,7 +740,7 @@ class Order extends Order_parent
      */
     public function mollieSendSecondChanceEmail()
     {
-        $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $oEmail = oxNew(Email::class);
         $oEmail->mollieSendSecondChanceEmail($this, $this->mollieGetPaymentFinishUrl());
 
         $this->mollieMarkAsSecondChanceMailSent();
@@ -690,7 +784,7 @@ class Order extends Order_parent
 
         $this->blMollieReinitializePaymentMode = true;
 
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('mollieReinitializePaymentMode', true);
+        Registry::getSession()->setVariable('mollieReinitializePaymentMode', true);
 
         return $this->finalizeOrder($oBasket, $oUser);
     }
@@ -701,7 +795,7 @@ class Order extends Order_parent
      *
      * @param string $sTransactionId
      * @return bool
-     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     * @throws DatabaseConnectionException
      */
     public function mollieLoadOrderByTransactionId($sTransactionId)
     {

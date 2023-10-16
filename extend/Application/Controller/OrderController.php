@@ -75,8 +75,8 @@ class OrderController extends OrderController_parent
             }
 
             $aResult = $oOrder->mollieGetPaymentModel()->getTransactionHandler($oOrder)->processTransaction($oOrder, 'success');
-
-            if ($aResult['success'] === false) {
+            Registry::getLogger()->critical(print_r($aResult,true));
+            if ($aResult['success'] === false && $aResult['type'] !== 'success' ) {
                 Registry::getSession()->deleteVariable('sess_challenge');
 
                 $sErrorIdent = 'MOLLIE_ERROR_SOMETHING_WENT_WRONG';

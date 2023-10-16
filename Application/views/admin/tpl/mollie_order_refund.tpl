@@ -77,76 +77,134 @@
 [{else}]
     [{assign var="readonly" value=""}]
 [{/if}]
+[{assign var="order" value=$oView->getOrder()}]
+[{assign var="paymentType" value=$order->getPaymentType()}]
+[{if $oView->isMollieOrder() === true}]
+<fieldset>
+    <legend>[{oxmultilang ident="MOLLIE_PAYMENT_DETAILS"}]</legend>
+    <table>
+        <tr>
+            <td class="edittext">
+                [{oxmultilang ident="MOLLIE_PAYMENT_TYPE"}]:
+            </td>
+            <td class="edittext">
+                [{$paymentType->oxpayments__oxdesc->value}]
+            </td>
+            <td class="edittext"></td>
+        </tr>
+        <tr>
+            <td class="edittext">
+                [{oxmultilang ident="MOLLIE_TRANSACTION_ID"}]:
+            </td>
+            <td class="edittext">
+                [{$order->oxorder__oxtransid->value}]
+            </td>
+            <td class="edittext"></td>
+        </tr>
+        [{if $order->oxorder__mollieexternaltransid->value != ""}]
+        <tr>
+            <td class="edittext">
+                [{oxmultilang ident="MOLLIE_EXTERNAL_TRANSACTION_ID"}]:
+            </td>
+            <td class="edittext">
+                [{$order->oxorder__mollieexternaltransid->value}]
+            </td>
+            <td class="edittext"></td>
+        </tr>
+        [{/if}]
+    </table>
+</fieldset>
+[{if $oView->getErrorMessage() != false}]
+    <fieldset class="refundError message">
+        <strong>Error</strong>
+        [{$oView->getErrorMessage()}]
+    </fieldset>
+[{/if}]
+[{if $oView->wasRefundSuccessful() == true}]
+    <fieldset class="refundSuccess message">
+        [{oxmultilang ident="MOLLIE_REFUND_SUCCESSFUL"}]
+    </fieldset>
+[{/if}]
+[{if $oView->wasCaptureSuccessful() == true}]
+    <fieldset class="refundSuccess message">
+        [{oxmultilang ident="MOLLIE_CAPTURE_SUCCESSFUL"}]
+    </fieldset>
+[{/if}]
 
+[{assign var="blIsOrderRefundable" value=$oView->isOrderRefundable()}]
+[{if $blIsOrderRefundable == false}]
+    <fieldset class="refundNotice message">
+        <strong>[{oxmultilang ident="MOLLIE_NOTICE"}]</strong>
+        [{oxmultilang ident="MOLLIE_ORDER_NOT_REFUNDABLE"}]
+    </fieldset>
+    [{/if}]
+
+[{if $oView->hasOrderVoucher() == true}]
+    <fieldset class="refundNotice message">
+        <strong>[{oxmultilang ident="MOLLIE_NOTICE"}]</strong>
+        [{oxmultilang ident="MOLLIE_VOUCHERS_EXISTING"}]
+    </fieldset>
+[{/if}]
+    [{if $oView->isDirektOrAuthorizedOrder()}]
+    <fieldset class="capturelist">
+        <legend>[{oxmultilang ident="MOLLIE_CAPTURE_TITLE"}]</legend>
+        [{if !$oView->getOrderCaptures()}]
+        <form name="capturelist" id="search" action="[{$oViewConf->getSelfLink()}]" method="post">
+            [{$oViewConf->getHiddenSid()}]
+            <input type="hidden" name="cl" value="mollie_order_refund">
+            <input type="hidden" name="oxid" value="[{$oxid}]">
+            <input type="hidden" name="fnc" value="captureOrder">
+
+            <span><label for="refund_description">[{oxmultilang ident="MOLLIE_CAPTURE_DESCRIPTION"}]:</label></span>
+            <input type="text" name="capture_partial" value="[{$edit->oxorder__oxtotalordersum->value}]" placeholder="[{$edit->oxorder__oxtotalordersum->value}]" maxlength="140" size="120"><br>
+            <input type="submit" value="[{oxmultilang ident="MOLLIE_CAPTURE_AMOUNT"}]" class="refundSubmit">
+        </form>
+        [{/if}]
+        [{if $oView->getOrderCaptures()}]
+            <table cellspacing="0" cellpadding="0" border="0" width="98%" class="refundTable">
+                <tr>
+                    <td class="listheader first" height="15" width="10%">[{oxmultilang ident="MOLLIE_AMOUNT"}]</td>
+                    <td class="listheader" width="10%">[{oxmultilang ident="MOLLIE_TRANSACTION_ID"}]</td>
+                    <td class="listheader" width="10%">[{oxmultilang ident="MOLLIE_CAPTURE_ID"}]</td>
+                    <td class="listheader" width="10%">[{oxmultilang ident="SHOP_MODULE_sMollieMode"}]</td>
+                    <td class="listheader" width="10%">[{oxmultilang ident="MOLLIE_CAPTURE_STATUS"}]</td>
+                </tr>
+                [{foreach from=$oView->getOrderCaptures() item=listitem name=orderCaptures}]
+                <tr id="art.[{$smarty.foreach.orderCaptures.iteration}]">
+                    [{if $listitem.isOrderarticle == false && $blBorderDrawn == false}]
+                    [{assign var="class" value=" borderTop"}]
+                    [{assign var="blBorderDrawn" value=true}]
+                    [{/if}]
+                    [{assign var="listclass" value=listitem$blWhite}]
+                    <td valign="top" class="[{$listclass}][{$class}]" height="15">[{$oView->getFormatedPrice($listitem.amount)}]  <small>[{$edit->oxorder__oxcurrency->value}]</small></a></td>
+                    <td valign="top" class="[{$listclass}][{$class}]">[{$listitem.paymentId|strip_tags}]</a></td>
+                    <td valign="top" class="[{$listclass}][{$class}]">[{$listitem.captureId}]</td>
+                    <td valign="top" class="[{$listclass}][{$class}]">[{$listitem.mode}]</td>
+                    <td valign="top" class="[{$listclass}][{$class}]">[{$listitem.status}]</td>
+
+                    [{if $listitem.isOrderarticle == false}]
+                    [{assign var="class" value=""}]
+                    [{/if}]
+                </tr>
+                [{if $blWhite == "2"}]
+                [{assign var="blWhite" value=""}]
+                [{else}]
+                [{assign var="blWhite" value="2"}]
+                [{/if}]
+                [{/foreach}]
+            </table>
+        [{/if}]
+    </fieldset>
+    [{/if}]
 <form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
     [{$oViewConf->getHiddenSid()}]
     <input type="hidden" name="oxid" value="[{$oxid}]">
     <input type="hidden" name="cl" value="mollie_order_refund">
 </form>
-[{if $oView->isMollieOrder() === true}]
-    [{if $oView->wasRefundSuccessful() == true}]
-        <fieldset class="refundSuccess message">
-            [{oxmultilang ident="MOLLIE_REFUND_SUCCESSFUL"}]
-        </fieldset>
-    [{/if}]
-    [{if $oView->getErrorMessage() != false}]
-        <fieldset class="refundError message">
-            <strong>Error</strong>
-            [{$oView->getErrorMessage()}]
-        </fieldset>
-    [{/if}]
 
-    [{assign var="blIsOrderRefundable" value=$oView->isOrderRefundable()}]
-    [{if $blIsOrderRefundable == false}]
-        <fieldset class="refundNotice message">
-            <strong>[{oxmultilang ident="MOLLIE_NOTICE"}]</strong>
-            [{oxmultilang ident="MOLLIE_ORDER_NOT_REFUNDABLE"}]
-        </fieldset>
-    [{/if}]
 
-    [{if $oView->hasOrderVoucher() == true}]
-        <fieldset class="refundNotice message">
-            <strong>[{oxmultilang ident="MOLLIE_NOTICE"}]</strong>
-            [{oxmultilang ident="MOLLIE_VOUCHERS_EXISTING"}]
-        </fieldset>
-    [{/if}]
 
-    [{assign var="order" value=$oView->getOrder()}]
-    [{assign var="paymentType" value=$order->getPaymentType()}]
-    <fieldset>
-        <legend>[{oxmultilang ident="MOLLIE_PAYMENT_DETAILS"}]</legend>
-        <table>
-            <tr>
-                <td class="edittext">
-                    [{oxmultilang ident="MOLLIE_PAYMENT_TYPE"}]:
-                </td>
-                <td class="edittext">
-                    [{$paymentType->oxpayments__oxdesc->value}]
-                </td>
-                <td class="edittext"></td>
-            </tr>
-            <tr>
-                <td class="edittext">
-                    [{oxmultilang ident="MOLLIE_TRANSACTION_ID"}]:
-                </td>
-                <td class="edittext">
-                    [{$order->oxorder__oxtransid->value}]
-                </td>
-                <td class="edittext"></td>
-            </tr>
-            [{if $order->oxorder__mollieexternaltransid->value != ""}]
-                <tr>
-                    <td class="edittext">
-                        [{oxmultilang ident="MOLLIE_EXTERNAL_TRANSACTION_ID"}]:
-                    </td>
-                    <td class="edittext">
-                        [{$order->oxorder__mollieexternaltransid->value}]
-                    </td>
-                    <td class="edittext"></td>
-                </tr>
-            [{/if}]
-        </table>
-    </fieldset>
+
 
     [{if $order->mollieIsEligibleForPaymentFinish()}]
         <fieldset>
