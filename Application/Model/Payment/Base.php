@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Model\Payment;
 
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Application\Model\PaymentConfig;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Application\Model\Order;
@@ -78,6 +79,13 @@ abstract class Base
      * @var bool
      */
     protected $blIsMethodHiddenInitially = false;
+
+    /**
+     * Determines if the payment method can be display in the payment list in checkout
+     *
+     * @var bool
+     */
+    protected $blShowInPaymentList = true;
 
     /**
      * Array with country-codes the payment method is restricted to
@@ -194,6 +202,16 @@ abstract class Base
     public function isMollieMethodHiddenInitially()
     {
         return $this->blIsMethodHiddenInitially;
+    }
+
+    /**
+     * Returns if the payment method can be display in the payment list in checkout
+     *
+     * @return bool
+     */
+    public function isMethodDisplayableInPaymentList()
+    {
+        return $this->blShowInPaymentList;
     }
 
     /**
@@ -519,5 +537,16 @@ abstract class Base
             return $aPaymentConfig[$sParameterName];
         }
         return false;
+    }
+
+    /**
+     * Method to perform certain actions when the API call failed
+     *
+     * @param  ApiException $exc
+     * @return void
+     */
+    public function handlePaymentError(ApiException $exc)
+    {
+        // do nothing here - method can be overloaded by child classes
     }
 }

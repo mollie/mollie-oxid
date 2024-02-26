@@ -112,6 +112,7 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
     'controllers'   => [
         'MollieWebhook' => Mollie\Payment\Application\Controller\MollieWebhook::class,
         'MollieApplePay' => Mollie\Payment\Application\Controller\MollieApplePay::class,
+        'MolliePayPalExpress' => Mollie\Payment\Application\Controller\MolliePayPalExpress::class,
         'MollieFinishPayment' => Mollie\Payment\Application\Controller\MollieFinishPayment::class,
         'mollie_order_refund' => Mollie\Payment\Application\Controller\Admin\OrderRefund::class,
         'mollie_order_capture' => Mollie\Payment\Application\Controller\Admin\OrderCapture::class,
@@ -132,6 +133,7 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
         'mollieapplepay.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/mollieapplepay.tpl',
         'molliecreditcard.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/molliecreditcard.tpl',
         'mollieapplepaybutton.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/mollieapplepaybutton.tpl',
+        'molliepaypalexpress.tpl' => 'mollie/molliepayment/Application/views/frontend/tpl/molliepaypalexpress.tpl',
         'mollie_order_refund.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/mollie_order_refund.tpl',
         'mollie_second_chance.tpl' => 'mollie/molliepayment/Application/views/email/tpl/mollie_second_chance.tpl',
         'mollie_module_main.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/mollie_module_main.tpl',
@@ -147,10 +149,14 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
         ['template' => 'page/checkout/inc/payment_other.tpl',   'block' => 'checkout_payment_longdesc',     'file' => 'mollie_checkout_payment_longdesc.tpl'],
         ['template' => 'mollie_payment_showicons.tpl',          'block' => 'checkout_payment_longdesc',     'file' => 'mollie_checkout_payment_longdesc.tpl'],
         ['template' => 'page/checkout/payment.tpl',             'block' => 'select_payment',                'file' => 'mollie_select_payment.tpl'],
+        ['template' => 'page/checkout/payment.tpl',             'block' => 'change_payment',                'file' => 'mollie_change_payment.tpl'],
         ['template' => 'page/checkout/payment.tpl',             'block' => 'checkout_payment_errors',       'file' => 'mollie_checkout_payment_errors.tpl'],
+        ['template' => 'page/checkout/order.tpl',               'block' => 'checkout_order_address',        'file' => 'mollie_checkout_order_address.tpl'],
         ['template' => 'page/details/inc/productmain.tpl',      'block' => 'details_productmain_tobasket',  'file' => 'mollie_details_productmain_tobasket.tpl'],
         ['template' => 'page/checkout/basket.tpl',              'block' => 'basket_btn_next_top',           'file' => 'mollie_basket_btn_next_top.tpl'],
         ['template' => 'page/checkout/basket.tpl',              'block' => 'basket_btn_next_bottom',        'file' => 'mollie_basket_btn_next_bottom.tpl'],
+        ['template' => 'page/checkout/basket.tpl',              'block' => 'checkout_basket_main',          'file' => 'mollie_checkout_error_insert.tpl'],
+        ['template' => 'widget/minibasket/minibasket.tpl',      'block' => 'widget_minibasket',             'file' => 'mollie_minibasket.tpl'],
     ],
     'settings'      => [
         ['group' => 'MOLLIE_GENERAL',           'name' => 'sMollieMode',                        'type' => 'select',     'value' => 'test',      'position' => 10, 'constraints' => 'live|test'],
@@ -172,6 +178,12 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
         ['group' => 'MOLLIE_CRONJOBS',          'name' => 'sMollieCronSecureKey',               'type' => 'str',        'value' => '',          'position' => 120],
         ['group' => 'MOLLIE_APPLEPAY',          'name' => 'blMollieApplePayButtonOnBasket',     'type' => 'bool',       'value' => '1',         'position' => 200],
         ['group' => 'MOLLIE_APPLEPAY',          'name' => 'blMollieApplePayButtonOnDetails',    'type' => 'bool',       'value' => '1',         'position' => 210],
+        ['group' => 'MOLLIE_PAYPALEXPRESS',     'name' => 'blMolliePayPalButtonOnBasket',       'type' => 'bool',       'value' => '1',         'position' => 300],
+        ['group' => 'MOLLIE_PAYPALEXPRESS',     'name' => 'blMolliePayPalButtonOnDetails',      'type' => 'bool',       'value' => '1',         'position' => 310],
+        ['group' => 'MOLLIE_PAYPALEXPRESS',     'name' => 'sMolliePPEButtonShape',              'type' => 'select',     'value' => 'rounded',   'position' => 320, 'constraints' => 'rounded|pill'],
+        ['group' => 'MOLLIE_PAYPALEXPRESS',     'name' => 'sMolliePPEButtonType',               'type' => 'select',     'value' => 'pay',       'position' => 330, 'constraints' => 'checkout|pay'],
+        ['group' => 'MOLLIE_PAYPALEXPRESS',     'name' => 'sMolliePPEButtonColor',              'type' => 'select',     'value' => 'golden',    'position' => 340, 'constraints' => 'black|blue|golden|gray|white'],
+        ['group' => 'MOLLIE_PAYPALEXPRESS',     'name' => 'sMolliePPEButtonPreviewPaceholder',  'type' => 'str',        'value' => '',          'position' => 350],
         ['group' => 'MOLLIE_PAYMENTLOGOS',      'name' => 'sMolliePaymentLogosPlaceholder',     'type' => 'str',        'value' => '',          'position' => 500],
     ]
 ];

@@ -2,21 +2,24 @@
 
 namespace Mollie\Api\Resources;
 
-class Permission extends \Mollie\Api\Resources\BaseResource
+class Permission extends BaseResource
 {
     /**
      * @var string
      * @example payments.read
      */
     public $id;
+
     /**
      * @var string
      */
     public $description;
+
     /**
      * @var bool
      */
     public $granted;
+
     /**
      * @var \stdClass
      */

@@ -53,7 +53,7 @@ class User
         return array(
             'street' => isset($aMatch[1]) ? $aMatch[1] : $aStreet[0],
             'number' => isset($aMatch[2]) ? $aMatch[2] : '',
-            'addinfo' => !empty($aStreet) ? implode($aStreet, ' ') : '',
+            'addinfo' => !empty($aStreet) ? implode(' ', $aStreet) : '',
         );
     }
 
@@ -104,14 +104,19 @@ class User
      *
      * @return \OxidEsales\Eshop\Application\Model\User
      */
-    protected function getDummyUser()
+    protected function getApplePayDummyUser()
     {
         $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
 
         // setting object id as it is requested later while processing user object
         $oUser->setId(\OxidEsales\Eshop\Core\UtilsObject::getInstance()->generateUID());
 
-        $this->setInitialDeliveryData($oUser);
+        $this->setInitialDeliveryData(
+            $oUser,
+            Registry::getRequest()->getRequestEscapedParameter('countryCode'),
+            Registry::getRequest()->getRequestEscapedParameter('city'),
+            Registry::getRequest()->getRequestEscapedParameter('zip')
+        );
 
         $aShippingContact = Registry::getRequest()->getRequestEscapedParameter('shippingContact');
         if (!empty($aShippingContact)) {
@@ -126,18 +131,45 @@ class User
     }
 
     /**
+     * Generates a new dummy-user
+     *
+     * @param  \stdClass $
+     * @return \OxidEsales\Eshop\Application\Model\User
+     */
+    protected function getMollieSessionDummyUser($oMollieSessionAddress)
+    {
+        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+
+        // setting object id as it is requested later while processing user object
+        $oUser->setId(\OxidEsales\Eshop\Core\UtilsObject::getInstance()->generateUID());
+
+        $this->setInitialDeliveryData(
+            $oUser,
+            $oMollieSessionAddress->country,
+            $oMollieSessionAddress->city,
+            $oMollieSessionAddress->postalCode
+        );
+
+        $oUser->oxuser__oxusername = new Field($oMollieSessionAddress->email);
+        $this->updateUserFromMollieSessionData($oUser, $oMollieSessionAddress);
+        $oUser->save();
+
+        $oUser->mollieSetAutoGroups();
+
+        return $oUser;
+    }
+
+    /**
      * Sets delivery information with zip, city and country given by apple pay initially
      *
      * @param  \OxidEsales\Eshop\Application\Model\User $oUser
      * @return void
      */
-    public function setInitialDeliveryData(&$oUser)
+    public function setInitialDeliveryData(&$oUser, $sCountryCode, $sCity, $sZip)
     {
-        $oRequest = Registry::getRequest();
-        $sCountryCode = $oRequest->getRequestEscapedParameter('countryCode');
         if (!empty($sCountryCode)) {
-            $oUser->oxuser__oxcity = new Field($oRequest->getRequestEscapedParameter('city'));
-            $oUser->oxuser__oxzip = new Field($oRequest->getRequestEscapedParameter('zip'));
+            $oUser->oxuser__oxcity = new Field($sCity);
+            $oUser->oxuser__oxzip = new Field($sZip);
 
             $country = oxNew(\OxidEsales\Eshop\Application\Model\Country::class);
             $countryId = $country->getIdByCode($sCountryCode);
@@ -174,6 +206,92 @@ class User
             $oUser->oxuser__oxzip = new Field($aBillingContact['postalCode']);
             $oUser->oxuser__oxsal = new Field(UserHelper::getInstance()->getSalByFirstname($aBillingContact['givenName']));
         }
+    }
+
+    /**
+     * Updates user object with address data from apple pay
+     *
+     * @param  \OxidEsales\Eshop\Application\Model\User $oUser
+     * @return void
+     */
+    protected function updateUserFromMollieSessionData(&$oUser, $oMollieSessionAddress)
+    {
+        // bill address
+        $oUser->oxuser__oxfname = new Field($oMollieSessionAddress->givenName);
+        $oUser->oxuser__oxlname = new Field($oMollieSessionAddress->familyName);
+
+        $aBillingStreetSplitInfo = UserHelper::getInstance()->splitStreet([$oMollieSessionAddress->streetAndNumber]);
+        $oUser->oxuser__oxstreet = new Field($aBillingStreetSplitInfo['street']);
+        $oUser->oxuser__oxstreetnr = new Field($aBillingStreetSplitInfo['number']);
+        $oUser->oxuser__oxaddinfo = new Field($aBillingStreetSplitInfo['addinfo']);
+        $oUser->oxuser__oxcity = new Field($oMollieSessionAddress->city);
+        $oUser->oxuser__oxcountryid = new Field(oxNew(Country::class)->getIdByCode($oMollieSessionAddress->country));
+        $oUser->oxuser__oxzip = new Field($oMollieSessionAddress->postalCode);
+        $oUser->oxuser__oxsal = new Field(UserHelper::getInstance()->getSalByFirstname($oMollieSessionAddress->givenName));
+    }
+
+    protected function setShippingAddressFromMollieSession($oUser, $oMollieSessionAddress)
+    {
+        $sAddressId = $this->getExistingAddressId($oUser, $oMollieSessionAddress);
+
+        $oAddress = oxNew(\OxidEsales\Eshop\Application\Model\Address::class);
+        if (!empty($sAddressId)) {
+            $oAddress->setId($sAddressId);
+            $oAddress->load($sAddressId);
+        }
+
+        $oAddress->oxaddress__oxuserid = new \OxidEsales\Eshop\Core\Field($oUser->getId(), \OxidEsales\Eshop\Core\Field::T_RAW);
+        $oAddress->oxaddress__oxfname = new Field($oMollieSessionAddress->givenName);
+        $oAddress->oxaddress__oxlname = new Field($oMollieSessionAddress->familyName);
+
+        $aBillingStreetSplitInfo = UserHelper::getInstance()->splitStreet([$oMollieSessionAddress->streetAndNumber]);
+        $oAddress->oxaddress__oxstreet = new Field($aBillingStreetSplitInfo['street']);
+        $oAddress->oxaddress__oxstreetnr = new Field($aBillingStreetSplitInfo['number']);
+        $oAddress->oxaddress__oxaddinfo = new Field($aBillingStreetSplitInfo['addinfo']);
+        $oAddress->oxaddress__oxcity = new Field($oMollieSessionAddress->city);
+        $oAddress->oxaddress__oxzip = new Field($oMollieSessionAddress->postalCode);
+        $oAddress->oxaddress__oxcountry = $oUser->getUserCountry();
+        $oAddress->oxaddress__oxcountryid = new Field(oxNew(Country::class)->getIdByCode($oMollieSessionAddress->country));
+        $oAddress->oxaddress__oxsal = new Field(UserHelper::getInstance()->getSalByFirstname($oMollieSessionAddress->givenName));
+        $oAddress->save();
+
+        // saving delivery Address for later use
+        Registry::getSession()->setVariable('deladrid', $oAddress->getId());
+    }
+
+    /**
+     * Check if address already exists for the user
+     *
+     * @param  object $oUser
+     * @param  object $oMollieSessionAddress
+     * @return string
+     */
+    protected function getExistingAddressId($oUser, $oMollieSessionAddress)
+    {
+        $sQuery = "SELECT 
+                       oxid 
+                   FROM 
+                       oxaddress 
+                   WHERE 
+                       OXUSERID = :userid AND
+                       OXFNAME = :fname AND
+                       OXLNAME = :lname AND
+                       OXSTREET = :street AND
+                       OXSTREETNR = :streetnr AND
+                       OXCITY = :city AND
+                       OXZIP = :zip
+                   LIMIT 1";
+
+        $aBillingStreetSplitInfo = UserHelper::getInstance()->splitStreet([$oMollieSessionAddress->streetAndNumber]);
+        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQuery, [
+            ':userid' => $oUser->getId(),
+            ':fname' => $oMollieSessionAddress->givenName,
+            ':lname' => $oMollieSessionAddress->familyName,
+            ':street' => $aBillingStreetSplitInfo['street'],
+            ':streetnr' => $aBillingStreetSplitInfo['number'],
+            ':city' => $oMollieSessionAddress->city,
+            ':zip' => $oMollieSessionAddress->postalCode,
+        ]);
     }
 
     /**
@@ -243,13 +361,34 @@ class User
 
         if ($oUser === false) {
             if (!$oUser || Registry::getRequest()->getRequestEscapedParameter('countryCode')) {
-                $oUser = $this->getDummyUser();
+                $oUser = $this->getApplePayDummyUser();
             }
         } else {
             if ($blIsDeliveryMethodCall === true) {
-                $this->setInitialDeliveryData($oUser);
+                $this->setInitialDeliveryData(
+                    $oUser,
+                    Registry::getRequest()->getRequestEscapedParameter('countryCode'),
+                    Registry::getRequest()->getRequestEscapedParameter('city'),
+                    Registry::getRequest()->getRequestEscapedParameter('zip')
+                );
             }
             $this->updateUserFromApplePayData($oUser);
+        }
+        return $oUser;
+    }
+
+    public function getMollieSessionUser($oMollieSessionAddress)
+    {
+        $oUser = Registry::getConfig()->getActiveView()->getUser();
+        if (!$oUser && !empty($oMollieSessionAddress->email)) {
+            $oUser = $this->getExistingUser($oMollieSessionAddress->email);
+        }
+
+        if ($oUser === false) { // no user logged in, no user existing in shop
+            $oUser = $this->getMollieSessionDummyUser($oMollieSessionAddress);
+        } else { // user logged in or existing in shop
+            $this->updateUserFromMollieSessionData($oUser, $oMollieSessionAddress);
+            $this->setShippingAddressFromMollieSession($oUser, $oMollieSessionAddress);
         }
         return $oUser;
     }

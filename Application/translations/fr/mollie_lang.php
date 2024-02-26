@@ -30,4 +30,11 @@ $aLang = [
     'MOLLIE_ERROR_ORDER_FAILED'                 => 'Le paiement a échoué, veuillez essayer à nouveau',
     'MOLLIE_BILLING_APPLE_PAY_NOT_AVAILABLE'    => 'Apple Pay n\'est pas disponible pour cette adresse de facturation',
     'MOLLIE_SECOND_CHANCE_MAIL_SUBJECT'         => 'Finalisation de votre commande à',
+
+    'MOLLIE_PAYPAL_EXPRESS_DESCRIPTION'         => 'Payment at ',
+    'MOLLIE_PAYPAL_EXPRESS'                     => 'PayPal Express',
+    'MOLLIE_PAYPAL_EXPRESS_INFO'                => 'Your payment will be processed by PayPal Express.<br>Press the &quot;Unlink&quot; button to cancel your PayPal Express payment and choose another payment method.',
+    'MOLLIE_PAYPAL_EXPRESS_UNLINK'              => 'Unlink',
+    'MOLLIE_PAYPAL_EXPRESS_SESSIONID_MISSING'   => 'An error occured. PayPal Express transaction information could not be found, please try again.',
+    'MOLLIE_PAYPAL_EXPRESS_NO_SESSION_INFO'     => 'An error occured. PayPal Express transaction information could not be retrieved, please try again.',
 ];

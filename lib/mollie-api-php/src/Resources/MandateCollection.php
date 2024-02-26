@@ -2,7 +2,7 @@
 
 namespace Mollie\Api\Resources;
 
-class MandateCollection extends \Mollie\Api\Resources\CursorCollection
+class MandateCollection extends CursorCollection
 {
     /**
      * @return string
@@ -11,13 +11,15 @@ class MandateCollection extends \Mollie\Api\Resources\CursorCollection
     {
         return "mandates";
     }
+
     /**
      * @return BaseResource
      */
     protected function createResourceObject()
     {
-        return new \Mollie\Api\Resources\Mandate($this->client);
+        return new Mandate($this->client);
     }
+
     /**
      * @param string $status
      * @return array|\Mollie\Api\Resources\MandateCollection
@@ -25,12 +27,14 @@ class MandateCollection extends \Mollie\Api\Resources\CursorCollection
     public function whereStatus($status)
     {
         $collection = new self($this->client, 0, $this->_links);
+
         foreach ($this as $item) {
             if ($item->status === $status) {
                 $collection[] = $item;
                 $collection->count++;
             }
         }
+
         return $collection;
     }
 }

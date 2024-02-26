@@ -2,7 +2,7 @@
 
 namespace Mollie\Api\Resources;
 
-class TerminalCollection extends \Mollie\Api\Resources\CursorCollection
+class TerminalCollection extends CursorCollection
 {
     /**
      * @return string
@@ -11,11 +11,12 @@ class TerminalCollection extends \Mollie\Api\Resources\CursorCollection
     {
         return "terminals";
     }
+
     /**
      * @return BaseResource
      */
     protected function createResourceObject()
     {
-        return new \Mollie\Api\Resources\Terminal($this->client);
+        return new Terminal($this->client);
     }
 }

@@ -53,6 +53,66 @@
             </dl>
         [{/if}]
     [{/if}]
+[{elseif $module_var == 'sMolliePPEButtonPreviewPaceholder'}]
+    <dl>
+        <dd>
+            [{oxmultilang ident="SHOP_MODULE_sMolliePPEButtonPreviewPaceholder"}]<br>
+            <select id="sMolliePPEButtonLanguage">
+                <option value="en">[{oxmultilang ident="SHOP_MODULE_sMolliePPEButtonLangEn"}]</option>
+                <option value="de">[{oxmultilang ident="SHOP_MODULE_sMolliePPEButtonLangDe"}]</option>
+                <option value="nl">[{oxmultilang ident="SHOP_MODULE_sMolliePPEButtonLangNl"}]</option>
+                <option value="fr">[{oxmultilang ident="SHOP_MODULE_sMolliePPEButtonLangFr"}]</option>
+                <option value="pl">[{oxmultilang ident="SHOP_MODULE_sMolliePPEButtonLangPl"}]</option>
+            </select>[{oxinputhelp ident="HELP_SHOP_MODULE_sMolliePPEButtonLang"}]<br>
+            <script type="text/javascript">
+                function mollieAddChangeEvents() {
+                    document.getElementsByName("confselects[sMolliePPEButtonShape]")[0].addEventListener("change", updatePreviewImgUrl);
+                    document.getElementsByName("confselects[sMolliePPEButtonType]")[0].addEventListener("change", updatePreviewImgUrl);
+                    document.getElementsByName("confselects[sMolliePPEButtonColor]")[0].addEventListener("change", updatePreviewImgUrl);
+                    document.getElementById("sMolliePPEButtonLanguage").addEventListener("change", updatePreviewImgUrl);
+                }
+                function updatePreviewImgUrl() {
+                    let shopBaseUrl = "https://robert.demoshop.fatchip.de/ox65_mollie/source/admin/"; ///@TODO
+
+                    var data = new FormData();
+                    data.append('cl', 'module_config');
+                    data.append('oxid', 'molliepayment');
+                    data.append('fnc', 'mollieGetPayPalExpressImageUrl');
+                    data.append('stoken', window.moduleConfiguration.stoken.value);
+                    data.append('admin_sid', window.moduleConfiguration.admin_sid.value);
+
+                    data.append('shape', document.getElementsByName("confselects[sMolliePPEButtonShape]")[0].value);
+                    data.append('type', document.getElementsByName("confselects[sMolliePPEButtonType]")[0].value);
+                    data.append('color', document.getElementsByName("confselects[sMolliePPEButtonColor]")[0].value);
+                    data.append('language', document.getElementById("sMolliePPEButtonLanguage").value);
+
+                    let xhr = new XMLHttpRequest()
+                    xhr.open('POST', shopBaseUrl, true)
+                    xhr.send(data);
+                    xhr.onload = function () {
+                        if(xhr.status === 200 && xhr.responseText) {
+                            showPreviewImg(xhr.responseText);
+                        }
+                    }
+
+                }
+                function showPreviewImg(url) {
+                    let imgElementId = "sMolliePPEButtonPreviewImg";
+                    let img = document.getElementById(imgElementId);
+                    if (!img) {
+                        img = document.createElement("img");
+                        img.id = imgElementId;
+                        img.style.marginTop = "1em";
+                        document.getElementById("sMolliePPEButtonPreview").appendChild(img)
+                    }
+                    img.src = url;
+                }
+                mollieAddChangeEvents();
+                updatePreviewImgUrl();
+            </script>
+            <div id="sMolliePPEButtonPreview"></div>
+        </dd>
+    </dl>
 [{elseif $module_var == 'sMolliePaymentLogosPlaceholder'}]
     <link rel="stylesheet" href="[{$oViewConf->getModuleUrl('molliepayment','out/src/css/mollie.css')}]">
     <input type="hidden" name="mollieDeleteAltLogo" value="">

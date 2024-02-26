@@ -5,16 +5,20 @@ namespace Mollie\Api\Endpoints;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Client;
 use Mollie\Api\Resources\ClientCollection;
-class ClientEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
+use Mollie\Api\Resources\LazyCollection;
+
+class ClientEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "clients";
+
     /**
      * @return Client
      */
     protected function getResourceObject()
     {
-        return new \Mollie\Api\Resources\Client($this->client);
+        return new Client($this->client);
     }
+
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -25,8 +29,9 @@ class ClientEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new \Mollie\Api\Resources\ClientCollection($this->client, $count, $_links);
+        return new ClientCollection($this->client, $count, $_links);
     }
+
     /**
      * Retrieve a client from Mollie.
      *
@@ -42,10 +47,12 @@ class ClientEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
     public function get($clientId, array $parameters = [])
     {
         if (empty($clientId)) {
-            throw new \Mollie\Api\Exceptions\ApiException("Client ID is empty.");
+            throw new ApiException("Client ID is empty.");
         }
+
         return parent::rest_read($clientId, $parameters);
     }
+
     /**
      * Retrieves a page of clients from Mollie.
      *
@@ -56,8 +63,23 @@ class ClientEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
      * @return ClientCollection
      * @throws ApiException
      */
-    public function page($from = null, $limit = null, array $parameters = [])
+    public function page(?string $from = null, ?int $limit = null, array $parameters = [])
     {
         return $this->rest_list($from, $limit, $parameters);
+    }
+
+    /**
+     * Create an iterator for iterating over clients retrieved from Mollie.
+     *
+     * @param string $from The first client ID you want to include in your list.
+     * @param int $limit
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    {
+        return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }
 }

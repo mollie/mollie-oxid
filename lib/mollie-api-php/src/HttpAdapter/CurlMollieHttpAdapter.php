@@ -2,32 +2,38 @@
 
 namespace Mollie\Api\HttpAdapter;
 
-use Composer\CaBundle;
+use Composer\CaBundle\CaBundle;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\CurlConnectTimeoutException;
 use Mollie\Api\MollieApiClient;
-final class CurlMollieHttpAdapter implements \Mollie\Api\HttpAdapter\MollieHttpAdapterInterface
+
+final class CurlMollieHttpAdapter implements MollieHttpAdapterInterface
 {
     /**
      * Default response timeout (in seconds).
      */
     public const DEFAULT_TIMEOUT = 10;
+
     /**
      * Default connect timeout (in seconds).
      */
     public const DEFAULT_CONNECT_TIMEOUT = 2;
+
     /**
      * HTTP status code for an empty ok response.
      */
     public const HTTP_NO_CONTENT = 204;
+
     /**
      * The maximum number of retries
      */
     public const MAX_RETRIES = 5;
+
     /**
      * The amount of milliseconds the delay is being increased with on each retry.
      */
     public const DELAY_INCREASE_MS = 1000;
+
     /**
      * @param string $httpMethod
      * @param string $url
@@ -40,15 +46,20 @@ final class CurlMollieHttpAdapter implements \Mollie\Api\HttpAdapter\MollieHttpA
     public function send($httpMethod, $url, $headers, $httpBody)
     {
         for ($i = 0; $i <= self::MAX_RETRIES; $i++) {
-            \usleep($i * self::DELAY_INCREASE_MS);
+            usleep($i * self::DELAY_INCREASE_MS);
+
             try {
                 return $this->attemptRequest($httpMethod, $url, $headers, $httpBody);
-            } catch (\Mollie\Api\Exceptions\CurlConnectTimeoutException $e) {
+            } catch (CurlConnectTimeoutException $e) {
                 // Nothing
             }
         }
-        throw new \Mollie\Api\Exceptions\CurlConnectTimeoutException("Unable to connect to Mollie. Maximum number of retries (" . self::MAX_RETRIES . ") reached.");
+
+        throw new CurlConnectTimeoutException(
+            "Unable to connect to Mollie. Maximum number of retries (". self::MAX_RETRIES .") reached."
+        );
     }
+
     /**
      * @param string $httpMethod
      * @param string $url
@@ -59,48 +70,60 @@ final class CurlMollieHttpAdapter implements \Mollie\Api\HttpAdapter\MollieHttpA
      */
     protected function attemptRequest($httpMethod, $url, $headers, $httpBody)
     {
-        $curl = \curl_init($url);
+        $curl = curl_init($url);
         $headers["Content-Type"] = "application/json";
-        \curl_setopt($curl, \CURLOPT_RETURNTRANSFER, \true);
-        \curl_setopt($curl, \CURLOPT_HTTPHEADER, $this->parseHeaders($headers));
-        \curl_setopt($curl, \CURLOPT_CONNECTTIMEOUT, self::DEFAULT_CONNECT_TIMEOUT);
-        \curl_setopt($curl, \CURLOPT_TIMEOUT, self::DEFAULT_TIMEOUT);
-        \curl_setopt($curl, \CURLOPT_SSL_VERIFYPEER, \true);
-        \curl_setopt($curl, \CURLOPT_CAINFO, CaBundle\CaBundle::getBundledCaBundlePath());
+
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $this->parseHeaders($headers));
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, self::DEFAULT_CONNECT_TIMEOUT);
+        curl_setopt($curl, CURLOPT_TIMEOUT, self::DEFAULT_TIMEOUT);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($curl, CURLOPT_CAINFO, CaBundle::getBundledCaBundlePath());
+
         switch ($httpMethod) {
-            case \Mollie\Api\MollieApiClient::HTTP_POST:
-                \curl_setopt($curl, \CURLOPT_POST, \true);
-                \curl_setopt($curl, \CURLOPT_POSTFIELDS, $httpBody);
+            case MollieApiClient::HTTP_POST:
+                curl_setopt($curl, CURLOPT_POST, true);
+                curl_setopt($curl, CURLOPT_POSTFIELDS,  $httpBody);
+
                 break;
-            case \Mollie\Api\MollieApiClient::HTTP_GET:
+            case MollieApiClient::HTTP_GET:
                 break;
-            case \Mollie\Api\MollieApiClient::HTTP_PATCH:
-                \curl_setopt($curl, \CURLOPT_CUSTOMREQUEST, 'PATCH');
-                \curl_setopt($curl, \CURLOPT_POSTFIELDS, $httpBody);
+            case MollieApiClient::HTTP_PATCH:
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $httpBody);
+
                 break;
-            case \Mollie\Api\MollieApiClient::HTTP_DELETE:
-                \curl_setopt($curl, \CURLOPT_CUSTOMREQUEST, 'DELETE');
-                \curl_setopt($curl, \CURLOPT_POSTFIELDS, $httpBody);
+            case MollieApiClient::HTTP_DELETE:
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+                curl_setopt($curl, CURLOPT_POSTFIELDS,  $httpBody);
+
                 break;
             default:
-                throw new \InvalidArgumentException("Invalid http method: " . $httpMethod);
+                throw new \InvalidArgumentException("Invalid http method: ". $httpMethod);
         }
-        $startTime = \microtime(\true);
-        $response = \curl_exec($curl);
-        $endTime = \microtime(\true);
-        if ($response === \false) {
+
+        $startTime = microtime(true);
+        $response = curl_exec($curl);
+        $endTime = microtime(true);
+
+        if ($response === false) {
             $executionTime = $endTime - $startTime;
-            $curlErrorNumber = \curl_errno($curl);
-            $curlErrorMessage = "Curl error: " . \curl_error($curl);
+            $curlErrorNumber = curl_errno($curl);
+            $curlErrorMessage = "Curl error: " . curl_error($curl);
+
             if ($this->isConnectTimeoutError($curlErrorNumber, $executionTime)) {
-                throw new \Mollie\Api\Exceptions\CurlConnectTimeoutException("Unable to connect to Mollie. " . $curlErrorMessage);
+                throw new CurlConnectTimeoutException("Unable to connect to Mollie. " . $curlErrorMessage);
             }
-            throw new \Mollie\Api\Exceptions\ApiException($curlErrorMessage);
+
+            throw new ApiException($curlErrorMessage);
         }
-        $statusCode = \curl_getinfo($curl, \CURLINFO_RESPONSE_CODE);
-        \curl_close($curl);
+
+        $statusCode = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+        curl_close($curl);
+
         return $this->parseResponseBody($response, $statusCode, $httpBody);
     }
+
     /**
      * The version number for the underlying http client, if available.
      * @example Guzzle/6.3
@@ -111,6 +134,7 @@ final class CurlMollieHttpAdapter implements \Mollie\Api\HttpAdapter\MollieHttpA
     {
         return 'Curl/*';
     }
+
     /**
      * Whether this http adapter provides a debugging mode. If debugging mode is enabled, the
      * request will be included in the ApiException.
@@ -119,8 +143,9 @@ final class CurlMollieHttpAdapter implements \Mollie\Api\HttpAdapter\MollieHttpA
      */
     public function supportsDebugging()
     {
-        return \false;
+        return false;
     }
+
     /**
      * @param int $curlErrorNumber
      * @param string|float $executionTime
@@ -128,18 +153,28 @@ final class CurlMollieHttpAdapter implements \Mollie\Api\HttpAdapter\MollieHttpA
      */
     protected function isConnectTimeoutError($curlErrorNumber, $executionTime)
     {
-        $connectErrors = [\CURLE_COULDNT_RESOLVE_HOST => \true, \CURLE_COULDNT_CONNECT => \true, \CURLE_SSL_CONNECT_ERROR => \true, \CURLE_GOT_NOTHING => \true];
+        $connectErrors = [
+            \CURLE_COULDNT_RESOLVE_HOST => true,
+            \CURLE_COULDNT_CONNECT => true,
+            \CURLE_SSL_CONNECT_ERROR => true,
+            \CURLE_GOT_NOTHING => true,
+        ];
+
         if (isset($connectErrors[$curlErrorNumber])) {
-            return \true;
-        }
+            return true;
+        };
+
         if ($curlErrorNumber === \CURLE_OPERATION_TIMEOUTED) {
             if ($executionTime > self::DEFAULT_TIMEOUT) {
-                return \false;
+                return false;
             }
-            return \true;
+
+            return true;
         }
-        return \false;
+
+        return false;
     }
+
     /**
      * @param string $response
      * @param int $statusCode
@@ -153,38 +188,52 @@ final class CurlMollieHttpAdapter implements \Mollie\Api\HttpAdapter\MollieHttpA
             if ($statusCode === self::HTTP_NO_CONTENT) {
                 return null;
             }
-            throw new \Mollie\Api\Exceptions\ApiException("No response body found.");
+
+            throw new ApiException("No response body found.");
         }
-        $body = @\json_decode($response);
+
+        $body = @json_decode($response);
+
         // GUARDS
-        if (\json_last_error() !== \JSON_ERROR_NONE) {
-            throw new \Mollie\Api\Exceptions\ApiException("Unable to decode Mollie response: '{$response}'.");
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new ApiException("Unable to decode Mollie response: '{$response}'.");
         }
+
         if (isset($body->error)) {
-            throw new \Mollie\Api\Exceptions\ApiException($body->error->message);
+            throw new ApiException($body->error->message);
         }
+
         if ($statusCode >= 400) {
             $message = "Error executing API call ({$body->status}: {$body->title}): {$body->detail}";
+
             $field = null;
-            if (!empty($body->field)) {
+
+            if (! empty($body->field)) {
                 $field = $body->field;
             }
+
             if (isset($body->_links, $body->_links->documentation)) {
                 $message .= ". Documentation: {$body->_links->documentation->href}";
             }
+
             if ($httpBody) {
                 $message .= ". Request body: {$httpBody}";
             }
-            throw new \Mollie\Api\Exceptions\ApiException($message, $statusCode, $field);
+
+            throw new ApiException($message, $statusCode, $field);
         }
+
         return $body;
     }
+
     protected function parseHeaders($headers)
     {
         $result = [];
+
         foreach ($headers as $key => $value) {
-            $result[] = $key . ': ' . $value;
+            $result[] = $key .': ' . $value;
         }
+
         return $result;
     }
 }

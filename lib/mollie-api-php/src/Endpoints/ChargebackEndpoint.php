@@ -5,9 +5,12 @@ namespace Mollie\Api\Endpoints;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Chargeback;
 use Mollie\Api\Resources\ChargebackCollection;
-class ChargebackEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
+use Mollie\Api\Resources\LazyCollection;
+
+class ChargebackEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "chargebacks";
+
     /**
      * Get the object that is used by this API endpoint. Every API endpoint uses one type of object.
      *
@@ -15,8 +18,9 @@ class ChargebackEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstrac
      */
     protected function getResourceObject()
     {
-        return new \Mollie\Api\Resources\Chargeback($this->client);
+        return new Chargeback($this->client);
     }
+
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -27,8 +31,9 @@ class ChargebackEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstrac
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new \Mollie\Api\Resources\ChargebackCollection($this->client, $count, $_links);
+        return new ChargebackCollection($this->client, $count, $_links);
     }
+
     /**
      * Retrieves a collection of Chargebacks from Mollie.
      *
@@ -39,8 +44,23 @@ class ChargebackEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstrac
      * @return ChargebackCollection
      * @throws ApiException
      */
-    public function page($from = null, $limit = null, array $parameters = [])
+    public function page(?string $from = null, ?int $limit = null, array $parameters = [])
     {
         return $this->rest_list($from, $limit, $parameters);
+    }
+
+    /**
+     * Create an iterator for iterating over chargeback retrieved from Mollie.
+     *
+     * @param string $from The first chargevback ID you want to include in your list.
+     * @param int $limit
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    {
+        return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }
 }

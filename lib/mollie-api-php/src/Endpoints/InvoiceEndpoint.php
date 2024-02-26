@@ -5,9 +5,12 @@ namespace Mollie\Api\Endpoints;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Invoice;
 use Mollie\Api\Resources\InvoiceCollection;
-class InvoiceEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
+use Mollie\Api\Resources\LazyCollection;
+
+class InvoiceEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "invoices";
+
     /**
      * Get the object that is used by this API. Every API uses one type of object.
      *
@@ -15,8 +18,9 @@ class InvoiceEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
      */
     protected function getResourceObject()
     {
-        return new \Mollie\Api\Resources\Invoice($this->client);
+        return new Invoice($this->client);
     }
+
     /**
      * Get the collection object that is used by this API. Every API uses one type of collection object.
      *
@@ -27,8 +31,9 @@ class InvoiceEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new \Mollie\Api\Resources\InvoiceCollection($this->client, $count, $_links);
+        return new InvoiceCollection($this->client, $count, $_links);
     }
+
     /**
      * Retrieve an Invoice from Mollie.
      *
@@ -44,6 +49,7 @@ class InvoiceEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
     {
         return $this->rest_read($invoiceId, $parameters);
     }
+
     /**
      * Retrieves a collection of Invoices from Mollie.
      *
@@ -58,6 +64,7 @@ class InvoiceEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
     {
         return $this->rest_list($from, $limit, $parameters);
     }
+
     /**
      * This is a wrapper method for page
      *
@@ -69,5 +76,20 @@ class InvoiceEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
     public function all(array $parameters = [])
     {
         return $this->page(null, null, $parameters);
+    }
+
+    /**
+     * Create an iterator for iterating over invoices retrieved from Mollie.
+     *
+     * @param string $from The first resource ID you want to include in your list.
+     * @param int $limit
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    {
+        return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }
 }

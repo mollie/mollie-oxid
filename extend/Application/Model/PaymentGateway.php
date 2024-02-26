@@ -37,7 +37,7 @@ class PaymentGateway extends PaymentGateway_parent
         if(!PaymentHelper::getInstance()->isMolliePaymentMethod($oOrder->oxorder__oxpaymenttype->value)) {
             return parent::executePayment($dAmount, $oOrder);
         }
-        return $this->handleMolliePayment($oOrder, $dAmount);;
+        return $this->handleMolliePayment($oOrder, $dAmount);
     }
 
     /**
@@ -98,7 +98,9 @@ class PaymentGateway extends PaymentGateway_parent
         $oOrder->mollieSetOrderNumber();
 
         try {
-            $oResponse = $oOrder->mollieGetPaymentModel()->getApiRequestModel()->sendRequest($oOrder, $dAmount, $this->getRedirectUrl());
+            $oPaymentModel = $oOrder->mollieGetPaymentModel();
+
+            $oResponse = $oPaymentModel->getApiRequestModel()->sendRequest($oOrder, $dAmount, $this->getRedirectUrl());
             $oOrder->mollieSetTransactionId($oResponse->id);
 
             $sPaymentUrl = $oResponse->getCheckoutUrl();
@@ -107,6 +109,8 @@ class PaymentGateway extends PaymentGateway_parent
                 Registry::getUtils()->redirect($sPaymentUrl);
             }
         } catch(ApiException $exc) {
+            $oPaymentModel->handlePaymentError($exc);
+
             $this->_iLastErrorNo = $exc->getCode();
             $this->_sLastError = $exc->getMessage();
             return false;

@@ -2,6 +2,8 @@
 
 namespace Mollie\Payment\extend\Application\Controller;
 
+use Mollie\Payment\Application\Helper\Payment;
+use Mollie\Payment\Application\Helper\PayPalExpress;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Core\Registry;
@@ -60,6 +62,7 @@ class PaymentController extends PaymentController_parent
      * 2. Config option "blMollieRemoveByBillingCountry" activated AND payment method is not available for given billing country
      * 3. BasketSum is outside of the min-/max-limits of the payment method
      * 4. Payment method has a billing country restriction and customer is not from that country
+     * 5. Config option "blShowInPaymentList" is false
      *
      * @return void
      */
@@ -76,7 +79,8 @@ class PaymentController extends PaymentController_parent
                     ($blRemoveByBillingCountry === true && $oMolliePayment->isMolliePaymentActive($sBillingCountryCode) === false) ||
                     $oMolliePayment->mollieIsBasketSumInLimits($oBasket->getPrice()->getBruttoPrice()) === false ||
                     $oMolliePayment->mollieIsMethodAvailableForCountry($sBillingCountryCode) === false ||
-                    ($oMolliePayment->isOnlyB2BSupported() === true && $this->mollieIsB2BOrder($oBasket) === false)
+                    ($oMolliePayment->isOnlyB2BSupported() === true && $this->mollieIsB2BOrder($oBasket) === false) ||
+                    $oMolliePayment->isMethodDisplayableInPaymentList() === false
                 ) {
                     unset($this->_oPaymentList[$oPayment->getId()]);
                 }
@@ -94,5 +98,35 @@ class PaymentController extends PaymentController_parent
         parent::getPaymentList();
         $this->mollieRemoveUnavailablePaymentMethods();
         return $this->_oPaymentList;
+    }
+
+    /**
+     * Returns url to cancel PayPal Express checkout session and show payment list
+     *
+     * @return string
+     */
+    public function getMolliePayPaylExpressCheckoutCancelUrl()
+    {
+        return Registry::getConfig()->getSslShopUrl()."?cl=payment&fnc=mollieCancelPayPalExpress";
+    }
+
+    /**
+     * Cancel PPE action
+     *
+     * @return void
+     */
+    public function mollieCancelPayPalExpress()
+    {
+        PayPalExpress::getInstance()->mollieCancelPayPalExpress();
+    }
+
+    /**
+     * Returns oxid payment id of PPE
+     *
+     * @return string
+     */
+    public function mollieGetPayPalExpressPaymentId()
+    {
+        return \Mollie\Payment\Application\Model\Payment\PayPalExpress::OXID;
     }
 }

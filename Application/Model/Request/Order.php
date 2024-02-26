@@ -3,6 +3,7 @@
 namespace Mollie\Payment\Application\Model\Request;
 
 use OxidEsales\Eshop\Application\Model\Order as CoreOrder;
+use OxidEsales\Eshop\Core\Registry;
 
 class Order extends Base
 {
@@ -31,6 +32,10 @@ class Order extends Base
         $oUser = $oOrder->getUser();
         if ($oUser && $oUser->oxuser__oxbirthday->value != '0000-00-00') {
             $this->addParameter('consumerDateOfBirth', $oUser->oxuser__oxbirthday->value);
+        }
+
+        if (!empty(Registry::getSession()->getVariable('mollie_ppe_authenticationId'))) {
+            $this->addParameter('authenticationId', Registry::getSession()->getVariable('mollie_ppe_authenticationId'));
         }
     }
 }

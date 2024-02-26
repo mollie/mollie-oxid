@@ -4,12 +4,16 @@ namespace Mollie\Api\Endpoints;
 
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\CurrentProfile;
+use Mollie\Api\Resources\LazyCollection;
 use Mollie\Api\Resources\Profile;
 use Mollie\Api\Resources\ProfileCollection;
-class ProfileEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
+
+class ProfileEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "profiles";
-    protected $resourceClass = \Mollie\Api\Resources\Profile::class;
+
+    protected $resourceClass = Profile::class;
+
     /**
      * @var string
      */
@@ -23,6 +27,7 @@ class ProfileEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
     {
         return new $this->resourceClass($this->client);
     }
+
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -33,8 +38,9 @@ class ProfileEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new \Mollie\Api\Resources\ProfileCollection($this->client, $count, $_links);
+        return new ProfileCollection($this->client, $count, $_links);
     }
+
     /**
      * Creates a Profile in Mollie.
      *
@@ -48,6 +54,7 @@ class ProfileEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
     {
         return $this->rest_create($data, $filters);
     }
+
     /**
      * Retrieve a Profile from Mollie.
      *
@@ -64,8 +71,10 @@ class ProfileEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
         if ($profileId === 'me') {
             return $this->getCurrent($parameters);
         }
+
         return $this->rest_read($profileId, $parameters);
     }
+
     /**
      * Update a specific Profile resource.
      *
@@ -79,11 +88,13 @@ class ProfileEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
      */
     public function update($profileId, array $data = [])
     {
-        if (empty($profileId) || \strpos($profileId, self::RESOURCE_ID_PREFIX) !== 0) {
-            throw new \Mollie\Api\Exceptions\ApiException("Invalid profile id: '{$profileId}'. An profile id should start with '" . self::RESOURCE_ID_PREFIX . "'.");
+        if (empty($profileId) || strpos($profileId, self::RESOURCE_ID_PREFIX) !== 0) {
+            throw new ApiException("Invalid profile id: '{$profileId}'. An profile id should start with '" . self::RESOURCE_ID_PREFIX . "'.");
         }
+
         return parent::rest_update($profileId, $data);
     }
+
     /**
      * Retrieve the current Profile from Mollie.
      *
@@ -94,9 +105,11 @@ class ProfileEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
      */
     public function getCurrent(array $parameters = [])
     {
-        $this->resourceClass = \Mollie\Api\Resources\CurrentProfile::class;
+        $this->resourceClass = CurrentProfile::class;
+
         return $this->rest_read('me', $parameters);
     }
+
     /**
      * Delete a Profile from Mollie.
      *
@@ -113,6 +126,7 @@ class ProfileEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
     {
         return $this->rest_delete($profileId, $data);
     }
+
     /**
      * Retrieves a collection of Profiles from Mollie.
      *
@@ -126,5 +140,20 @@ class ProfileEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
     public function page($from = null, $limit = null, array $parameters = [])
     {
         return $this->rest_list($from, $limit, $parameters);
+    }
+
+    /**
+     * Create an iterator for iterating over profiles retrieved from Mollie.
+     *
+     * @param string $from The first resource ID you want to include in your list.
+     * @param int $limit
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    {
+        return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }
 }

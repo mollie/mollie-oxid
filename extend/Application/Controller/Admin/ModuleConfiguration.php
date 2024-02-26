@@ -4,6 +4,7 @@ namespace Mollie\Payment\extend\Application\Controller\Admin;
 
 use Mollie\Payment\Application\Helper\Database;
 use Mollie\Payment\Application\Helper\Payment;
+use Mollie\Payment\Application\Helper\PayPalExpress;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -156,6 +157,23 @@ class ModuleConfiguration extends ModuleConfiguration_parent
             }
         }
         return true;
+    }
+
+    /**
+     * Outputs URL to a PayPal Express button image
+     *
+     * @return void
+     */
+    public function mollieGetPayPalExpressImageUrl()
+    {
+        $sLang = Registry::getRequest()->getRequestEscapedParameter('language');
+        $sShape = Registry::getRequest()->getRequestEscapedParameter('shape');
+        $sType = Registry::getRequest()->getRequestEscapedParameter('type');
+        $sColor = Registry::getRequest()->getRequestEscapedParameter('color');
+
+        $sUrl = PayPalExpress::getInstance()->getPayPalButtonUrl($sLang, $sShape, $sType, $sColor);
+
+        Registry::getUtils()->showMessageAndExit($sUrl);
     }
 
     /**

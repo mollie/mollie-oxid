@@ -3,23 +3,28 @@
 namespace Mollie\Api\Endpoints;
 
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Resources\LazyCollection;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentLink;
 use Mollie\Api\Resources\PaymentLinkCollection;
-class PaymentLinkEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
+
+class PaymentLinkEndpoint extends CollectionEndpointAbstract
 {
     protected $resourcePath = "payment-links";
+
     /**
      * @var string
      */
     public const RESOURCE_ID_PREFIX = 'pl_';
+
     /**
      * @return PaymentLink
      */
     protected function getResourceObject()
     {
-        return new \Mollie\Api\Resources\PaymentLink($this->client);
+        return new PaymentLink($this->client);
     }
+
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -30,8 +35,9 @@ class PaymentLinkEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstra
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new \Mollie\Api\Resources\PaymentLinkCollection($this->client, $count, $_links);
+        return new PaymentLinkCollection($this->client, $count, $_links);
     }
+
     /**
      * Creates a payment link in Mollie.
      *
@@ -45,6 +51,7 @@ class PaymentLinkEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstra
     {
         return $this->rest_create($data, $filters);
     }
+
     /**
      * Retrieve payment link from Mollie.
      *
@@ -57,11 +64,13 @@ class PaymentLinkEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstra
      */
     public function get($paymentLinkId, array $parameters = [])
     {
-        if (empty($paymentLinkId) || \strpos($paymentLinkId, self::RESOURCE_ID_PREFIX) !== 0) {
-            throw new \Mollie\Api\Exceptions\ApiException("Invalid payment link ID: '{$paymentLinkId}'. A payment link ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
+        if (empty($paymentLinkId) || strpos($paymentLinkId, self::RESOURCE_ID_PREFIX) !== 0) {
+            throw new ApiException("Invalid payment link ID: '{$paymentLinkId}'. A payment link ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
         }
+
         return parent::rest_read($paymentLinkId, $parameters);
     }
+
     /**
      * Retrieves a collection of Payment Links from Mollie.
      *
@@ -75,5 +84,20 @@ class PaymentLinkEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstra
     public function page($from = null, $limit = null, array $parameters = [])
     {
         return $this->rest_list($from, $limit, $parameters);
+    }
+
+    /**
+     * Create an iterator for iterating over payment links retrieved from Mollie.
+     *
+     * @param string $from The first resource ID you want to include in your list.
+     * @param int $limit
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    {
+        return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }
 }

@@ -18,6 +18,49 @@ function mollieGetProductAmount(implementationPosition) {
     return 1;
 }
 
+function mollieGetProductId(elementId)
+{
+    return $('#' + elementId).closest('form')[0].aid.value;
+}
+
+function mollieInitPayPalExpress(elementId, implementationPosition) {
+    let data = {
+        cl: "molliePayPalExpress",
+        fnc: "initSession"
+    };
+    if (implementationPosition == "Details") {
+        data.amount = mollieGetProductAmount(implementationPosition);
+        data.aid = mollieGetProductId(elementId);
+    }
+    $.ajax({
+        url: shopBaseUrl + 'index.php',
+        type: 'POST',
+        dataType: 'json',
+        data: data,
+        success: function (response) {
+            if (response.success === true && response.redirectUrl) {
+                window.location.replace(response.redirectUrl);
+            } else {
+                console.log(response);
+            }
+        },
+        error: function (xhr, status, errorThrown) {
+            console.log('An error occured. ' + status);
+            console.log(xhr);
+            console.log(errorThrown);
+        }
+    });
+}
+
+function mollieAddPayPalExpressClickEvent(elementId, implementationPosition) {
+    let elem = document.getElementById(elementId);
+    if (elem) {
+        elem.addEventListener('click', function () {
+            mollieInitPayPalExpress(elementId, implementationPosition);
+        });
+    }
+}
+
 function mollieGetProductBasketPrice(detailsProductId, implementationPosition) {
     var ajaxCall = $.ajax({
         url: shopBaseUrl + 'index.php',
@@ -205,4 +248,19 @@ function mollieInitApplePay(countryCode, currencyCode, shopName, price, delivery
         });
     };
     session.begin();
+}
+
+function addSpinnerDiv()
+{
+    if (document.getElementById("mollie-overlay")) {
+        return;
+    }
+    console.log("A");
+    $("body").append('<div id="mollie-overlay"><div class="mollie-cv-spinner"><span class="mollie-spinner"></span></div></div>');
+    if (document.getElementById("mollie-overlay")) {
+        console.log("Found");
+    } else {
+        console.log("Not Found");
+    }
+    console.log("B");
 }

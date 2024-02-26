@@ -5,8 +5,11 @@ namespace Mollie\Api\Resources;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
-class Order extends \Mollie\Api\Resources\BaseResource
+
+class Order extends BaseResource
 {
+    use HasPresetOptions;
+
     /**
      * Id of the order.
      *
@@ -14,6 +17,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var string
      */
     public $id;
+
     /**
      * The profile ID this order belongs to.
      *
@@ -21,60 +25,70 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var string
      */
     public $profileId;
+
     /**
      * Either "live" or "test". Indicates this being a test or a live (verified) order.
      *
      * @var string
      */
     public $mode;
+
     /**
      * Amount object containing the value and currency
      *
      * @var \stdClass
      */
     public $amount;
+
     /**
      * The total amount captured, thus far.
      *
      * @var \stdClass
      */
     public $amountCaptured;
+
     /**
      * The total amount refunded, thus far.
      *
      * @var \stdClass
      */
     public $amountRefunded;
+
     /**
      * The status of the order.
      *
      * @var string
      */
     public $status;
+
     /**
      * The person and the address the order is billed to.
      *
      * @var \stdClass
      */
     public $billingAddress;
+
     /**
      * The date of birth of your customer, if available.
      * @example 1976-08-21
      * @var string|null
      */
     public $consumerDateOfBirth;
+
     /**
      * The order number that was used when creating the order.
      *
      * @var string
      */
     public $orderNumber;
+
     /**
      * The person and the address the order is billed to.
      *
      * @var \stdClass
      */
     public $shippingAddress;
+
     /**
      * The payment method last used when paying for the order.
      *
@@ -82,12 +96,14 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var string
      */
     public $method;
+
     /**
      * The locale used for this order.
      *
      * @var string
      */
     public $locale;
+
     /**
      * During creation of the order you can set custom metadata that is stored with
      * the order, and given back whenever you retrieve that order.
@@ -95,30 +111,35 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var \stdClass|mixed|null
      */
     public $metadata;
+
     /**
      * Can this order be canceled?
      *
      * @var bool
      */
     public $isCancelable;
+
     /**
      * Webhook URL set on this payment
      *
      * @var string|null
      */
     public $webhookUrl;
+
     /**
      * Redirect URL set on this payment
      *
      * @var string
      */
     public $redirectUrl;
+
     /**
      * Cancel URL set on this payment
      *
      * @var string
      */
     public $cancelUrl;
+
     /**
      * UTC datetime the order was created in ISO-8601 format.
      *
@@ -126,6 +147,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var string|null
      */
     public $createdAt;
+
     /**
      * UTC datetime the order the order will expire in ISO-8601 format.
      *
@@ -133,6 +155,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var string|null
      */
     public $expiresAt;
+
     /**
      * UTC datetime if the order is expired, the time of expiration will be present in ISO-8601 format.
      *
@@ -140,6 +163,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var string|null
      */
     public $expiredAt;
+
     /**
      * UTC datetime if the order has been paid, the time of payment will be present in ISO-8601 format.
      *
@@ -147,6 +171,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var string|null
      */
     public $paidAt;
+
     /**
      * UTC datetime if the order has been authorized, the time of authorization will be present in ISO-8601 format.
      *
@@ -154,6 +179,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var string|null
      */
     public $authorizedAt;
+
     /**
      * UTC datetime if the order has been canceled, the time of cancellation will be present in ISO 8601 format.
      *
@@ -161,6 +187,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var string|null
      */
     public $canceledAt;
+
     /**
      * UTC datetime if the order is completed, the time of completion will be present in ISO 8601 format.
      *
@@ -168,12 +195,14 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var string|null
      */
     public $completedAt;
+
     /**
      * The order lines contain the actual things the customer bought.
      *
      * @var array|object[]
      */
     public $lines;
+
     /**
      * For digital goods, you must make sure to apply the VAT rate from your customer’s country in most jurisdictions.
      * Use this parameter to restrict the payment methods available to your customer to methods from the billing country
@@ -182,16 +211,19 @@ class Order extends \Mollie\Api\Resources\BaseResource
      * @var bool
      */
     public $shopperCountryMustMatchBillingCountry;
+
     /**
      * An object with several URL objects relevant to the customer. Every URL object will contain an href and a type field.
      *
      * @var \stdClass
      */
     public $_links;
+
     /**
      * @var \stdClass|null
      */
     public $_embedded;
+
     /**
      * Is this order created?
      *
@@ -199,8 +231,9 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function isCreated()
     {
-        return $this->status === \Mollie\Api\Types\OrderStatus::STATUS_CREATED;
+        return $this->status === OrderStatus::STATUS_CREATED;
     }
+
     /**
      * Is this order paid for?
      *
@@ -208,8 +241,9 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function isPaid()
     {
-        return $this->status === \Mollie\Api\Types\OrderStatus::STATUS_PAID;
+        return $this->status === OrderStatus::STATUS_PAID;
     }
+
     /**
      * Is this order authorized?
      *
@@ -217,8 +251,9 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function isAuthorized()
     {
-        return $this->status === \Mollie\Api\Types\OrderStatus::STATUS_AUTHORIZED;
+        return $this->status === OrderStatus::STATUS_AUTHORIZED;
     }
+
     /**
      * Is this order canceled?
      *
@@ -226,8 +261,9 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function isCanceled()
     {
-        return $this->status === \Mollie\Api\Types\OrderStatus::STATUS_CANCELED;
+        return $this->status === OrderStatus::STATUS_CANCELED;
     }
+
     /**
      * (Deprecated) Is this order refunded?
      * @deprecated 2018-11-27
@@ -236,8 +272,9 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function isRefunded()
     {
-        return $this->status === \Mollie\Api\Types\OrderStatus::STATUS_REFUNDED;
+        return $this->status === OrderStatus::STATUS_REFUNDED;
     }
+
     /**
      * Is this order shipping?
      *
@@ -245,8 +282,9 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function isShipping()
     {
-        return $this->status === \Mollie\Api\Types\OrderStatus::STATUS_SHIPPING;
+        return $this->status === OrderStatus::STATUS_SHIPPING;
     }
+
     /**
      * Is this order completed?
      *
@@ -254,8 +292,9 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function isCompleted()
     {
-        return $this->status === \Mollie\Api\Types\OrderStatus::STATUS_COMPLETED;
+        return $this->status === OrderStatus::STATUS_COMPLETED;
     }
+
     /**
      * Is this order expired?
      *
@@ -263,8 +302,9 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function isExpired()
     {
-        return $this->status === \Mollie\Api\Types\OrderStatus::STATUS_EXPIRED;
+        return $this->status === OrderStatus::STATUS_EXPIRED;
     }
+
     /**
      * Is this order completed?
      *
@@ -272,8 +312,9 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function isPending()
     {
-        return $this->status === \Mollie\Api\Types\OrderStatus::STATUS_PENDING;
+        return $this->status === OrderStatus::STATUS_PENDING;
     }
+
     /**
      * Cancels this order.
      * If the order was partially shipped, the status will be "completed" instead of
@@ -288,6 +329,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
     {
         return $this->client->orders->cancel($this->id, $this->getPresetOptions());
     }
+
     /**
      * Cancel a line for this order.
      * The data array must contain a lines array.
@@ -302,6 +344,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
     {
         return $this->client->orderLines->cancelFor($this, $data);
     }
+
     /**
      * Cancels all eligible lines for this order.
      * Returns null if successful.
@@ -313,8 +356,10 @@ class Order extends \Mollie\Api\Resources\BaseResource
     public function cancelAllLines($data = [])
     {
         $data['lines'] = [];
+
         return $this->client->orderLines->cancelFor($this, $data);
     }
+
     /**
      * Get the line value objects
      *
@@ -322,8 +367,13 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function lines()
     {
-        return \Mollie\Api\Resources\ResourceFactory::createBaseResourceCollection($this->client, \Mollie\Api\Resources\OrderLine::class, $this->lines);
+        return ResourceFactory::createBaseResourceCollection(
+            $this->client,
+            OrderLine::class,
+            $this->lines
+        );
     }
+
     /**
      * Create a shipment for some order lines. You can provide an empty array for the
      * "lines" option to include all unshipped lines for this order.
@@ -337,6 +387,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
     {
         return $this->client->shipments->createFor($this, $this->withPresetOptions($options));
     }
+
     /**
      * Create a shipment for all unshipped order lines.
      *
@@ -347,8 +398,10 @@ class Order extends \Mollie\Api\Resources\BaseResource
     public function shipAll(array $options = [])
     {
         $options['lines'] = [];
+
         return $this->createShipment($options);
     }
+
     /**
      * Retrieve a specific shipment for this order.
      *
@@ -362,6 +415,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
     {
         return $this->client->shipments->getFor($this, $shipmentId, $this->withPresetOptions($parameters));
     }
+
     /**
      * Get all shipments for this order.
      *
@@ -374,6 +428,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
     {
         return $this->client->shipments->listFor($this, $this->withPresetOptions($parameters));
     }
+
     /**
      * Get the checkout URL where the customer can complete the payment.
      *
@@ -384,8 +439,10 @@ class Order extends \Mollie\Api\Resources\BaseResource
         if (empty($this->_links->checkout)) {
             return null;
         }
+
         return $this->_links->checkout->href;
     }
+
     /**
      * Refund specific order lines.
      *
@@ -397,6 +454,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
     {
         return $this->client->orderRefunds->createFor($this, $this->withPresetOptions($data));
     }
+
     /**
      * Refund all eligible order lines.
      *
@@ -406,8 +464,10 @@ class Order extends \Mollie\Api\Resources\BaseResource
     public function refundAll(array $data = [])
     {
         $data['lines'] = [];
+
         return $this->refund($data);
     }
+
     /**
      * Retrieves all refunds associated with this order
      *
@@ -416,12 +476,20 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function refunds()
     {
-        if (!isset($this->_links->refunds->href)) {
-            return new \Mollie\Api\Resources\RefundCollection($this->client, 0, null);
+        if (! isset($this->_links->refunds->href)) {
+            return new RefundCollection($this->client, 0, null);
         }
-        $result = $this->client->performHttpCallToFullUrl(\Mollie\Api\MollieApiClient::HTTP_GET, $this->_links->refunds->href);
-        return \Mollie\Api\Resources\ResourceFactory::createCursorResourceCollection($this->client, $result->_embedded->refunds, \Mollie\Api\Resources\Refund::class, $result->_links);
+
+        $result = $this->client->performHttpCallToFullUrl(MollieApiClient::HTTP_GET, $this->_links->refunds->href);
+
+        return ResourceFactory::createCursorResourceCollection(
+            $this->client,
+            $result->_embedded->refunds,
+            Refund::class,
+            $result->_links
+        );
     }
+
     /**
      * Saves the order's updated billingAddress and/or shippingAddress.
      *
@@ -430,10 +498,20 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function update()
     {
-        $body = ["billingAddress" => $this->billingAddress, "shippingAddress" => $this->shippingAddress, "orderNumber" => $this->orderNumber, "redirectUrl" => $this->redirectUrl, "cancelUrl" => $this->cancelUrl, "webhookUrl" => $this->webhookUrl];
+        $body = [
+            "billingAddress" => $this->billingAddress,
+            "shippingAddress" => $this->shippingAddress,
+            "orderNumber" => $this->orderNumber,
+            "redirectUrl" => $this->redirectUrl,
+            "cancelUrl" => $this->cancelUrl,
+            "webhookUrl" => $this->webhookUrl,
+        ];
+
         $result = $this->client->orders->update($this->id, $body);
-        return \Mollie\Api\Resources\ResourceFactory::createFromApiResult($result, new \Mollie\Api\Resources\Order($this->client));
+
+        return ResourceFactory::createFromApiResult($result, new Order($this->client));
     }
+
     /**
      * Create a new payment for this Order.
      *
@@ -446,6 +524,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
     {
         return $this->client->orderPayments->createFor($this, $data, $filters);
     }
+
     /**
      * Retrieve the payments for this order.
      * Requires the order to be retrieved using the embed payments parameter.
@@ -454,32 +533,14 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function payments()
     {
-        if (!isset($this->_embedded, $this->_embedded->payments)) {
+        if (! isset($this->_embedded, $this->_embedded->payments)) {
             return null;
         }
-        return \Mollie\Api\Resources\ResourceFactory::createCursorResourceCollection($this->client, $this->_embedded->payments, \Mollie\Api\Resources\Payment::class);
-    }
-    /**
-     * When accessed by oAuth we want to pass the testmode by default
-     *
-     * @return array
-     */
-    private function getPresetOptions()
-    {
-        $options = [];
-        if ($this->client->usesOAuth()) {
-            $options["testmode"] = $this->mode === "test" ? \true : \false;
-        }
-        return $options;
-    }
-    /**
-     * Apply the preset options.
-     *
-     * @param array $options
-     * @return array
-     */
-    private function withPresetOptions(array $options)
-    {
-        return \array_merge($this->getPresetOptions(), $options);
+
+        return ResourceFactory::createCursorResourceCollection(
+            $this->client,
+            $this->_embedded->payments,
+            Payment::class
+        );
     }
 }

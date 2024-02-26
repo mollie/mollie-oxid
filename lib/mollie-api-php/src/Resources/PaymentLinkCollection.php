@@ -2,7 +2,7 @@
 
 namespace Mollie\Api\Resources;
 
-class PaymentLinkCollection extends \Mollie\Api\Resources\CursorCollection
+class PaymentLinkCollection extends CursorCollection
 {
     /**
      * @return string
@@ -11,11 +11,12 @@ class PaymentLinkCollection extends \Mollie\Api\Resources\CursorCollection
     {
         return "payment_links";
     }
+
     /**
      * @return BaseResource
      */
     protected function createResourceObject()
     {
-        return new \Mollie\Api\Resources\PaymentLink($this->client);
+        return new PaymentLink($this->client);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Mollie\Api\Resources;
 
-class RouteCollection extends \Mollie\Api\Resources\CursorCollection
+class RouteCollection extends CursorCollection
 {
     /**
      * @return string
@@ -11,11 +11,12 @@ class RouteCollection extends \Mollie\Api\Resources\CursorCollection
     {
         return "route";
     }
+
     /**
      * @return BaseResource
      */
     protected function createResourceObject()
     {
-        return new \Mollie\Api\Resources\Route($this->client);
+        return new Route($this->client);
     }
 }

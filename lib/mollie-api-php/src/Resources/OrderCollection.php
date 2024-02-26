@@ -2,7 +2,7 @@
 
 namespace Mollie\Api\Resources;
 
-class OrderCollection extends \Mollie\Api\Resources\CursorCollection
+class OrderCollection extends CursorCollection
 {
     /**
      * @return string
@@ -11,11 +11,12 @@ class OrderCollection extends \Mollie\Api\Resources\CursorCollection
     {
         return "orders";
     }
+
     /**
      * @return BaseResource
      */
     protected function createResourceObject()
     {
-        return new \Mollie\Api\Resources\Order($this->client);
+        return new Order($this->client);
     }
 }
