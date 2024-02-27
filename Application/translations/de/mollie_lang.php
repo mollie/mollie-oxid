@@ -34,6 +34,7 @@ $aLang = [
     'MOLLIE_PAYPAL_EXPRESS_DESCRIPTION'         => 'Zahlung bei ',
     'MOLLIE_PAYPAL_EXPRESS'                     => 'PayPal Express',
     'MOLLIE_PAYPAL_EXPRESS_INFO'                => 'Ihre Zahlung wird mit PayPal Express durchgef&uuml;hrt.<br>Um Ihre PayPal Express Zahlung abzubrechen und eine andere Zahlart auszuw&auml;hlen, klicken Sie auf den &quot;Aufheben&quot; Button.',
+    'MOLLIE_PAYPAL_EXPRESS_UNLINK'              => 'Aufheben',
     'MOLLIE_PAYPAL_EXPRESS_SESSIONID_MISSING'   => 'Ein Fehler ist aufgetreten. Informationen zu PayPal Express Transaktion konnten nicht gefunden werden, bitte versuchen Sie es erneut.',
     'MOLLIE_PAYPAL_EXPRESS_NO_SESSION_INFO'     => 'Ein Fehler ist aufgetreten. Informationen zu PayPal Express Transaktion konnten nicht abgerufen werden, bitte versuchen Sie es erneut.',
 ];

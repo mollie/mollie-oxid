@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Controller;
 
+use Mollie\Payment\Application\Helper\DeliverySet;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Model\Payment\PayPalExpress;
 use Mollie\Payment\Application\Helper\PayPalExpress as PayPalExpressHelper;
@@ -104,15 +105,19 @@ class MolliePayPalExpress extends FrontendController
      * @param  bool $blInit
      * @return \OxidEsales\Eshop\Application\Model\Basket
      */
-    protected function getPayPalExpressBasket($blInit = false)
+    protected function getPayPalExpressBasket($oUser)
     {
         $oBasket = Registry::getSession()->getBasket();
-        if ($blInit === true) {
-            $oBasket->deleteBasket();
-        }
         $oBasket->setPayment(PayPalExpress::OXID);
 
         Registry::getSession()->setVariable('paymentid', PayPalExpress::OXID);
+
+        if (empty(Registry::getSession()->getVariable('sShipSet'))) {
+            $aDelMethods = DeliverySet::getInstance()->getDeliveryMethods($oUser, $oBasket);
+            if (!empty($aDelMethods)) {
+                $oBasket->setShipping($aDelMethods[0]['identifier']);
+            }
+        }
 
         return $oBasket;
     }
@@ -141,7 +146,7 @@ class MolliePayPalExpress extends FrontendController
 
         $oUser = UserHelper::getInstance()->getMollieSessionUser($oSession->shippingAddress);
 
-        $oBasket = $this->getPayPalExpressBasket();
+        $oBasket = $this->getPayPalExpressBasket($oUser);
         $oBasket->calculateBasket(true);
 
         Registry::getConfig()->getActiveView()->setUser($oUser);
