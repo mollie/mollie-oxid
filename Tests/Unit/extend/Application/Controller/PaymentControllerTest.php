@@ -5,6 +5,7 @@ namespace Mollie\Payment\Tests\Unit\extend\Application\Controller;
 
 
 use Mollie\Payment\Application\Model\Payment\Creditcard;
+use Mollie\Payment\Application\Model\Payment\PayPalExpress;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\PaymentList;
@@ -89,5 +90,29 @@ class PaymentControllerTest extends UnitTestCase
 
         $return = $oPaymentController->getPaymentList();
         $this->assertCount(1, $return);
+    }
+
+    public function testGetMolliePayPaylExpressCheckoutCancelUrl()
+    {
+        $oPaymentController = new \Mollie\Payment\extend\Application\Controller\PaymentController();
+        $return = $oPaymentController->getMolliePayPaylExpressCheckoutCancelUrl();
+        $result = strpos($return, "?cl=payment&fnc=mollieCancelPayPalExpress") !== false ? true : false;
+        $this->assertTrue($result);
+    }
+
+    public function testMollieCancelPayPalExpress()
+    {
+        $oPaymentController = new \Mollie\Payment\extend\Application\Controller\PaymentController();
+        $return = $oPaymentController->mollieCancelPayPalExpress();
+
+        $this->assertNull($return);
+    }
+
+    public function testMollieGetPayPalExpressPaymentId()
+    {
+        $oPaymentController = new \Mollie\Payment\extend\Application\Controller\PaymentController();
+        $return = $oPaymentController->mollieGetPayPalExpressPaymentId();
+
+        $this->assertEquals(PayPalExpress::OXID, $return);
     }
 }

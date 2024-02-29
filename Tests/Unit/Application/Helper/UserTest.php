@@ -148,7 +148,7 @@ class UserTest extends UnitTestCase
         UtilsObject::setClassInstance(\OxidEsales\Eshop\Application\Model\User::class, $oUser);
 
         $oUserHelper = oxNew($this->getProxyClassName(User::class));
-        $result = $oUserHelper->getDummyUser();
+        $result = $oUserHelper->getApplePayDummyUser();
 
         $this->assertInstanceOf(\OxidEsales\Eshop\Application\Model\User::class, $result);
     }
@@ -183,5 +183,46 @@ class UserTest extends UnitTestCase
         $result = $oUserHelper->createMollieUser($oUser);
 
         $this->assertNull($result);
+    }
+
+    protected function getMollieSessionUser($email)
+    {
+        $oAddress = new \stdClass();
+        $oAddress->email = $email;
+        $oAddress->givenName = "Paul";
+        $oAddress->familyName = "Payer";
+        $oAddress->country = "DE";
+        $oAddress->city = "Berlin";
+        $oAddress->postalCode = "12345";
+        $oAddress->streetAndNumber = "Teststr. 9";
+        return $oAddress;
+    }
+
+    public function testGetMollieSessionUserNotExisting()
+    {
+        $expected = "a@b.cd";
+
+        $oAddress = $this->getMollieSessionUser($expected);
+
+        $oUserHelper = User::getInstance();
+        $result = $oUserHelper->getMollieSessionUser($oAddress);
+
+        $this->assertEquals($result->oxuser__oxusername->value, $expected);
+    }
+
+    public function testGetMollieSessionUserExisting()
+    {
+        $expected = "paypalexpresstest@mollie.com";
+
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('INSERT INTO oxuser (oxid, oxusername, oxfname) VALUES ("unitPayPalExpressTestUser", "'.$expected.'", "TestName - existant")');
+
+        $oAddress = $this->getMollieSessionUser($expected);
+
+        $oUserHelper = User::getInstance();
+        $result = $oUserHelper->getMollieSessionUser($oAddress);
+
+        $this->assertEquals($result->oxuser__oxusername->value, $expected);
+
+        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('DELETE FROM oxuser WHERE oxid = "'.$expected.'"');
     }
 }

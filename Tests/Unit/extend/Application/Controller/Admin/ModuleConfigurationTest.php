@@ -4,6 +4,7 @@
 namespace Mollie\Payment\Tests\Unit\extend\Application\Controller\Admin;
 
 
+use Mollie\Payment\Application\Helper\Payment;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\TestingLibrary\UnitTestCase;
@@ -118,7 +119,7 @@ class ModuleConfigurationTest extends UnitTestCase
         $oModuleConfigController = new \Mollie\Payment\extend\Application\Controller\Admin\ModuleConfiguration();
         $result = $oModuleConfigController->molliePaymentMethods();
 
-        $this->assertCount(20, $result);
+        $this->assertCount(count(Payment::getInstance()->getMolliePaymentMethods()), $result);
     }
 
     public function testMollieIsApiKeyUsable()

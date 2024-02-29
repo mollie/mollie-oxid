@@ -5,6 +5,7 @@ namespace Mollie\Payment\Tests\Unit\Application\Model\Payment;
 
 
 use Mollie\Api\Endpoints\MethodEndpoint;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Model\PaymentConfig;
 use OxidEsales\Eshop\Application\Model\Order;
@@ -125,5 +126,23 @@ class CreditcardTest extends UnitTestCase
 
         UtilsObject::resetClassInstances();
         \Mollie\Payment\Application\Helper\User::destroyInstance();
+    }
+
+    public function testIsMethodDisplayableInPaymentList()
+    {
+        $oPayment = new \Mollie\Payment\Application\Model\Payment\Creditcard();
+        $result = $oPayment->isMethodDisplayableInPaymentList();
+
+        $this->assertTrue($result);
+    }
+
+    public function testHandlePaymentError()
+    {
+        $oApiException = new ApiException("Error");
+
+        $oPayment = new \Mollie\Payment\Application\Model\Payment\Creditcard();
+        $result = $oPayment->handlePaymentError($oApiException);
+
+        $this->assertNull($result);
     }
 }

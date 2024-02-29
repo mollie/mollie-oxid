@@ -158,7 +158,7 @@ class ViewConfig extends ViewConfig_parent
      *
      * @return string
      */
-    public function getPayPalExpressButtonImageUrl()
+    public function getMolliePayPalExpressButtonImageUrl()
     {
         return PayPalExpress::getInstance()->getPayPalButtonUrl();
     }

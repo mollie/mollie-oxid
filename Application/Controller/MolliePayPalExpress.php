@@ -12,16 +12,31 @@ use OxidEsales\Eshop\Core\Registry;
 
 class MolliePayPalExpress extends FrontendController
 {
+    /**
+     * Defines PPE success return URL
+     *
+     * @return string
+     */
     protected function getReturnUrl()
     {
         return Registry::getConfig()->getCurrentShopUrl().'index.php?cl=molliePayPalExpress&fnc=handlePayPalReturn';
     }
 
+    /**
+     * Defines PPE cancel/error return URL
+     *
+     * @return string
+     */
     protected function getCancelUrl()
     {
         return Registry::getConfig()->getCurrentShopUrl().'index.php?cl=molliePayPalExpress&fnc=handlePayPalCancel';
     }
 
+    /**
+     * Starts Mollie PPE process
+     *
+     * @return void
+     */
     public function initSession()
     {
         $oBasket = Registry::getSession()->getBasket();
@@ -122,6 +137,13 @@ class MolliePayPalExpress extends FrontendController
         return $oBasket;
     }
 
+    /**
+     * Method handles PayPal express errors
+     *
+     * @param  string $sErrorMessage
+     * @param  \Exception $oException
+     * @return void
+     */
     protected function handlePayPalExpressError($sErrorMessage = null, $oException = null)
     {
         PayPalExpressHelper::getInstance()->mollieCancelPayPalExpress(false);
@@ -129,6 +151,11 @@ class MolliePayPalExpress extends FrontendController
         Registry::getUtils()->redirect(Registry::getConfig()->getSslShopUrl()."?cl=basket");
     }
 
+    /**
+     * Handles the return of the customer from PayPal to the shop
+     *
+     * @return void
+     */
     public function handlePayPalReturn()
     {
         $sSessionId = Registry::getSession()->getVariable('mollie_ppe_sessionId');
@@ -159,6 +186,11 @@ class MolliePayPalExpress extends FrontendController
         Registry::getUtils()->redirect($sRedirectUrl);
     }
 
+    /**
+     * Handles a cancellation of the PayPal Express process by the user
+     *
+     * @return void
+     */
     public function handlePayPalCancel()
     {
         $sRedirectUrl = Registry::getConfig()->getSslShopUrl()."?cl=basket";

@@ -154,4 +154,116 @@ class ViewConfigTest extends UnitTestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testMollieShowPayPalExpressButtonOnDetails()
+    {
+        $expected = true;
+
+        $oConfig = $this->getMockBuilder(\OxidEsales\Eshop\Core\Config::class)->disableOriginalConstructor()->getMock();
+        $oConfig->method('getShopConfVar')->willReturn($expected);
+
+        Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
+
+        $oViewConfig = new \Mollie\Payment\extend\Core\ViewConfig();
+        $result = $oViewConfig->mollieShowPayPalExpressButtonOnDetails();
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testMollieGetErrorMessage()
+    {
+        $expected = "ErrorMessage";
+
+        $oSession = $this->getMockBuilder(\OxidEsales\Eshop\Core\Session::class)->disableOriginalConstructor()->getMock();
+        $oSession->method('getVariable')->willReturn($expected);
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+
+        $oViewConfig = new \Mollie\Payment\extend\Core\ViewConfig();
+        $result = $oViewConfig->mollieGetErrorMessage();
+
+        $this->assertEquals($expected, $result);
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, null);
+    }
+
+    public function testIsMolliePayPalExpressCheckoutTrue()
+    {
+        $expected = true;
+
+        $oSession = $this->getMockBuilder(\OxidEsales\Eshop\Core\Session::class)->disableOriginalConstructor()->getMock();
+        $oSession->method('getVariable')->willReturn("4711");
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+
+        $oViewConfig = new \Mollie\Payment\extend\Core\ViewConfig();
+        $result = $oViewConfig->isMolliePayPalExpressCheckout();
+
+        $this->assertEquals($expected, $result);
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, null);
+    }
+
+    public function testIsMolliePayPalExpressCheckoutFalse()
+    {
+        $expected = false;
+
+        $oSession = $this->getMockBuilder(\OxidEsales\Eshop\Core\Session::class)->disableOriginalConstructor()->getMock();
+        $oSession->method('getVariable')->willReturn(null);
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+
+        $oViewConfig = new \Mollie\Payment\extend\Core\ViewConfig();
+        $result = $oViewConfig->isMolliePayPalExpressCheckout();
+
+        $this->assertEquals($expected, $result);
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, null);
+    }
+
+    public function testMollieSuppressBasketModalTrue()
+    {
+        $expected = true;
+
+        $oRequest = $this->getMockBuilder(\OxidEsales\Eshop\Core\Request::class)->disableOriginalConstructor()->getMock();
+        $oRequest->method('getRequestParameter')->willReturn('order');
+
+        Registry::set(\OxidEsales\Eshop\Core\Request::class, $oRequest);
+
+        $oSession = $this->getMockBuilder(\OxidEsales\Eshop\Core\Session::class)->disableOriginalConstructor()->getMock();
+        $oSession->method('getVariable')->willReturn(true);
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+
+        $oViewConfig = new \Mollie\Payment\extend\Core\ViewConfig();
+        $result = $oViewConfig->mollieSuppressBasketModal();
+
+        $this->assertEquals($expected, $result);
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, null);
+        Registry::set(\OxidEsales\Eshop\Core\Request::class, null);
+    }
+
+    public function testMollieSuppressBasketModaleFalse()
+    {
+        $expected = false;
+
+        $oRequest = $this->getMockBuilder(\OxidEsales\Eshop\Core\Request::class)->disableOriginalConstructor()->getMock();
+        $oRequest->method('getRequestParameter')->willReturn('user');
+
+        Registry::set(\OxidEsales\Eshop\Core\Request::class, $oRequest);
+
+        $oSession = $this->getMockBuilder(\OxidEsales\Eshop\Core\Session::class)->disableOriginalConstructor()->getMock();
+        $oSession->method('getVariable')->willReturn(false);
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+
+        $oViewConfig = new \Mollie\Payment\extend\Core\ViewConfig();
+        $result = $oViewConfig->mollieSuppressBasketModal();
+
+        $this->assertEquals($expected, $result);
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, null);
+        Registry::set(\OxidEsales\Eshop\Core\Request::class, null);
+    }
 }

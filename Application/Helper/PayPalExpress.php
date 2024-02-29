@@ -11,6 +11,11 @@ class PayPalExpress
      */
     protected static $oInstance = null;
 
+    /**
+     * Array with fallback buttons
+     *
+     * @var string[]
+     */
     protected $aPayPalExpressFallBackButtons = [
         "en" => "out/img/ppe/en/rounded_pay_golden.png",
         "de" => "out/img/ppe/de/rounded_pay_golden.png",

@@ -55,7 +55,12 @@ class OrderController extends OrderController_parent
         return false; // execution ends with redirect - return used for unit tests
     }
 
-    protected function cleanUpSessionAfterFailure()
+    /**
+     * Cleans PayPal Express session variables after a failure
+     *
+     * @return void
+     */
+    protected function mollieCleanUpSessionAfterFailure()
     {
         Registry::getSession()->deleteVariable('sess_challenge');
 
@@ -87,7 +92,7 @@ class OrderController extends OrderController_parent
             $aResult = $oOrder->mollieGetPaymentModel()->getTransactionHandler($oOrder)->processTransaction($oOrder, 'success');
 
             if ($aResult['success'] === false) {
-                $this->cleanUpSessionAfterFailure();
+                $this->mollieCleanUpSessionAfterFailure();
 
                 $sErrorIdent = 'MOLLIE_ERROR_SOMETHING_WENT_WRONG';
                 if ($aResult['status'] == 'canceled') {

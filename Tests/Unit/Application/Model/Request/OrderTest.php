@@ -23,6 +23,15 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {
     public function testSendRequest()
     {
+        $oBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
+        $oBasket->method('isCalculationModeNetto')->willReturn(true);
+
+        $oSession = $this->getMockBuilder(\OxidEsales\Eshop\Core\Session::class)->disableOriginalConstructor()->getMock();
+        $oSession->method('getVariable')->willReturn('authId');
+        $oSession->method('getBasket')->willReturn($oBasket);
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+
         $oCountry = $this->getMockBuilder(Country::class)->disableOriginalConstructor()->getMock();
         $oCountry->method('__get')->willReturn(new Field('NL'));
 
@@ -81,6 +90,8 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $result = $oRequest->sendRequest($oOrder, 50, "http://someurl.com");
 
         $this->assertInstanceOf(\Mollie\Api\Resources\Order::class, $result);
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, null);
     }
 
     public function testSendRequestFixProductsumMismatch()
