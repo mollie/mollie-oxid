@@ -230,6 +230,13 @@ class User
         $oUser->oxuser__oxsal = new Field(UserHelper::getInstance()->getSalByFirstname($oMollieSessionAddress->givenName));
     }
 
+    /**
+     * Fills an Oxid Address object with information from Mollie session address
+     *
+     * @param  $oUser
+     * @param  \stdClass $oMollieSessionAddress
+     * @return void
+     */
     protected function setShippingAddressFromMollieSession($oUser, $oMollieSessionAddress)
     {
         $sAddressId = $this->getExistingAddressId($oUser, $oMollieSessionAddress);
@@ -377,6 +384,12 @@ class User
         return $oUser;
     }
 
+    /**
+     * Generates a user or loads an existing user from Mollie session shipping address
+     *
+     * @param  \stdClass $oMollieSessionAddress
+     * @return false|\OxidEsales\Eshop\Application\Model\User
+     */
     public function getMollieSessionUser($oMollieSessionAddress)
     {
         $oUser = Registry::getConfig()->getActiveView()->getUser();

@@ -12,6 +12,6 @@
     [{/if}]
 
     [{if $oViewConf->mollieShowPayPalExpressButtonOnDetails()}]
-        [{oxid_include_dynamic file="molliepaypalexpress.tpl" type="mollie" position="Details" payment_price=$price->getBruttoPrice() details_product_id=$oDetailsProduct->getId() shipping_id=$oxcmp_basket->getShippingId()}]
+        [{oxid_include_dynamic file="molliepaypalexpress.tpl" type="mollie" position="Details"}]
     [{/if}]
 [{/if}]

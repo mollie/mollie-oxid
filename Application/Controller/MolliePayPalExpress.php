@@ -148,7 +148,27 @@ class MolliePayPalExpress extends FrontendController
     {
         PayPalExpressHelper::getInstance()->mollieCancelPayPalExpress(false);
         Registry::getSession()->setVariable('mollieErrorMessage', $sErrorMessage);
+        Registry::getSession()->setVariable('mollieModalTimeout', time() + 2); // add 2 sec to basket modal timeout
         Registry::getUtils()->redirect(Registry::getConfig()->getSslShopUrl()."?cl=basket");
+        exit;
+    }
+
+    /**
+     * Checks if the given delivery country is active in Oxid
+     *
+     * @param  \stdClass $oMollieSessionAddress
+     * @return bool
+     */
+    protected function isDeliveryCountryAvailable($oMollieSessionAddress)
+    {
+        $country = oxNew(\OxidEsales\Eshop\Application\Model\Country::class);
+        $countryId = $country->getIdByCode($oMollieSessionAddress->country);
+
+        $country->load($countryId);
+        if ($country->oxcountry__oxactive->value == 1) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -167,6 +187,10 @@ class MolliePayPalExpress extends FrontendController
             $oSession = $this->getSessionFromMollie($sSessionId);
         } catch (\Exception $exc) {
             $this->handlePayPalExpressError(Registry::getLang()->translateString("MOLLIE_PAYPAL_EXPRESS_NO_SESSION_INFO")); // redirects to basket with error message, so execution ends here
+        }
+
+        if ($this->isDeliveryCountryAvailable($oSession->shippingAddress) === false) {
+            $this->handlePayPalExpressError(Registry::getLang()->translateString("MOLLIE_PAYPAL_DELIVERY_COUNTRY_INACTIVE")); // redirects to basket with error message, so execution ends here
         }
 
         Registry::getSession()->setVariable('mollie_ppe_authenticationId', $oSession->authenticationId);

@@ -9,6 +9,6 @@
     [{/if}]
 
     [{if $oViewConf->mollieShowPayPalExpressButtonOnBasket()}]
-        [{oxid_include_dynamic file="molliepaypalexpress.tpl" type="mollie" position="BasketBottom" payment_price=$oViewConf->mollieGetApplePayBasketSum() delivery_costs=$oxcmp_basket->getDeliveryCosts() shipping_id=$oxcmp_basket->getShippingId()}]
+        [{oxid_include_dynamic file="molliepaypalexpress.tpl" type="mollie" position="BasketBottom"}]
     [{/if}]
 [{/if}]

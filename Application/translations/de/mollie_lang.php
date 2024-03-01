@@ -37,4 +37,5 @@ $aLang = [
     'MOLLIE_PAYPAL_EXPRESS_UNLINK'              => 'Aufheben',
     'MOLLIE_PAYPAL_EXPRESS_SESSIONID_MISSING'   => 'Ein Fehler ist aufgetreten. Informationen zu PayPal Express Transaktion konnten nicht gefunden werden, bitte versuchen Sie es erneut.',
     'MOLLIE_PAYPAL_EXPRESS_NO_SESSION_INFO'     => 'Ein Fehler ist aufgetreten. Informationen zu PayPal Express Transaktion konnten nicht abgerufen werden, bitte versuchen Sie es erneut.',
+    'MOLLIE_PAYPAL_DELIVERY_COUNTRY_INACTIVE'   => 'Ihr ausgew&auml;hltes Lieferland kann von uns aktuell leider nicht beliefert werden.',
 ];

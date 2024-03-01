@@ -94,6 +94,25 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
+     * Determines if PayPal Express buttons can be shown
+     *
+     * @return bool
+     */
+    public function mollieCanShowPayPalExpressButton()
+    {
+        $oPayPalExpress = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        if ($oPayPalExpress->load(\Mollie\Payment\Application\Model\Payment\PayPalExpress::OXID)) {
+            if ($oPayPalExpress->oxpayments__oxactive->value == 1) {
+                $oMolliePayment = $oPayPalExpress->getMolliePaymentModel();
+                if ($oMolliePayment && $oMolliePayment->isMolliePaymentActive()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns if PayPal Express button should be shown on basket page
      *
      * @return bool
@@ -171,7 +190,12 @@ class ViewConfig extends ViewConfig_parent
     public function mollieSuppressBasketModal()
     {
         $blReturn = false;
-        if ((Registry::getSession()->getVariable('mollie_suppress_basket_modal') === true || $this->isMolliePayPalExpressCheckout()) && in_array(Registry::getRequest()->getRequestParameter("cl"), ['basket', 'order'])) {
+        if ((
+                Registry::getSession()->getVariable('mollie_suppress_basket_modal') === true ||
+                $this->isMolliePayPalExpressCheckout() ||
+                (!empty(Registry::getSession()->getVariable('mollieModalTimeout')) && Registry::getSession()->getVariable('mollieModalTimeout') > time())
+            ) &&
+            in_array(Registry::getRequest()->getRequestParameter("cl"), ['basket', 'order'])) {
             $blReturn = true;
         }
         Registry::getSession()->deleteVariable('mollie_suppress_basket_modal');
