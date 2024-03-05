@@ -7,6 +7,7 @@ use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Model\Payment\PayPalExpress;
 use Mollie\Payment\Application\Helper\PayPalExpress as PayPalExpressHelper;
 use Mollie\Payment\Application\Helper\User as UserHelper;
+use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -72,14 +73,19 @@ class MolliePayPalExpress extends FrontendController
             'success' => false
         ];
 
+        $oRequestLog = oxNew(RequestLog::class);
         try {
             $oMollieApi = Payment::getInstance()->loadMollieApi();
             $oSession = $oMollieApi->sessions->create($aParams);
+
+            $oRequestLog->logRequest($aParams, $oSession, null, $this->getConfig()->getShopId());
+
             $aResponse['success'] = true;
             $aResponse['redirectUrl'] = $oSession->getRedirectUrl();
 
             Registry::getSession()->setVariable('mollie_ppe_sessionId', $oSession->id);
         } catch(\Exception $exc) {
+            $oRequestLog->logExceptionResponse($aParams, $exc->getCode(), $exc->getMessage(), PayPalExpress::OXID, null, $this->getConfig()->getShopId());
             $aResponse['error'] = $exc->getMessage();
         }
 
@@ -183,9 +189,13 @@ class MolliePayPalExpress extends FrontendController
             $this->handlePayPalExpressError(Registry::getLang()->translateString("MOLLIE_PAYPAL_EXPRESS_SESSIONID_MISSING")); // redirects to basket with error message, so execution ends here
         }
 
+        $oRequestLog = oxNew(RequestLog::class);
         try {
             $oSession = $this->getSessionFromMollie($sSessionId);
+
+            $oRequestLog->logRequest(['sessionId' => $sSessionId], $oSession, null, $this->getConfig()->getShopId());
         } catch (\Exception $exc) {
+            $oRequestLog->logExceptionResponse(['sessionId' => $sSessionId], $exc->getCode(), $exc->getMessage(), PayPalExpress::OXID, null, $this->getConfig()->getShopId());
             $this->handlePayPalExpressError(Registry::getLang()->translateString("MOLLIE_PAYPAL_EXPRESS_NO_SESSION_INFO")); // redirects to basket with error message, so execution ends here
         }
 
