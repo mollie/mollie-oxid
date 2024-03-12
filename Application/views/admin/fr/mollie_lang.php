@@ -16,8 +16,6 @@ $aLang = array(
     'SHOP_MODULE_sMollieLiveToken'                      => 'Clé API Live',
     'SHOP_MODULE_blMollieShowIcons'                     => 'Afficher les icônes',
     'SHOP_MODULE_blMollieLogTransactionInfo'            => 'Journaliser le résultat du traitement des transactions',
-    'SHOP_MODULE_blMollieRemoveDeactivatedMethods'      => 'Retirer les types de paiements désactivés',
-    'SHOP_MODULE_blMollieRemoveByBillingCountry'        => 'Remove not supported payment types by billing country',
     'SHOP_MODULE_GROUP_MOLLIE_STATUS_MAPPING'           => 'Correspondances des statuts',
     'SHOP_MODULE_sMollieStatusPending'                  => 'Statut En attente',
     'SHOP_MODULE_sMollieStatusProcessing'               => 'Statut En traitement',
@@ -36,8 +34,6 @@ $aLang = array(
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Afficher les icônes de paiement sur le Checkout',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Le fichier de journalisation se trouve ici: SHOPROOT/log/MollieTransactions.log',
-    'HELP_SHOP_MODULE_blMollieRemoveDeactivatedMethods' => 'Retirer les types de paiement de la sélection (frontend), qui ne sont pas activés dans le tableau de bord Mollie et provoqueraient donc une erreur.',
-    'HELP_SHOP_MODULE_blMollieRemoveByBillingCountry'   => 'Removes the payment types from the frontend payment selection which are not supported for the billing country given by the customer and thus would result in an error.',
     'HELP_SHOP_MODULE_sMollieStatusPending'             => 'Définir le statut de commande avant que le client ne soit redirigé vers le portail de paiement',
     'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Définir le statut de commande pour les paiement achevés',
     'HELP_SHOP_MODULE_sMollieStatusCancelled'           => 'Définir le statut de commande pour les commandes annulées',

@@ -14,7 +14,7 @@
                 <b style="color: red;">[{oxmultilang ident="MOLLIE_TOKEN_NOT_CONFIGURED"}]</b>
             </td>
         </tr>
-    [{elseif $paymentModel->isMolliePaymentActive() === false}]
+    [{elseif $paymentModel->isMolliePaymentActiveInGeneral() === false}]
         <tr>
             <td class="edittext" colspan="2">
                 <b style="color: red;">[{oxmultilang ident="MOLLIE_IS_METHOD_ACTIVATED"}]</b>

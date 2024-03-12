@@ -16,8 +16,6 @@ $aLang = array(
     'SHOP_MODULE_sMollieLiveToken'                      => 'Chiave API live',
     'SHOP_MODULE_blMollieShowIcons'                     => 'Mostra icone',
     'SHOP_MODULE_blMollieLogTransactionInfo'            => 'Registra risultato della gestione delle transazioni',
-    'SHOP_MODULE_blMollieRemoveDeactivatedMethods'      => 'Rimuovere i tipi di pagamento disattivati',
-    'SHOP_MODULE_blMollieRemoveByBillingCountry'        => 'Remove not supported payment types by billing country',
     'SHOP_MODULE_GROUP_MOLLIE_STATUS_MAPPING'           => 'Registrazione dello stato',
     'SHOP_MODULE_sMollieStatusPending'                  => 'Stato in sospeso',
     'SHOP_MODULE_sMollieStatusProcessing'               => 'Stato in elaborazione',
@@ -35,8 +33,6 @@ $aLang = array(
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Mostra le icone di pagamento al checkout',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Il file di log è disponibile qui: SHOPROOT/log/MollieTransactions.log',
-    'HELP_SHOP_MODULE_blMollieRemoveDeactivatedMethods' => 'Rimuove dalla selezione di pagamento frontend i tipi di pagamento che non sono attivi nella dashboard di Mollie e che quindi risulterebbero in un errore.',
-    'HELP_SHOP_MODULE_blMollieRemoveByBillingCountry'   => 'Removes the payment types from the frontend payment selection which are not supported for the billing country given by the customer and thus would result in an error.',
     'HELP_SHOP_MODULE_sMollieStatusPending'             => 'Impostare lo stato dell\'ordine prima che il cliente venga reindirizzato al gateway di pagamento',
     'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Impostare lo stato dell\'ordine per Pagamenti completati',
     'HELP_SHOP_MODULE_sMollieStatusCancelled'           => 'Impostare lo stato dell\'ordine per Ordini annullati',

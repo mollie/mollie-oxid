@@ -16,8 +16,6 @@ $aLang = array(
     'SHOP_MODULE_sMollieLiveToken'                      => 'Live API Key',
     'SHOP_MODULE_blMollieShowIcons'                     => 'Toon iconen',
     'SHOP_MODULE_blMollieLogTransactionInfo'            => 'Logresultaten van transactieverwerking',
-    'SHOP_MODULE_blMollieRemoveDeactivatedMethods'      => 'Verwijder gedeactiveerde betalingstypes',
-    'SHOP_MODULE_blMollieRemoveByBillingCountry'        => 'Remove not supported payment types by billing country',
     'SHOP_MODULE_GROUP_MOLLIE_STATUS_MAPPING'           => 'Status In kaart brengen',
     'SHOP_MODULE_sMollieStatusPending'                  => 'Status In behandeling',
     'SHOP_MODULE_sMollieStatusProcessing'               => 'Status Verwerken',
@@ -36,8 +34,6 @@ $aLang = array(
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Toon betaaliconen tijdens checkout',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Log file hier te vinden: SHOPROOT/log/MollieTransactions.log',
-    'HELP_SHOP_MODULE_blMollieRemoveDeactivatedMethods' => 'Verwijdert betalingstypes uit de frontend betalingsselectie die niet in het Mollie Dashboard zijn geactiveerd en dus zouden resulteren in een foutmelding',
-    'HELP_SHOP_MODULE_blMollieRemoveByBillingCountry'   => 'Removes the payment types from the frontend payment selection which are not supported for the billing country given by the customer and thus would result in an error.',
     'HELP_SHOP_MODULE_sMollieStatusPending'             => 'Stel de bestelstatus in voordat de klant wordt doorgestuurd naar Payment Gateway',
     'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Stel de bestelstatus in voor Completed Payments',
     'HELP_SHOP_MODULE_sMollieStatusCancelled'           => 'Stel de bestelstatus in voor geannuleerde bestellingen',

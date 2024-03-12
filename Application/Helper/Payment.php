@@ -46,6 +46,8 @@ class Payment
         'molliemybank'          => array('title' => 'MyBank',           'model' => \Mollie\Payment\Application\Model\Payment\MyBank::class),
         'molliein3'             => array('title' => 'in3',              'model' => \Mollie\Payment\Application\Model\Payment\In3::class),
         'molliebillie'          => array('title' => 'Billie',           'model' => \Mollie\Payment\Application\Model\Payment\Billie::class),
+        'mollietwint'           => array('title' => 'TWINT',            'model' => \Mollie\Payment\Application\Model\Payment\Twint::class),
+        'mollieblik'            => array('title' => 'BLIK',             'model' => \Mollie\Payment\Application\Model\Payment\Blik::class),
     );
 
     /**
