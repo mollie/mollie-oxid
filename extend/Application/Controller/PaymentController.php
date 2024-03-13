@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\extend\Application\Controller;
 
+use Mollie\Payment\Application\Helper\User;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Core\Registry;
@@ -21,22 +22,6 @@ class PaymentController extends PaymentController_parent
         }
         Registry::getSession()->deleteVariable('mollieIsRedirected');
         parent::init();
-    }
-
-    /**
-     * Returns billing country code of current basket
-     *
-     * @param  Basket $oBasket
-     * @return string
-     */
-    protected function mollieGetBillingCountry($oBasket)
-    {
-        $oUser = $oBasket->getBasketUser();
-
-        $oCountry = oxNew(Country::class);
-        $oCountry->load($oUser->oxuser__oxcountryid->value);
-
-        return $oCountry->oxcountry__oxisoalpha2->value;
     }
 
     /**
@@ -67,13 +52,13 @@ class PaymentController extends PaymentController_parent
     protected function mollieRemoveUnavailablePaymentMethods()
     {
         $oBasket = Registry::getSession()->getBasket();
-        $sBillingCountryCode = $this->mollieGetBillingCountry($oBasket);
+        $sBillingCountryCode = User::getInstance()->getBillingCountry($oBasket);
         foreach ($this->_oPaymentList as $oPayment) {
             if (method_exists($oPayment, 'isMolliePaymentMethod') && $oPayment->isMolliePaymentMethod() === true) {
                 $sCurrency = $oBasket->getBasketCurrency()->name;
                 $oMolliePayment = $oPayment->getMolliePaymentModel($oBasket->getPrice()->getBruttoPrice(), $sCurrency);
                 if ($oMolliePayment->isMolliePaymentActive($sBillingCountryCode, $oBasket->getPrice()->getBruttoPrice(), $sCurrency) === false ||
-                    $oMolliePayment->mollieIsBasketSumInLimits($oBasket->getPrice()->getBruttoPrice()) === false ||
+                    $oMolliePayment->mollieIsBasketSumInLimits($oBasket->getPrice()->getBruttoPrice(), $sBillingCountryCode, $sCurrency) === false ||
                     $oMolliePayment->mollieIsMethodAvailableForCountry($sBillingCountryCode) === false ||
                     ($oMolliePayment->isOnlyB2BSupported() === true && $this->mollieIsB2BOrder($oBasket) === false) ||
                     $oMolliePayment->isCurrencySupported($sCurrency) === false
@@ -91,8 +76,15 @@ class PaymentController extends PaymentController_parent
      */
     public function getPaymentList()
     {
+        $blFilterList = false;
+        if ($this->_oPaymentList === null) {
+            $blFilterList = true;
+        }
+
         parent::getPaymentList();
-        $this->mollieRemoveUnavailablePaymentMethods();
+        if ($blFilterList === true) { // filtering only needed once this filtered list remains in _oPaymentList but method is called multiple times
+            $this->mollieRemoveUnavailablePaymentMethods();
+        }
         return $this->_oPaymentList;
     }
 }
