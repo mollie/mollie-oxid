@@ -39,6 +39,10 @@ class Payment extends Base
             $blSuccess = true;
         }
 
+        if ($oTransaction->isAuthorized()) {
+            $blSuccess = true;
+        }
+
         if ($oTransaction->hasRefunds()) {
             $blSuccess = true;
         }
