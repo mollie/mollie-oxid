@@ -69,6 +69,9 @@ class Order extends Base
         }
 
         if ($oTransaction->isCompleted()) {
+            if ($oOrder->oxorder__oxpaid->value == '0000-00-00 00:00:00') {
+                $oOrder->mollieMarkAsPaid();
+            }
             $blSuccess = true;
         }
 

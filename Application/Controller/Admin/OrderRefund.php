@@ -4,7 +4,6 @@ namespace Mollie\Payment\Application\Controller\Admin;
 
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
-use Mollie\Payment\Application\Model\Payment\Creditcard;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Payment\Application\Model\RequestLog;
@@ -142,15 +141,14 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         return $this->_sTemplate;
     }
 
-    public function isDirektOrAuthorizedOrder() {
+    /**
+     * @return bool
+     */
+    public function orderNeedsManualCapture() {
         $oOrder = $this->getOrder();
-        if ($oOrder->mollieGetPaymentModel() instanceof Creditcard) {
-            if ($oOrder->mollieIsManualCaptureMethod() === true) {
-                return true;
-            }
-        }
-        return false;
+        return $oOrder->mollieGetPaymentModel()->isManualCaptureNeeded($oOrder);
     }
+
     /**
      * @return mixed
      */
@@ -160,7 +158,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         /** @var \Mollie\Payment\extend\Application\Model\Order $oOrder */
         $oOrder = $this->getOrder();
         try {
-           return $oOrder->getCaptures();
+           return $oOrder->mollieGetCaptures();
         } catch(ApiException $e) {
             $oRequestLog->logExceptionResponse([], $e->getCode(), $e->getMessage(), 'capture', $oOrder->getId(), $this->getConfig()->getShopId());
             $this->setErrorMessage($e->getMessage());
@@ -178,7 +176,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oOrder = $this->getOrder();
         $aParams = $this->getCaptureParams();
         try {
-            $oOrder->captureOrder($aParams);
+            $oOrder->mollieCaptureOrder($aParams);
             $this->_blSuccessCapture = true;
         } catch (ApiException $e) {
             $oRequestLog->logExceptionResponse($aParams, $e->getCode(), $e->getMessage(), 'capture', $oOrder->getId(), $this->getConfig()->getShopId());

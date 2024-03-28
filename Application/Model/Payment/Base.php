@@ -104,6 +104,13 @@ abstract class Base
     protected $aAllowedCurrencies = [];
 
     /**
+     * Determines if payment has to be captured manually
+     *
+     * @var bool
+     */
+    protected $blNeedsManualCapture = false;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -571,5 +578,16 @@ abstract class Base
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns if payment has to be captured manually
+     *
+     * @param Order $oOrder
+     * @return bool
+     */
+    public function isManualCaptureNeeded(Order $oOrder)
+    {
+        return $this->blNeedsManualCapture;
     }
 }
