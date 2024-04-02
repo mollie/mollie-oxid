@@ -111,6 +111,13 @@ abstract class Base
     protected $blNeedsManualCapture = false;
 
     /**
+     * Determines if a shipping address has to be sent every time
+     *
+     * @var bool
+     */
+    protected $blShippingAddressIsMandatory = false;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -589,5 +596,15 @@ abstract class Base
     public function isManualCaptureNeeded(Order $oOrder)
     {
         return $this->blNeedsManualCapture;
+    }
+
+    /**
+     * Returns if shipping address has to be sent to Mollie
+     *
+     * @return bool
+     */
+    public function isShippingAddressMandatory()
+    {
+        return $this->blShippingAddressIsMandatory;
     }
 }
