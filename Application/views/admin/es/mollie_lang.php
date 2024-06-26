@@ -120,6 +120,7 @@ $aLang = array(
     'MOLLIE_PAYMENT_TYPE'                               => 'Payment type',
     'MOLLIE_TRANSACTION_ID'                             => 'Mollie Transaction ID',
     'MOLLIE_EXTERNAL_TRANSACTION_ID'                    => 'External Transaction ID',
+    'MOLLIE_PAYMENT_DISABLED_ACTIVATION'                => 'Este método de pago Mollie ya no se puede activar, ya que se eliminará en breve!',
     'MOLLIE_CAPTURE_TITLE'                              => 'Capture payments',
     'MOLLIE_CAPTURE_STATUS'                             => 'Status',
     'MOLLIE_CAPTURE_DESCRIPTION'                        => 'Amount to capture',

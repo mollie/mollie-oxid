@@ -2,7 +2,21 @@
     [{assign var="paymentModel" value=$edit->getMolliePaymentModel() }]
     <tr>
         <td class="edittext" colspan="2">
-            <b>[{oxmultilang ident="MOLLIE_IS_MOLLIE"}]</b>
+            [{if $paymentModel->isMethodDeprecated() === false}]
+                <b>[{oxmultilang ident="MOLLIE_IS_MOLLIE"}]</b>
+            [{else}]
+                <script type="text/javascript">
+                    function handleDeprecatedMethod() {
+                        let checkboxes = document.getElementsByName("editval[oxpayments__oxactive]");
+                        if (checkboxes.length > 0) {
+                            checkboxes[0].checked = false;
+                            checkboxes[0].disabled = true;
+                        }
+                    }
+                    setTimeout(handleDeprecatedMethod, 100);
+                </script>
+                <b style="color: red;">[{oxmultilang ident="MOLLIE_PAYMENT_DISABLED_ACTIVATION"}]</b>
+            [{/if}]
             [{if $paymentModel->isOnlyOrderApiSupported() === true}]
                 <input type="hidden" name="mollie[api]" value="order">
             [{/if}]

@@ -118,6 +118,15 @@ abstract class Base
     protected $blShippingAddressIsMandatory = false;
 
     /**
+     * Determines if payment method is deprecated.
+     * Deprecated methods are disabled, can't be used anymore and will be removed in a future release.
+     * They stay in the module to allow finishing old orders where these methods have been used
+     *
+     * @var bool
+     */
+    protected $blMethodIsDeprecated = false;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -606,5 +615,15 @@ abstract class Base
     public function isShippingAddressMandatory()
     {
         return $this->blShippingAddressIsMandatory;
+    }
+
+    /**
+     * Returns im this method is deprecated
+     *
+     * @return bool
+     */
+    public function isMethodDeprecated()
+    {
+        return $this->blMethodIsDeprecated;
     }
 }

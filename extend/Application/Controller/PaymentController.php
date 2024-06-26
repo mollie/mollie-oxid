@@ -46,6 +46,7 @@ class PaymentController extends PaymentController_parent
      * 3. Payment method has a billing country restriction and customer is not from that country
      * 4. Payment method is only available for B2B orders and current order is not a B2B order
      * 5. Currently selected currency is not supported by payment method
+     * 6. Payment method is deprecated
      *
      * @return void
      */
@@ -61,7 +62,8 @@ class PaymentController extends PaymentController_parent
                     $oMolliePayment->mollieIsBasketSumInLimits($oBasket->getPrice()->getBruttoPrice(), $sBillingCountryCode, $sCurrency) === false ||
                     $oMolliePayment->mollieIsMethodAvailableForCountry($sBillingCountryCode) === false ||
                     ($oMolliePayment->isOnlyB2BSupported() === true && $this->mollieIsB2BOrder($oBasket) === false) ||
-                    $oMolliePayment->isCurrencySupported($sCurrency) === false
+                    $oMolliePayment->isCurrencySupported($sCurrency) === false ||
+                    $oMolliePayment->isMethodDeprecated() === true
                 ) {
                     unset($this->_oPaymentList[$oPayment->getId()]);
                 }
