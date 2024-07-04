@@ -115,6 +115,8 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
         'MollieFinishPayment' => Mollie\Payment\Application\Controller\MollieFinishPayment::class,
         'mollie_order_refund' => Mollie\Payment\Application\Controller\Admin\OrderRefund::class,
         'mollie_order_capture' => Mollie\Payment\Application\Controller\Admin\OrderCapture::class,
+        'mollie_apilog_main' => Mollie\Payment\Application\Controller\Admin\ApiLogMain::class,
+        'mollie_apilog_list' => Mollie\Payment\Application\Controller\Admin\ApiLogList::class,
     ],
     'templates'     => [
         'molliewebhook.tpl' => 'mollie/molliepayment/Application/views/hook/tpl/molliewebhook.tpl',
@@ -136,6 +138,7 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
         'mollie_second_chance.tpl' => 'mollie/molliepayment/Application/views/email/tpl/mollie_second_chance.tpl',
         'mollie_module_main.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/mollie_module_main.tpl',
         'mollie_support_email.tpl' => 'mollie/molliepayment/Application/views/email/tpl/mollie_support_email.tpl',
+        'mollie_apilog_main.tpl' => 'mollie/molliepayment/Application/views/admin/tpl/mollie_apilog_main.tpl',
     ],
     'events'        => [
         'onActivate' => \Mollie\Payment\Core\Events::class.'::onActivate',

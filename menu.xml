@@ -7,4 +7,11 @@
             </SUBMENU>
         </MAINMENU>
     </OXMENU>
+    <OXMENU id="MOLLIE_ADMIN_TITLE">
+        <MAINMENU id="MOLLIE_ADMIN_LOGS">
+            <SUBMENU id="MOLLIE_ADMIN_API_LOGS" cl="mollie_apilog_main" list="mollie_apilog_list">
+                <TAB id="MOLLIE_ADMIN_API_LOGS" cl="mollie_apilog" />
+            </SUBMENU>
+        </MAINMENU>
+    </OXMENU>
 </OX>
