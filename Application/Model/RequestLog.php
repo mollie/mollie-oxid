@@ -4,9 +4,15 @@ namespace Mollie\Payment\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
 
-class RequestLog
+class RequestLog extends \OxidEsales\Eshop\Core\Model\BaseModel
 {
     public static $sTableName = "mollierequestlog";
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->init('mollierequestlog');
+    }
 
     /**
      * Return create query for module installation
