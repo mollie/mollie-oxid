@@ -4,6 +4,8 @@
 <head>
     <title>[{ oxmultilang ident="GENERAL_ADMIN_TITLE" }]</title>
 </head>
+<link rel="stylesheet" href="[{$oViewConf->getResourceUrl()}]main.css">
+
 
 <!-- frames -->
 <frameset  rows="40%,*" border="0" onload="top.loadEditFrame('[{$oViewConf->getSelfLink()}]&[{ $editurl }][{ if $oxid }]&oxid=[{$oxid}][{/if}]');">

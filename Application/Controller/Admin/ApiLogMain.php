@@ -19,10 +19,14 @@ class ApiLogMain extends AdminDetailsController
     public function render()
     {
         $sOxId = $this->getEditObjectId();
+        if($sOxId != '-1') {
+            $oRequestLog = oxNew(RequestLog::class);
+            $oRequestLog->load($sOxId);
 
-        $oRequestLog = oxNew(RequestLog::class);
-        $oRequestLog->load($sOxId);
-        $this->_aViewData['edit'] = $oRequestLog;
+            $this->_aViewData['edit'] = $oRequestLog;
+            $this->_aViewData['request'] = $oRequestLog->decodeData($oRequestLog->mollierequestlog__request->rawValue);
+            $this->_aViewData['response'] = $oRequestLog->decodeData($oRequestLog->mollierequestlog__response->rawValue);
+        }
 
         return parent::render();
     }

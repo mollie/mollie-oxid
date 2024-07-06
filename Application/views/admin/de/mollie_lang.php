@@ -65,6 +65,7 @@ $aLang = array(
     'MOLLIE_ADMIN_LOGS'                                 => 'Mollie Logging',
     'MOLLIE_ADMIN_API_LOGS'                             => 'API Logs',
     'MOLLIE_ADMIN_API_LOGS_MAIN'                        => 'Logs',
+    'MOLLIE_ADMIN_API_LOGS_SELECT_ENTRY'                => 'Bitte wählen Sie ein Element von der oberen Liste aus.',
     'MOLLIE_REFUND_SUCCESSFUL'                          => 'R&uuml;ckerstattung war erfolgreich.',
     'MOLLIE_CAPTURE_SUCCESSFUL'                         => 'Betrag wurde erfolgreich eingezogen.',
     'MOLLIE_NO_MOLLIE_PAYMENT'                          => 'Diese Bestellung wurde nicht mit Mollie bezahlt.',

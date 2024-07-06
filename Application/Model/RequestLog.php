@@ -3,15 +3,16 @@
 namespace Mollie\Payment\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 
-class RequestLog extends \OxidEsales\Eshop\Core\Model\BaseModel
+class RequestLog extends BaseModel
 {
     public static $sTableName = "mollierequestlog";
 
     public function __construct()
     {
         parent::__construct();
-        $this->init('mollierequestlog');
+        $this->init(self::$sTableName);
     }
 
     /**
@@ -51,7 +52,7 @@ class RequestLog extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param string $sData
      * @return array
      */
-    protected function decodeData($sData)
+    public function decodeData($sData)
     {
         return json_decode($sData, true);
     }
