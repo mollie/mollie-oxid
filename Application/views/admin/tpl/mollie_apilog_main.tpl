@@ -6,6 +6,8 @@
     [{assign var="readonly" value=""}]
 [{/if}]
 
+[{assign var="edit" value=$oView->getEdit()}]
+
 <script type="text/javascript">
 
     function editThis( sID )
@@ -26,8 +28,6 @@
     window.onload = function ()
     {
         top.oxid.admin.updateList('[{$oxid}]');
-        var oField = top.oxid.admin.getLockTarget();
-        oField.onchange = oField.onkeyup = oField.onmouseout = top.oxid.admin.unlockSave;
     }
 </script>
 
@@ -53,54 +53,60 @@
 </form>
 
 [{if $edit}]
+    [{assign var="request" value=$oView->getRequest()}]
+    [{assign var="response" value=$oView->getResponse()}]
     <table cellspacing="0" cellpadding="0" border="0" style="width:98%;border-collapse: collapse;">
         <tr class="request">
             <td id="editval_mollierequestlog__request" class="edittext">
                 <h2>Request</h2>
-                [{foreach from=$request key=requestkey item=requestvalue}]
-                    [{if $requestkey == 'amount' }]
-                        <b>[{$requestkey}]:</b> [{$requestvalue.value}] [{$requestvalue.currency}]<br><br>
-                    [{elseif $requestkey == 'metadata'}]
-                        [{foreach from=$requestvalue key=metadatakey item=metadatavalue}]
-                            <b>[{$metadatakey}]:</b> [{$metadatavalue}]<br><br>
-                        [{/foreach}]
-                    [{elseif $requestkey == 'billingAddress'}]
-                        <b>[{$requestkey}]:</b><br>
-                        [{foreach from=$requestvalue key=billingaddresskey item=billingaddressvalue}]
-                                [{$billingaddressvalue}][{if $billingaddresskey !== 'postalCode'}]<br>[{/if}]
-                        [{/foreach}]
-                        <br>
-                    [{else}]
-                        <b>[{$requestkey}]:</b> [{$requestvalue}]<br><br>
-                    [{/if}]
-                [{/foreach}]
+                [{if $request}]
+                    [{foreach from=$request key=requestkey item=requestvalue}]
+                        [{if $requestkey == 'amount' }]
+                            <b>[{$requestkey}]:</b> [{$requestvalue.value}] [{$requestvalue.currency}]<br><br>
+                        [{elseif $requestkey == 'metadata'}]
+                            [{foreach from=$requestvalue key=metadatakey item=metadatavalue}]
+                                <b>[{$metadatakey}]:</b> [{$metadatavalue}]<br><br>
+                            [{/foreach}]
+                        [{elseif $requestkey == 'billingAddress'}]
+                            <b>[{$requestkey}]:</b><br>
+                            [{foreach from=$requestvalue key=billingaddresskey item=billingaddressvalue}]
+                                    [{$billingaddressvalue}][{if $billingaddresskey !== 'postalCode'}]<br>[{/if}]
+                            [{/foreach}]
+                            <br>
+                        [{else}]
+                            <b>[{$requestkey}]:</b> [{$requestvalue}]<br><br>
+                        [{/if}]
+                    [{/foreach}]
+                [{/if}]
             </td>
         </tr>
         <tr class="response">
             <td id="editval_mollierequestlog__response" class="edittext">
                 <h2>Response</h2>
-                [{foreach from=$response key=responsekey item=responsevalue}]
-                    [{if $responsekey == 'amount'
-                        || $responsekey == 'settlementAmount'
-                        || $responsekey == 'amountRefunded'
-                        || $responsekey == 'amountRemaining'
-                        || $responsekey == 'amountChargedBack'}]
+                [{if $response}]
+                    [{foreach from=$response key=responsekey item=responsevalue}]
+                        [{if $responsekey == 'amount'
+                            || $responsekey == 'settlementAmount'
+                            || $responsekey == 'amountRefunded'
+                            || $responsekey == 'amountRemaining'
+                            || $responsekey == 'amountChargedBack'}]
 
-                        [{if isset($responsevalue.value) && $responsevalue.value != ''}]
-                            <b>[{$responsekey}]:</b> [{$responsevalue.value}] [{$responsevalue.currency}]<br><br>
-                        [{/if}]
-                    [{elseif $responsekey == 'metadata'}]
-                        [{foreach from=$responsevalue key=metadatakey item=metadatavalue}]
-                            [{if isset($metadatavalue) && $metadatavalue != ''}]
-                                <b>[{$metadatakey}]:</b> [{$metadatavalue}]<br><br>
+                            [{if isset($responsevalue.value) && $responsevalue.value != ''}]
+                                <b>[{$responsekey}]:</b> [{$responsevalue.value}] [{$responsevalue.currency}]<br><br>
                             [{/if}]
-                        [{/foreach}]
-                    [{else}]
-                        [{if isset($responsevalue) && $responsevalue != ''}]
-                            <b>[{$responsekey}]:</b> [{$responsevalue}]<br><br>
+                        [{elseif $responsekey == 'metadata'}]
+                            [{foreach from=$responsevalue key=metadatakey item=metadatavalue}]
+                                [{if isset($metadatavalue) && $metadatavalue != ''}]
+                                    <b>[{$metadatakey}]:</b> [{$metadatavalue}]<br><br>
+                                [{/if}]
+                            [{/foreach}]
+                        [{else}]
+                            [{if isset($responsevalue) && $responsevalue != ''}]
+                                <b>[{$responsekey}]:</b> [{$responsevalue}]<br><br>
+                            [{/if}]
                         [{/if}]
-                    [{/if}]
-                [{/foreach}]
+                    [{/foreach}]
+                [{/if}]
             </td>
         </tr>
     </table>

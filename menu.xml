@@ -6,8 +6,6 @@
                 <TAB id="MOLLIE_ORDER_REFUND" cl="mollie_order_refund" />
             </SUBMENU>
         </MAINMENU>
-    </OXMENU>
-    <OXMENU id="NAVIGATION_ESHOPADMIN">
         <MAINMENU id="MOLLIE_ADMIN">
             <SUBMENU id="MOLLIE_ADMIN_API_LOGS" cl="mollie_apilog" list="mollie_apilog_list">
                 <TAB id="MOLLIE_ADMIN_API_LOGS_MAIN" cl="mollie_apilog_main" />
