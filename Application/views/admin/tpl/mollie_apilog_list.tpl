@@ -73,7 +73,7 @@
             </tr>
 
             <tr>
-                <td class="listheader first" height="15" width="30"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'mollierequestlog', 'timestamp', 'asc');document.search.submit();" class="listheader">Timestamp</a></td>
+                <td class="listheader first" height="15" width="30"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'mollierequestlog', 'timestamp', 'desc');document.search.submit();" class="listheader">Timestamp</a></td>
                 <td class="listheader" height="15"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'mollierequestlog', 'orderid', 'asc');document.search.submit();" class="listheader">OrderID</a></td>
                 <td class="listheader" height="15"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'mollierequestlog', 'storeid', 'asc');document.search.submit();" class="listheader">StoreID</a></td>
                 <td class="listheader" height="15"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'mollierequestlog', 'requesttype', 'asc');document.search.submit();" class="listheader">Requesttype</a></td>
@@ -133,7 +133,7 @@
                 </tr>
 
             [{/foreach}]
-            [{include file="pagenavisnippet.tpl" colspan="3"}]
+            [{include file="pagenavisnippet.tpl" colspan="5"}]
         </table>
     </form>
 </div>

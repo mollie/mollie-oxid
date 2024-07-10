@@ -67,12 +67,24 @@
                             [{foreach from=$requestvalue key=metadatakey item=metadatavalue}]
                                 <b>[{$metadatakey}]:</b> [{$metadatavalue}]<br><br>
                             [{/foreach}]
-                        [{elseif $requestkey == 'billingAddress'}]
+                        [{elseif $requestkey == 'billingAddress' || $requestkey == 'shippingAddress'}]
                             <b>[{$requestkey}]:</b><br>
-                            [{foreach from=$requestvalue key=billingaddresskey item=billingaddressvalue}]
-                                    [{$billingaddressvalue}][{if $billingaddresskey !== 'postalCode'}]<br>[{/if}]
+                            [{if $requestvalue.email }]
+                                <u>[{$requestvalue.email}]</u>
+                                <br><br>
+                            [{/if}]
+                            [{if $requestvalue.givenName && $requestvalue.familyName }]
+                                [{$requestvalue.givenName}] [{$requestvalue.familyName}]
+                                <br>
+                            [{/if}]
+                            [{foreach from=$requestvalue key=addresskey item=addressvalue}]
+                                [{if $addresskey != 'givenName' && $addresskey != 'familyName' && $addresskey != 'email' }]
+                                    [{$addressvalue}][{if $addresskey !== 'postalCode'}]<br>[{/if}]
+                                [{/if}]
                             [{/foreach}]
                             <br>
+                        [{elseif $requestvalue === false || $requestvalue === true}]
+                            <b>[{$requestkey}]:</b> [{if $requestvalue === false }]false[{else}]true[{/if}]<br><br>
                         [{else}]
                             <b>[{$requestkey}]:</b> [{$requestvalue}]<br><br>
                         [{/if}]
@@ -89,7 +101,8 @@
                             || $responsekey == 'settlementAmount'
                             || $responsekey == 'amountRefunded'
                             || $responsekey == 'amountRemaining'
-                            || $responsekey == 'amountChargedBack'}]
+                            || $responsekey == 'amountChargedBack'
+                            || $responsekey == 'amountCaptured'}]
 
                             [{if isset($responsevalue.value) && $responsevalue.value != ''}]
                                 <b>[{$responsekey}]:</b> [{$responsevalue.value}] [{$responsevalue.currency}]<br><br>
@@ -100,6 +113,30 @@
                                     <b>[{$metadatakey}]:</b> [{$metadatavalue}]<br><br>
                                 [{/if}]
                             [{/foreach}]
+                        [{elseif $responsekey == 'details'}]
+                            [{foreach from=$responsevalue key=detailskey item=detailsvalue}]
+                                [{if isset($detailsvalue) && $detailsvalue != ''}]
+                                    <b>[{$detailskey}]:</b> [{$detailsvalue}]<br><br>
+                                [{/if}]
+                            [{/foreach}]
+                        [{elseif $responsekey == 'billingAddress' || $responsekey == 'shippingAddress'}]
+                            <b>[{$responsekey}]:</b><br>
+                            [{if $responsevalue.email }]
+                                <u>[{$responsevalue.email}]</u>
+                                <br><br>
+                            [{/if}]
+                            [{if $responsevalue.givenName && $responsevalue.familyName }]
+                                [{$responsevalue.givenName}] [{$responsevalue.familyName}]
+                                <br>
+                            [{/if}]
+                            [{foreach from=$responsevalue key=addresskey item=addressvalue}]
+                                [{if $addresskey != 'givenName' && $addresskey != 'familyName' && $addresskey != 'email' }]
+                                    [{$addressvalue}][{if $addresskey !== 'postalCode'}]<br>[{/if}]
+                                [{/if}]
+                            [{/foreach}]
+                            <br>
+                        [{elseif $responsevalue === false || $responsevalue === true}]
+                            <b>[{$responsekey}]:</b> [{if $responsevalue === false }]false[{else}]true[{/if}]<br><br>
                         [{else}]
                             [{if isset($responsevalue) && $responsevalue != ''}]
                                 <b>[{$responsekey}]:</b> [{$responsevalue}]<br><br>
