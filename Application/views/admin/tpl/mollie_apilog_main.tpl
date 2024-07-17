@@ -42,6 +42,13 @@
         width: 1600px;
         margin: 0 18px 20px 24px;
     }
+    .linebox {
+        border: 1px solid #A9A9A9;
+        margin-bottom: 15px;
+        padding-left: 10px;
+        width: 1572px;
+        background-color: #eee;
+    }
 </style>
 
 <form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
@@ -86,9 +93,30 @@
                         [{elseif $requestvalue === false || $requestvalue === true}]
                             <b>[{$requestkey}]:</b> [{if $requestvalue === false }]false[{else}]true[{/if}]<br><br>
                         [{else}]
-                            <b>[{$requestkey}]:</b> [{$requestvalue}]<br><br>
+                            [{if isset($requestvalue) && $requestvalue != '' && $requestkey != 'lines'}]
+                                <b>[{$requestkey}]:</b> [{$requestvalue}]<br><br>
+                            [{/if}]
                         [{/if}]
                     [{/foreach}]
+                    [{if $request.lines && $request.lines|count > 2}]
+                        [{foreach from=$request.lines item=line name=lines}]
+                            <div class="linebox">
+                                <h2>[{$smarty.foreach.lines.iteration}]. Position</h2>
+                                [{foreach from=$line key=lineelementkey item=lineelementvalue}]
+                                    [{if $lineelementkey == 'unitPrice'
+                                        || $lineelementkey == 'discountAmount'
+                                        || $lineelementkey == 'totalAmount'
+                                        || $lineelementkey == 'vatAmount'}]
+                                        <b>[{$lineelementkey}]:</b> [{$lineelementvalue.value}] [{$lineelementvalue.currency}]<br><br>
+                                    [{else}]
+                                        [{if isset($lineelementvalue) && $lineelementvalue != ''}]
+                                            <b>[{$lineelementkey}]:</b> [{$lineelementvalue}]<br><br>
+                                        [{/if}]
+                                    [{/if}]
+                                [{/foreach}]
+                            </div>
+                        [{/foreach}]
+                    [{/if}]
                 [{/if}]
             </td>
         </tr>
@@ -138,11 +166,43 @@
                         [{elseif $responsevalue === false || $responsevalue === true}]
                             <b>[{$responsekey}]:</b> [{if $responsevalue === false }]false[{else}]true[{/if}]<br><br>
                         [{else}]
-                            [{if isset($responsevalue) && $responsevalue != ''}]
+                            [{if isset($responsevalue) && $responsevalue != '' && $responsekey != 'lines'}]
                                 <b>[{$responsekey}]:</b> [{$responsevalue}]<br><br>
                             [{/if}]
                         [{/if}]
                     [{/foreach}]
+                    [{if $response.lines && $response.lines|count > 2}]
+                        [{foreach from=$response.lines item=line name=lines}]
+                            <div class="linebox">
+                                <h2>[{$smarty.foreach.lines.iteration}]. Position</h2>
+                                [{foreach from=$line key=lineelementkey item=lineelementvalue}]
+                                    [{if $lineelementkey == 'unitPrice'
+                                        || $lineelementkey == 'discountAmount'
+                                        || $lineelementkey == 'totalAmount'
+                                        || $lineelementkey == 'vatAmount'
+                                        || $lineelementkey == 'amountShipped'
+                                        || $lineelementkey == 'amountRefunded'
+                                        || $lineelementkey == 'amountCanceled'}]
+                                        <b>[{$lineelementkey}]:</b> [{$lineelementvalue.value}] [{$lineelementvalue.currency}]<br><br>
+                                        [{elseif $lineelementkey == '_links'}]
+                                            [{foreach from=$lineelementvalue key=linkskey item=linksvalue}]
+                                                [{if $linkskey == 'productUrl'}]
+                                                    <b><u>[{$linkskey}]</u></b><br>
+                                                    [{foreach from=$linksvalue key=producturlkey item=producturlvalue name=producturlloop}]
+                                                        <b>[{$producturlkey}]:</b> [{$producturlvalue}]<br>
+                                                        [{if $smarty.foreach.producturlloop.last}]<br>[{/if}]
+                                                    [{/foreach}]
+                                                [{/if}]
+                                            [{/foreach}]
+                                        [{else}]
+                                            [{if isset($lineelementvalue) && $lineelementvalue != ''}]
+                                                <b>[{$lineelementkey}]:</b> [{$lineelementvalue}]<br><br>
+                                            [{/if}]
+                                    [{/if}]
+                                [{/foreach}]
+                            </div>
+                        [{/foreach}]
+                    [{/if}]
                 [{/if}]
             </td>
         </tr>
