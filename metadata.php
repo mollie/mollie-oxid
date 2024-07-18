@@ -88,7 +88,7 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
 ",
     ],
     'thumbnail'    => 'mollie_logo.png',
-    'version'       => '1.0.36',
+    'version'       => '1.0.37',
     'author'        => 'Fatchip GmbH',
     'email'         => 'info@mollie.com',
     'url'          => 'https://www.mollie.com/',
