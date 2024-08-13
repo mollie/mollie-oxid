@@ -50,6 +50,7 @@ class Payment
         'mollietwint'           => array('title' => 'TWINT',               'model' => \Mollie\Payment\Application\Model\Payment\Twint::class),
         'mollieblik'            => array('title' => 'BLIK',                'model' => \Mollie\Payment\Application\Model\Payment\Blik::class),
         'mollietrustly'         => array('title' => 'Trustly',             'model' => \Mollie\Payment\Application\Model\Payment\Trustly::class),
+        'mollieriverty'         => array('title' => 'Riverty',             'model' => \Mollie\Payment\Application\Model\Payment\Riverty::class),
     );
 
     /**
