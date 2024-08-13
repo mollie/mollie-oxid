@@ -94,6 +94,7 @@ $aLang = array(
     'MOLLIE_REFUND_FREE_2'                              => ',',
     'MOLLIE_REFUND_FREE_3'                              => 'have already been refunded. Remaining refundable amount',
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'This order has been refunded completely already.',
+    'MOLLIE_NOT_YET_PAID'                               => 'This order is not yet marked as paid and therefore can not be refunded yet.',
     'MOLLIE_REFUND_REMAINING'                           => 'Refund remaining sum',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'This order includes vouchers or discount. These cant be refunded partially, they must be handled with the full or remaining refund.',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Creditcard data',

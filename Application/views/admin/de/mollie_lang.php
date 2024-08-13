@@ -95,6 +95,7 @@ $aLang = array(
     'MOLLIE_REFUND_FREE_2'                              => 'wurden bereits',
     'MOLLIE_REFUND_FREE_3'                              => 'erstattet. Restbetrag',
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'Diese Bestellung wurde bereits vollst&auml;ndig erstattet.',
+    'MOLLIE_NOT_YET_PAID'                               => 'Diese Bestellung ist noch nicht als bezahlt markiert und kann daher noch nicht erstattet werden.',
     'MOLLIE_REFUND_REMAINING'                           => 'Verbliebene Summe erstatten',
     'MOLLIE_CAPTURE_TITLE'                              => 'Zahlungen einziehen (Capture)',
     'MOLLIE_CAPTURE_STATUS'                             => 'Status',

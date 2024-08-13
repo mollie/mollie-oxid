@@ -137,7 +137,16 @@
         <strong>[{oxmultilang ident="MOLLIE_NOTICE"}]</strong>
         [{oxmultilang ident="MOLLIE_ORDER_NOT_REFUNDABLE"}]
     </fieldset>
-    [{/if}]
+[{/if}]
+
+[{assign var="blIsOrderPaid" value=$order->mollieIsPaid()}]
+[{if $blIsOrderPaid == false}]
+    <fieldset class="refundNotice message">
+        <strong>[{oxmultilang ident="MOLLIE_NOTICE"}]</strong>
+        [{oxmultilang ident="MOLLIE_NOT_YET_PAID"}]
+    </fieldset>
+    [{assign var="blIsOrderRefundable" value=false}]
+[{/if}]
 
 [{if $oView->hasOrderVoucher() == true}]
     <fieldset class="refundNotice message">
@@ -241,6 +250,7 @@
     [{/if}]
 [{/if}]
 
+[{if $blIsOrderPaid == true}]
 <fieldset>
     <legend>[{oxmultilang ident="MOLLIE_PARTIAL_REFUND"}]</legend>
     [{if $oView->isMollieOrder() === false}]
@@ -359,6 +369,7 @@
         [{/if}]
     [{/if}]
 </fieldset>
+[{/if}]
 
 [{include file="bottomnaviitem.tpl"}]
 </table>
