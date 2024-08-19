@@ -28,7 +28,7 @@
         </dd>
         <div class="spacer"></div>
     </dl>
-    [{if $module_var == 'sMollieLiveToken'}]
+    [{if $module_var == 'sMollieTestToken'}]
         <dl>
             <dt></dt>
             <dd>[{oxmultilang ident="MOLLIE_CONNECTION_DATA"}] <a href="https://www.mollie.com/admin" target="_blank">https://www.mollie.com/admin</a></dd>

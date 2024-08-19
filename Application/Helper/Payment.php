@@ -26,27 +26,33 @@ class Payment
      * @var array
      */
     protected $aPaymentMethods = array(
-        'molliebancontact'      => array('title' => 'Bancontact',       'model' => \Mollie\Payment\Application\Model\Payment\Bancontact::class),
-        'molliebanktransfer'    => array('title' => 'Banktransfer',     'model' => \Mollie\Payment\Application\Model\Payment\Banktransfer::class),
-        'molliebelfius'         => array('title' => 'Belfius',          'model' => \Mollie\Payment\Application\Model\Payment\Belfius::class),
-        'molliecreditcard'      => array('title' => 'Credit Card',      'model' => \Mollie\Payment\Application\Model\Payment\Creditcard::class),
-        'mollieeps'             => array('title' => 'EPS Österreich',   'model' => \Mollie\Payment\Application\Model\Payment\Eps::class),
-        'molliegiftcard'        => array('title' => 'Giftcard',         'model' => \Mollie\Payment\Application\Model\Payment\Giftcard::class),
-        'molliegiropay'         => array('title' => 'Giropay',          'model' => \Mollie\Payment\Application\Model\Payment\Giropay::class),
-        'mollieideal'           => array('title' => 'iDeal',            'model' => \Mollie\Payment\Application\Model\Payment\Ideal::class),
-        'molliekbc'             => array('title' => 'KBC',              'model' => \Mollie\Payment\Application\Model\Payment\Kbc::class),
-        'mollieklarnapaylater'  => array('title' => 'Klarna Pay Later', 'model' => \Mollie\Payment\Application\Model\Payment\KlarnaPayLater::class),
-        'mollieklarnapaynow'    => array('title' => 'Klarna Pay Now',   'model' => \Mollie\Payment\Application\Model\Payment\KlarnaPayNow::class),
-        'mollieklarnasliceit'   => array('title' => 'Klarna Slice It',  'model' => \Mollie\Payment\Application\Model\Payment\KlarnaSliceIt::class),
-        'molliepaypal'          => array('title' => 'PayPal',           'model' => \Mollie\Payment\Application\Model\Payment\PayPal::class),
+        'molliebancontact'      => array('title' => 'Bancontact',          'model' => \Mollie\Payment\Application\Model\Payment\Bancontact::class),
+        'molliebanktransfer'    => array('title' => 'Banktransfer',        'model' => \Mollie\Payment\Application\Model\Payment\Banktransfer::class),
+        'molliebelfius'         => array('title' => 'Belfius',             'model' => \Mollie\Payment\Application\Model\Payment\Belfius::class),
+        'molliecreditcard'      => array('title' => 'Credit Card',         'model' => \Mollie\Payment\Application\Model\Payment\Creditcard::class),
+        'mollieeps'             => array('title' => 'EPS Österreich',      'model' => \Mollie\Payment\Application\Model\Payment\Eps::class),
+        'molliegiftcard'        => array('title' => 'Giftcard',            'model' => \Mollie\Payment\Application\Model\Payment\Giftcard::class),
+        'molliegiropay'         => array('title' => 'Giropay',             'model' => \Mollie\Payment\Application\Model\Payment\Giropay::class),
+        'mollieideal'           => array('title' => 'iDeal',               'model' => \Mollie\Payment\Application\Model\Payment\Ideal::class),
+        'molliekbc'             => array('title' => 'KBC',                 'model' => \Mollie\Payment\Application\Model\Payment\Kbc::class),
+        'mollieklarna'          => array('title' => 'Bezahlen mit Klarna', 'model' => \Mollie\Payment\Application\Model\Payment\Klarna::class),
+        'mollieklarnapaylater'  => array('title' => 'Klarna Pay Later',    'model' => \Mollie\Payment\Application\Model\Payment\KlarnaPayLater::class),
+        'mollieklarnapaynow'    => array('title' => 'Klarna Pay Now',      'model' => \Mollie\Payment\Application\Model\Payment\KlarnaPayNow::class),
+        'mollieklarnasliceit'   => array('title' => 'Klarna Slice It',     'model' => \Mollie\Payment\Application\Model\Payment\KlarnaSliceIt::class),
+        'molliepaypal'          => array('title' => 'PayPal',              'model' => \Mollie\Payment\Application\Model\Payment\PayPal::class),
         'molliepaypalexpress'   => array('title' => 'PayPal Express',   'model' => \Mollie\Payment\Application\Model\Payment\PayPalExpress::class),
-        'molliepaysafecard'     => array('title' => 'Paysafecard',      'model' => \Mollie\Payment\Application\Model\Payment\Paysafecard::class),
-        'molliesofort'          => array('title' => 'Sofort',           'model' => \Mollie\Payment\Application\Model\Payment\Sofort::class),
-        'mollieapplepay'        => array('title' => 'Apple Pay',        'model' => \Mollie\Payment\Application\Model\Payment\ApplePay::class),
-        'mollieprzelewy24'      => array('title' => 'Przelewy24',       'model' => \Mollie\Payment\Application\Model\Payment\Przelewy24::class),
-        'molliemybank'          => array('title' => 'MyBank',           'model' => \Mollie\Payment\Application\Model\Payment\MyBank::class),
-        'molliein3'             => array('title' => 'in3',              'model' => \Mollie\Payment\Application\Model\Payment\In3::class),
-        'molliebillie'          => array('title' => 'Billie',           'model' => \Mollie\Payment\Application\Model\Payment\Billie::class),
+        'molliepaysafecard'     => array('title' => 'Paysafecard',         'model' => \Mollie\Payment\Application\Model\Payment\Paysafecard::class),
+        'molliesofort'          => array('title' => 'Sofort',              'model' => \Mollie\Payment\Application\Model\Payment\Sofort::class),
+        'mollieapplepay'        => array('title' => 'Apple Pay',           'model' => \Mollie\Payment\Application\Model\Payment\ApplePay::class),
+        'mollieprzelewy24'      => array('title' => 'Przelewy24',          'model' => \Mollie\Payment\Application\Model\Payment\Przelewy24::class),
+        'molliemybank'          => array('title' => 'MyBank',              'model' => \Mollie\Payment\Application\Model\Payment\MyBank::class),
+        'molliein3'             => array('title' => 'iDEAL in3',           'model' => \Mollie\Payment\Application\Model\Payment\In3::class),
+        'molliebillie'          => array('title' => 'Billie',              'model' => \Mollie\Payment\Application\Model\Payment\Billie::class),
+        'mollietwint'           => array('title' => 'TWINT',               'model' => \Mollie\Payment\Application\Model\Payment\Twint::class),
+        'mollieblik'            => array('title' => 'BLIK',                'model' => \Mollie\Payment\Application\Model\Payment\Blik::class),
+        'mollietrustly'         => array('title' => 'Trustly',             'model' => \Mollie\Payment\Application\Model\Payment\Trustly::class),
+        'mollieriverty'         => array('title' => 'Riverty',             'model' => \Mollie\Payment\Application\Model\Payment\Riverty::class),
+        'molliebancomatpay'     => array('title' => 'BANCOMAT PAY',        'model' => \Mollie\Payment\Application\Model\Payment\BancomatPay::class),
     );
 
     /**
@@ -155,7 +161,11 @@ class Payment
      */
     public function getMolliePaymentInfo($dAmount = false, $sCurrency = false, $sBillingCountryCode = false)
     {
-        if ($this->aPaymentInfo === null || ($dAmount !== false && $sCurrency !== false)) {
+        $sCacheKey = $dAmount.$sCurrency.$sBillingCountryCode;
+        if (empty($sCacheKey)) {
+            $sCacheKey = 'none';
+        }
+        if (empty($this->aPaymentInfo[$sCacheKey])) {
             $aParams = ['resource' => 'orders', 'includeWallets' => 'applepay'];
             if ($dAmount !== false && $sCurrency !== false) {
                 $aParams['amount[value]'] = number_format($dAmount, 2, '.', '');
@@ -178,9 +188,9 @@ class Payment
             } catch (\Exception $exc) {
                 Logger::logMessage($exc->getMessage());
             }
-            $this->aPaymentInfo = $aPaymentInfo;
+            $this->aPaymentInfo[$sCacheKey] = $aPaymentInfo;
         }
-        return $this->aPaymentInfo;
+        return $this->aPaymentInfo[$sCacheKey];
     }
 
     /**

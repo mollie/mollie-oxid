@@ -4,7 +4,6 @@ namespace Mollie\Payment\Application\Controller\Admin;
 
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
-use Mollie\Payment\Application\Model\Payment\Creditcard;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Payment\Application\Model\RequestLog;
@@ -142,15 +141,14 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         return $this->_sTemplate;
     }
 
-    public function isDirektOrAuthorizedOrder() {
+    /**
+     * @return bool
+     */
+    public function orderNeedsManualCapture() {
         $oOrder = $this->getOrder();
-        if ($oOrder->mollieGetPaymentModel() instanceof Creditcard) {
-            if ($oOrder->mollieIsManualCaptureMethod() === true) {
-                return true;
-            }
-        }
-        return false;
+        return $oOrder->mollieGetPaymentModel()->isManualCaptureNeeded($oOrder);
     }
+
     /**
      * @return mixed
      */
@@ -160,7 +158,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         /** @var \Mollie\Payment\extend\Application\Model\Order $oOrder */
         $oOrder = $this->getOrder();
         try {
-           return $oOrder->getCaptures();
+           return $oOrder->mollieGetCaptures();
         } catch(ApiException $e) {
             $oRequestLog->logExceptionResponse([], $e->getCode(), $e->getMessage(), 'capture', $oOrder->getId(), $this->getConfig()->getShopId());
             $this->setErrorMessage($e->getMessage());
@@ -178,7 +176,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oOrder = $this->getOrder();
         $aParams = $this->getCaptureParams();
         try {
-            $oOrder->captureOrder($aParams);
+            $oOrder->mollieCaptureOrder($aParams);
             $this->_blSuccessCapture = true;
         } catch (ApiException $e) {
             $oRequestLog->logExceptionResponse($aParams, $e->getCode(), $e->getMessage(), 'capture', $oOrder->getId(), $this->getConfig()->getShopId());
@@ -675,6 +673,55 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
+     * Checks if all available costs from the order have been refunded already
+     *
+     * @return bool
+     */
+    protected function isOrderEntityMarkedAsFullyRefunded()
+    {
+        $oOrder = $this->getOrder();
+        if ($oOrder->oxorder__molliedelcostrefunded->value != $oOrder->oxorder__oxdelcost->value ||
+            $oOrder->oxorder__molliepaycostrefunded->value != $oOrder->oxorder__oxpaycost->value ||
+            $oOrder->oxorder__molliewrapcostrefunded->value != $oOrder->oxorder__oxwrapcost->value ||
+            $oOrder->oxorder__molliegiftcardrefunded->value != $oOrder->oxorder__oxgiftcardcost->value ||
+            $oOrder->oxorder__mollievoucherdiscountrefunded->value != $oOrder->oxorder__oxvoucherdiscount->value ||
+            $oOrder->oxorder__molliediscountrefunded->value != $oOrder->oxorder__oxdiscount->value
+        ) {
+            return false;
+        }
+
+        foreach ($oOrder->getOrderArticles() as $oOrderArticle) {
+            if ($oOrderArticle->oxorderarticles__mollieamountrefunded->value != $oOrderArticle->oxorderarticles__oxbrutprice->value) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Return already refunded amount
+     *
+     * @return float
+     */
+    protected function getRefundedAmountFromEntity()
+    {
+        $oOrder = $this->getOrder();
+
+        $dRefunded = 0.0;
+        $dRefunded += $oOrder->oxorder__molliedelcostrefunded->value;
+        $dRefunded += $oOrder->oxorder__molliepaycostrefunded->value;
+        $dRefunded += $oOrder->oxorder__molliewrapcostrefunded->value;
+        $dRefunded += $oOrder->oxorder__molliegiftcardrefunded->value; // maybe negative?
+        $dRefunded += $oOrder->oxorder__mollievoucherdiscountrefunded->value; // maybe negative?
+        $dRefunded += $oOrder->oxorder__molliediscountrefunded->value; // maybe negative?
+
+        foreach ($oOrder->getOrderArticles() as $oOrderArticle) {
+            $dRefunded += $oOrderArticle->oxorderarticles__mollieamountrefunded->value;
+        }
+        return $dRefunded;
+    }
+
+    /**
      * Check Mollie API if order is refundable
      *
      * @return bool
@@ -683,6 +730,10 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     {
         if ($this->wasRefundSuccessful() === true && Registry::getRequest()->getRequestEscapedParameter('fnc') == 'fullRefund') {
             // the mollie order is not updated instantly, so this is used to show that the order was fully refunded already
+            return false;
+        }
+
+        if ($this->isOrderEntityMarkedAsFullyRefunded() === true) {
             return false;
         }
 

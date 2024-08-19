@@ -3,10 +3,17 @@
 namespace Mollie\Payment\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 
-class RequestLog
+class RequestLog extends BaseModel
 {
     public static $sTableName = "mollierequestlog";
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->init(self::$sTableName);
+    }
 
     /**
      * Return create query for module installation
@@ -45,7 +52,7 @@ class RequestLog
      * @param string $sData
      * @return array
      */
-    protected function decodeData($sData)
+    public function decodeData($sData)
     {
         return json_decode($sData, true);
     }

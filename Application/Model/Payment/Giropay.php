@@ -17,4 +17,13 @@ class Giropay extends Base
      * @var string
      */
     protected $sMolliePaymentCode = 'giropay';
+
+    /**
+     * Determines if payment method is deprecated.
+     * Deprecated methods are disabled, can't be used anymore and will be removed in a future release.
+     * They stay in the module to allow finishing old orders where these methods have been used
+     *
+     * @var bool
+     */
+    protected $blMethodIsDeprecated = true;
 }

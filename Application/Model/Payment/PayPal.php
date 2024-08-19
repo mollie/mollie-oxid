@@ -17,4 +17,11 @@ class PayPal extends Base
      * @var string
      */
     protected $sMolliePaymentCode = 'paypal';
+
+    /**
+     * Determines if a shipping address has to be sent every time
+     *
+     * @var bool
+     */
+    protected $blShippingAddressIsMandatory = true;
 }

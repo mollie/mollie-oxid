@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Model\Payment;
 
+use Mollie\Payment\Application\Helper\User;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Application\Model\PaymentConfig;
 use OxidEsales\Eshop\Core\Registry;
@@ -102,6 +103,36 @@ abstract class Base
      * @var bool
      */
     protected $blIsOnlyB2BSupported = false;
+
+    /**
+     * If filled, the payment method will only be shown if one of the allowed currencies is active in checkout
+     *
+     * @var array
+     */
+    protected $aAllowedCurrencies = [];
+
+    /**
+     * Determines if payment has to be captured manually
+     *
+     * @var bool
+     */
+    protected $blNeedsManualCapture = false;
+
+    /**
+     * Determines if a shipping address has to be sent every time
+     *
+     * @var bool
+     */
+    protected $blShippingAddressIsMandatory = false;
+
+    /**
+     * Determines if payment method is deprecated.
+     * Deprecated methods are disabled, can't be used anymore and will be removed in a future release.
+     * They stay in the module to allow finishing old orders where these methods have been used
+     *
+     * @var bool
+     */
+    protected $blMethodIsDeprecated = false;
 
     /**
      * Return Oxid payment id
@@ -404,11 +435,13 @@ abstract class Base
      * Determines if payment method is activated for this Mollie account
      *
      * @param string|false $sBillingCountryCode
+     * @param double|false $dAmount
+     * @param string|false $sCurrency
      * @return bool
      */
-    public function isMolliePaymentActive($sBillingCountryCode = false)
+    public function isMolliePaymentActive($sBillingCountryCode = false, $dAmount = false, $sCurrency = false)
     {
-        $aInfo = Payment::getInstance()->getMolliePaymentInfo(false, false, $sBillingCountryCode);
+        $aInfo = Payment::getInstance()->getMolliePaymentInfo($dAmount, $sCurrency, $sBillingCountryCode);
         if (isset($aInfo[$this->sMolliePaymentCode])) {
             return true;
         }
@@ -416,13 +449,27 @@ abstract class Base
     }
 
     /**
+     * Is used to show in backend if payment method can be used in general
+     * This method has the purpose to be overloaded by child-classes with specific parameters
+     *
+     * @return bool
+     */
+    public function isMolliePaymentActiveInGeneral()
+    {
+        return $this->isMolliePaymentActive();
+    }
+
+    /**
      * Returnes minimum order sum for Mollie payment type to be usable
      *
+     * @param string|false $sBillingCountryCode
+     * @param double|false $dAmount
+     * @param string|false $sCurrency
      * @return object|false
      */
-    public function getMollieFromAmount()
+    public function getMollieFromAmount($sBillingCountryCode = false, $dAmount = false, $sCurrency = false)
     {
-        $aInfo = Payment::getInstance()->getMolliePaymentInfo();
+        $aInfo = Payment::getInstance()->getMolliePaymentInfo($dAmount, $sCurrency, $sBillingCountryCode);
         if (isset($aInfo[$this->sMolliePaymentCode]['minAmount'])) {
             return $aInfo[$this->sMolliePaymentCode]['minAmount'];
         }
@@ -432,11 +479,14 @@ abstract class Base
     /**
      * Returnes maximum order sum for Mollie payment type to be usable
      *
+     * @param string|false $sBillingCountryCode
+     * @param double|false $dAmount
+     * @param string|false $sCurrency
      * @return object|false
      */
-    public function getMollieToAmount()
+    public function getMollieToAmount($sBillingCountryCode = false, $dAmount = false, $sCurrency = false)
     {
-        $aInfo = Payment::getInstance()->getMolliePaymentInfo();
+        $aInfo = Payment::getInstance()->getMolliePaymentInfo($dAmount, $sCurrency, $sBillingCountryCode);
         if (!empty(isset($aInfo[$this->sMolliePaymentCode]['maxAmount']))) {
             return $aInfo[$this->sMolliePaymentCode]['maxAmount'];
         }
@@ -449,14 +499,14 @@ abstract class Base
      * @param double $dBasketBruttoPrice
      * @return bool
      */
-    public function mollieIsBasketSumInLimits($dBasketBruttoPrice)
+    public function mollieIsBasketSumInLimits($dBasketBruttoPrice, $sBillingCountryCode = false, $sCurrency = false)
     {
-        $oFrom = $this->getMollieFromAmount();
+        $oFrom = $this->getMollieFromAmount($sBillingCountryCode, $dBasketBruttoPrice, $sCurrency);
         if ($oFrom && $dBasketBruttoPrice < $oFrom->value) {
             return false;
         }
 
-        $oTo = $this->getMollieToAmount();
+        $oTo = $this->getMollieToAmount($sBillingCountryCode, $dBasketBruttoPrice, $sCurrency);
         if ($oTo && $dBasketBruttoPrice > $oTo->value) {
             return false;
         }
@@ -505,7 +555,18 @@ abstract class Base
             return $sAltLogoUrl;
         }
 
-        $aInfo = Payment::getInstance()->getMolliePaymentInfo();
+        $dAmount = false;
+        $sCurrency = false;
+        $sBillingCountryCode = false;
+
+        $oBasket = Registry::getSession()->getBasket();
+        if ($oBasket) {
+            $dAmount = $oBasket->getPrice()->getBruttoPrice();
+            $sCurrency = $oBasket->getBasketCurrency()->name;
+            $sBillingCountryCode = User::getInstance()->getBillingCountry($oBasket);
+        }
+
+        $aInfo = Payment::getInstance()->getMolliePaymentInfo($dAmount, $sCurrency, $sBillingCountryCode);
         if (isset($aInfo[$this->sMolliePaymentCode])) {
             return $aInfo[$this->sMolliePaymentCode]['pic'];
         }
@@ -537,6 +598,51 @@ abstract class Base
             return $aPaymentConfig[$sParameterName];
         }
         return false;
+    }
+
+    /**
+     * Returns if given currency is allowed for mollie payment method
+     *
+     * @param  string $sCurrency
+     * @return bool
+     */
+    public function isCurrencySupported($sCurrency)
+    {
+        if (!empty($this->aAllowedCurrencies) && !in_array($sCurrency, $this->aAllowedCurrencies)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Returns if payment has to be captured manually
+     *
+     * @param Order $oOrder
+     * @return bool
+     */
+    public function isManualCaptureNeeded(Order $oOrder)
+    {
+        return $this->blNeedsManualCapture;
+    }
+
+    /**
+     * Returns if shipping address has to be sent to Mollie
+     *
+     * @return bool
+     */
+    public function isShippingAddressMandatory()
+    {
+        return $this->blShippingAddressIsMandatory;
+    }
+
+    /**
+     * Returns im this method is deprecated
+     *
+     * @return bool
+     */
+    public function isMethodDeprecated()
+    {
+        return $this->blMethodIsDeprecated;
     }
 
     /**

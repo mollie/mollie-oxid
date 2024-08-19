@@ -652,15 +652,14 @@ class Order extends Order_parent
      * @return Exception|ApiException|Capture|void
      * @throws ApiException
      */
-    public function captureOrder($aParams = null)
+    public function mollieCaptureOrder($aParams = null)
     {
         if ($this->mollieIsMolliePaymentUsed() === true) {
-            $api  = Payment::getInstance()->loadMollieApi($this->oxorder__molliemode->value);
+            $oMollieApi = Payment::getInstance()->loadMollieApi($this->oxorder__molliemode->value);
             if ($aParams === null) {
-                    return $api->paymentCaptures->createForId($this->oxorder__oxtransid->value);
-            } else {
-                    return $api->paymentCaptures->createForId($this->oxorder__oxtransid->value, $aParams);
+                return $oMollieApi->paymentCaptures->createForId($this->oxorder__oxtransid->value);
             }
+            return $oMollieApi->paymentCaptures->createForId($this->oxorder__oxtransid->value, $aParams);
         }
     }
 
@@ -668,10 +667,10 @@ class Order extends Order_parent
      * @return array
      * @throws ApiException
      */
-    public function getCaptures() {
+    public function mollieGetCaptures() {
 
-        $api  = Payment::getInstance()->loadMollieApi($this->oxorder__molliemode->value);
-        $payment = $api->payments->get($this->oxorder__oxtransid->value);
+        $oMollieApi = Payment::getInstance()->loadMollieApi($this->oxorder__molliemode->value);
+        $payment = $oMollieApi->payments->get($this->oxorder__oxtransid->value);
         $captures = $payment->captures();
         $aOrderCaptures = [];
 

@@ -231,6 +231,22 @@ class User
     }
 
     /**
+     * Returns billing country code of current basket
+     *
+     * @param  Basket $oBasket
+     * @return string
+     */
+    public function getBillingCountry($oBasket)
+    {
+        $oUser = $oBasket->getBasketUser();
+
+        $oCountry = oxNew(Country::class);
+        $oCountry->load($oUser->oxuser__oxcountryid->value);
+
+        return $oCountry->oxcountry__oxisoalpha2->value;
+    }
+
+    /**
      * Fills an Oxid Address object with information from Mollie session address
      *
      * @param  $oUser

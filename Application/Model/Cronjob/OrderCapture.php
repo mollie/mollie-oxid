@@ -76,7 +76,7 @@ class OrderCapture extends \Mollie\Payment\Application\Model\Cronjob\Base
                     "currency" => $oOrder->oxorder__oxcurrency->value,
                     "value" => $this->formatPrice($dAmount)
                 ];
-                $result = $oOrder->captureOrder($aParams);
+                $result = $oOrder->mollieCaptureOrder($aParams);
                 if ($result) {
                     $this->outputInfo("Finished Order with ID ".$oOrder->getId());
                     $oOrder->oxorder__molliewascaptured = new Field(1);
