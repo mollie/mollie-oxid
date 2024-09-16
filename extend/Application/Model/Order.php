@@ -432,6 +432,22 @@ class Order extends Order_parent
     }
 
     /**
+     * Populates article property in Basketitems without checking stock because this has already been done before redirect
+     * Only allowed in return mode
+     *
+     * @param Basket $oBasket
+     * @return void
+     */
+    protected function molliePopulateBasketItems($oBasket)
+    {
+        if ($this->blMollieFinalizeReturnMode === true) {
+            foreach ($oBasket->getContents() as $key => $oContent) {
+                $oProd = $oContent->getArticle(false);
+            }
+        }
+    }
+
+    /**
      * Extension: Order already existing because order was created before the user was redirected to mollie,
      * therefore no stock validation needed. Otherwise an exception would be thrown on return when last product in stock was bought
      *
@@ -441,6 +457,9 @@ class Order extends Order_parent
     {
         if ($this->blMollieFinalizeReturnMode === false) {
             return parent::validateStock($oBasket);
+        } else {
+            // populates articles property in basketitem objects like parent::validateStock would do but without checking stock
+            $this->molliePopulateBasketItems($oBasket);
         }
     }
 
