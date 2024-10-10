@@ -54,8 +54,8 @@ class Base
         $this->iShopId = $iShopId;
 
         $oCronjob = Cronjob::getInstance();
-        if ($this->getCronjobId() !== null && $oCronjob->isCronjobAlreadyExisting($this->getCronjobId()) === false) {
-            $oCronjob->addNewCronjob($this->getCronjobId(), $this->getDefaultMinuteInterval());
+        if ($this->getCronjobId() !== null && $oCronjob->isCronjobAlreadyExisting($this->getCronjobId(), $this->getShopId()) === false) {
+            $oCronjob->addNewCronjob($this->getCronjobId(), $this->getDefaultMinuteInterval(), $this->getShopId());
         }
         $this->loadDbData();
     }
@@ -67,7 +67,7 @@ class Base
      */
     protected function loadDbData()
     {
-        $this->aDbData = Cronjob::getInstance()->getCronjobData($this->getCronjobId());
+        $this->aDbData = Cronjob::getInstance()->getCronjobData($this->getCronjobId(), $this->getShopId());
     }
 
     /**
@@ -182,7 +182,7 @@ class Base
      */
     protected function finishCronjob($blResult, $sError = false)
     {
-        Cronjob::getInstance()->markCronjobAsFinished($this->getCronjobId());
+        Cronjob::getInstance()->markCronjobAsFinished($this->getCronjobId(), $this->getShopId());
         if ($blResult === false) {
             Logger::logMessage('Cron "'.$this->getCronjobId().'" failed'.($sError !== false ? " (Error: ".$sError.")" : ""), getShopBasePath().'/log/'.$this->sLogFileName);
         }

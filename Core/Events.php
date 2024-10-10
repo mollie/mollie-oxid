@@ -256,6 +256,9 @@ class Events
         self::addColumnIfNotExists('oxorder', 'MOLLIESHIPMENTHASBEENMARKED', "ALTER TABLE `oxorder` ADD COLUMN `MOLLIESHIPMENTHASBEENMARKED` tinyint(1) UNSIGNED NOT NULL DEFAULT  '0';", $aShipmentSentQuery);
 
         self::addColumnIfNotExists('oxuser', 'MOLLIECUSTOMERID', "ALTER TABLE `oxuser` ADD COLUMN `MOLLIECUSTOMERID` VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '' NOT NULL;");
+
+        $aCronjobShopIdFollowup = ["ALTER TABLE `molliecronjob` DROP PRIMARY KEY, ADD PRIMARY KEY (`OXID`, `OXSHOPID`) USING BTREE;"];
+        self::addColumnIfNotExists('molliecronjob', 'OXSHOPID', "ALTER TABLE `molliecronjob` ADD `OXSHOPID` INT(11) NOT NULL DEFAULT '1' AFTER `OXID`;", $aCronjobShopIdFollowup);
     }
 
     /**
