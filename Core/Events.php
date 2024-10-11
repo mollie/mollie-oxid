@@ -46,6 +46,15 @@ class Events
         'molliebitcoin',
         'mollieinghomepay',
     ];
+    
+    /**
+     * List of all payment methods to rename
+     *
+     * @var array
+     */
+    public static $aRenamePaymentMethods = [
+        'molliein3' => 'iDeal in3',
+    ];
 
     /**
      * Execute action on activate event.
@@ -57,6 +66,7 @@ class Events
         self::executeModuleMigrations();
         self::addData();
         self::deleteRemovedPaymentMethods();
+        self::renamePaymentMethods();
         self::regenerateViews();
         self::clearTmp();
     }
@@ -192,6 +202,30 @@ class Events
     {
         DatabaseProvider::getDb()->Execute("DELETE FROM oxpayments WHERE oxid = ?", [$sPaymentId]);
         DatabaseProvider::getDb()->Execute("DELETE FROM ".PaymentConfig::$sTableName." WHERE oxid = ?", [$sPaymentId]);
+    }
+    
+    /**
+     * Rename payment methods
+     *
+     * @return void
+     */
+    protected static function renamePaymentMethods()
+    {
+        foreach (self::$aRenamePaymentMethods as $sPaymentId => $sNewPaymentName) {
+            self::renamePaymentMethod($sPaymentId, $sNewPaymentName);
+        }
+    }
+
+    /**
+     * Rename payment method in database
+     *
+     * @param  string $sPaymentId
+     * @param string $sNewPaymentName
+     * @return void
+     */
+    protected static function renamePaymentMethod($sPaymentId, $sNewPaymentName)
+    {
+        DatabaseProvider::getDb()->Execute("UPDATE oxpayments SET oxdesc = ? WHERE oxid = ?", [$sNewPaymentName, $sPaymentId]);
     }
 
     /**
