@@ -6,7 +6,7 @@ use Doctrine\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 
-class BaseMigration extends AbstractMigration
+abstract class BaseMigration extends AbstractMigration
 {
     protected function createTableIfNotExists(Schema $oSchema, $sTableName, $sCreateSql): bool
     {
