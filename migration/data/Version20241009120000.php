@@ -53,32 +53,24 @@ class Version20241009120000 extends BaseMigration
      */
     protected function addNewColumns(Schema $schema): void
     {
-        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEDELCOSTREFUNDED', Types::FLOAT, ['columnDefinition' => 'NOT NULL', 'default' => 1]);
-        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEPAYCOSTREFUNDED', Types::FLOAT, ['columnDefinition' => 'NOT NULL', 'default' => 1]);
-        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEWRAPCOSTREFUNDED', Types::FLOAT, ['columnDefinition' => 'NOT NULL', 'default' => 1]);
-        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEGIFTCARDREFUNDED', Types::FLOAT, ['columnDefinition' => 'NOT NULL', 'default' => 1]);
-        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEWASCAPTURED', Types::FLOAT, ['columnDefinition' => 'NOT NULL', 'default' => 1]);
-        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEVOUCHERDISCOUNTREFUNDED', Types::FLOAT, ['columnDefinition' => 'NOT NULL', 'default' => 1]);
-        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEDISCOUNTREFUNDED', Types::FLOAT, ['columnDefinition' => 'NOT NULL', 'default' => 1]);
+        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEDELCOSTREFUNDED', Types::FLOAT, ['columnDefinition' => 'DOUBLE NOT NULL', 'default' => 1]);
+        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEPAYCOSTREFUNDED', Types::FLOAT, ['columnDefinition' => 'DOUBLE NOT NULL', 'default' => 1]);
+        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEWRAPCOSTREFUNDED', Types::FLOAT, ['columnDefinition' => 'DOUBLE NOT NULL', 'default' => 1]);
+        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEGIFTCARDREFUNDED', Types::FLOAT, ['columnDefinition' => 'DOUBLE NOT NULL', 'default' => 1]);
+        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEWASCAPTURED', Types::FLOAT, ['columnDefinition' => 'DOUBLE NOT NULL', 'default' => 1]);
+        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEVOUCHERDISCOUNTREFUNDED', Types::FLOAT, ['columnDefinition' => 'DOUBLE NOT NULL', 'default' => 1]);
+        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEDISCOUNTREFUNDED', Types::FLOAT, ['columnDefinition' => 'DOUBLE NOT NULL', 'default' => 1]);
         $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEMODE', Types::STRING, ['columnDefinition' => 'VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci NOT NULL', 'default' => '0']);
-        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIESECONDCHANCEMAILSENT', Types::DATETIME_MUTABLE, ['columnDefinition' => 'NOT NULL', 'default' => '0000-00-00 00:00:00']);
+        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIESECONDCHANCEMAILSENT', Types::DATETIME_MUTABLE, ['columnDefinition' => 'datetime NOT NULL', 'default' => '0000-00-00 00:00:00']);
         $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEEXTERNALTRANSID', Types::STRING, ['columnDefinition' => 'VARCHAR(64) CHARSET utf8 COLLATE utf8_general_ci NOT NULL', 'default' => '']);
         $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIECAPTUREMETHOD', Types::STRING, ['columnDefinition' => 'VARCHAR(64) CHARSET utf8 COLLATE utf8_general_ci NOT NULL', 'default' => '']);
         $this->addColumnIfNotExists($schema, 'oxorderarticles', 'MOLLIEQUANTITYREFUNDED', Types::INTEGER, ['columnDefinition' => 'INT(11) NOT NULL', 'default' => 0]);
-        $this->addColumnIfNotExists($schema, 'oxorderarticles', 'MOLLIEAMOUNTREFUNDED', Types::FLOAT, ['columnDefinition' => 'NOT NULL', 'default' => 0]);
+        $this->addColumnIfNotExists($schema, 'oxorderarticles', 'MOLLIEAMOUNTREFUNDED', Types::FLOAT, ['columnDefinition' => 'DOUBLE NOT NULL', 'default' => 0]);
 
-        $aNewColumnDataQueriesMollieApi = [
-            "UPDATE `oxorder` SET mollieapi = 'payment' WHERE oxpaymenttype LIKE 'mollie%' AND oxtransid LIKE 'tr_%'",
-            "UPDATE `oxorder` SET mollieapi = 'order' WHERE oxpaymenttype LIKE 'mollie%' AND oxtransid LIKE 'ord_%'",
-        ];
-        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEAPI', Types::STRING, ['columnDefinition' => 'VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci NOT NULL', 'default' => ''], $aNewColumnDataQueriesMollieApi);
+        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEAPI', Types::STRING, ['columnDefinition' => 'VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci NOT NULL', 'default' => '']);
 
-        $aShipmentSentQuery = ["UPDATE `oxorder` SET MOLLIESHIPMENTHASBEENMARKED = 1 WHERE oxpaymenttype LIKE 'mollie%' AND oxsenddate > '1970-01-01 00:00:01';"];
-        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIESHIPMENTHASBEENMARKED', Types::SMALLINT, ['columnDefinition' => 'tinyint(1) UNSIGNED NOT NULL', 'default' => 0], $aShipmentSentQuery);
+        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIESHIPMENTHASBEENMARKED', Types::SMALLINT, ['columnDefinition' => 'tinyint(1) UNSIGNED NOT NULL', 'default' => 0]);
 
         $this->addColumnIfNotExists($schema, 'oxuser', 'MOLLIECUSTOMERID', Types::STRING, ['columnDefinition' => 'VARCHAR(32) CHARSET utf8 COLLATE utf8_general_ci NOT NULL', 'default' => '']);
-
-        $aCronjobShopIdFollowup = ["ALTER TABLE `molliecronjob` DROP PRIMARY KEY, ADD PRIMARY KEY (`OXID`, `OXSHOPID`) USING BTREE;"];
-        $this->addColumnBySqlIfNotExists($schema, 'molliecronjob', 'OXSHOPID', "ALTER TABLE `molliecronjob` ADD `OXSHOPID` INT(11) NOT NULL DEFAULT '1' AFTER `OXID`;", $aCronjobShopIdFollowup);
     }
 }
