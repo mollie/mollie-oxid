@@ -776,6 +776,10 @@ class Order extends Order_parent
         $this->blMollieFinalizeReturnMode = true;
         $this->blMollieFinishOrderReturnMode = true;
 
+        foreach ($oBasket->getContents() as $item) {
+            $item->mollieUnsetArticle();
+        }
+
         //finalizing order (skipping payment execution, vouchers marking and mail sending)
         return $this->finalizeOrder($oBasket, $this->getOrderUser());
     }
