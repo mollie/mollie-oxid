@@ -98,6 +98,7 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
         \OxidEsales\Eshop\Application\Model\OrderArticle::class => Mollie\Payment\extend\Application\Model\OrderArticle::class,
         \OxidEsales\Eshop\Application\Model\Payment::class => Mollie\Payment\extend\Application\Model\Payment::class,
         \OxidEsales\Eshop\Application\Model\User::class => Mollie\Payment\extend\Application\Model\User::class,
+        \OxidEsales\Eshop\Application\Model\BasketItem::class => Mollie\Payment\extend\Application\Model\BasketItem::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleConfiguration::class => Mollie\Payment\extend\Application\Controller\Admin\ModuleConfiguration::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ModuleMain::class => Mollie\Payment\extend\Application\Controller\Admin\ModuleMain::class,
         \OxidEsales\Eshop\Application\Controller\Admin\PaymentMain::class => Mollie\Payment\extend\Application\Controller\Admin\PaymentMain::class,

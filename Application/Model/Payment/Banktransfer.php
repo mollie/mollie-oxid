@@ -54,7 +54,7 @@ class Banktransfer extends Base
             'dueDate' => $this->getDueDate(),
         ];
         if ($this->getApiMethod() == 'order') {
-            $aParams = []; // existance of billingEmail param in OrderAPI triggers error
+            unset($aParams['billingEmail']); // existance of billingEmail param in OrderAPI triggers error
         }
         return $aParams;
     }
