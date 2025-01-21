@@ -27,7 +27,7 @@ class MollieWebhook extends FrontendController
         $sTransactionId = Registry::getRequest()->getRequestParameter('id');
         if (!empty($sTransactionId)) {
             $oOrder = oxNew(Order::class);
-            if ($oOrder->mollieLoadOrderByTransactionId($sTransactionId) === true) {
+            if ($oOrder->mollieLoadOrderByTransactionId($sTransactionId) === true && $oOrder->mollieOrderIsWebhookReady() === true) {
                 $oOrder->mollieGetPaymentModel()->getTransactionHandler($oOrder)->processTransaction($oOrder);
             } else {
                 // Throw HTTP error when order not found, this will trigger Mollie to retry sending the status

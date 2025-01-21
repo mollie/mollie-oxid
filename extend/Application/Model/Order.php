@@ -511,13 +511,88 @@ class Order extends Order_parent
     public function finalizeOrder(Basket $oBasket, $oUser, $blRecalculatingOrder = false)
     {
         $this->mollieRecalculateOrder = $blRecalculatingOrder;
-        if (PaymentHelper::getInstance()->isMolliePaymentMethod($oBasket->getPaymentId()) === true && $this->mollieIsReturnAfterPayment() === true) {
-            $this->blMollieFinalizeReturnMode = true;
+        if (PaymentHelper::getInstance()->isMolliePaymentMethod($oBasket->getPaymentId()) === true) {
+            $this->mollieSetOrderIsLocked(1, $blRecalculatingOrder);
+            if ($this->mollieIsReturnAfterPayment() === true) {
+                $this->blMollieFinalizeReturnMode = true;
+            }
         }
         if (Registry::getSession()->getVariable('mollieReinitializePaymentMode')) {
             $this->blMollieReinitializePaymentMode = true;
         }
         return parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
+    }
+
+    /**
+     * Send order to shop owner and user
+     *
+     * Overload: _sendOrderByEmail is the very last action in finalizeOrder.
+     *           Using it to append an action there and making sure that finalizeOrder went all the way through
+     *
+     * @param \OxidEsales\Eshop\Application\Model\User        $oUser    order user
+     * @param \OxidEsales\Eshop\Application\Model\Basket      $oBasket  current order basket
+     * @param \OxidEsales\Eshop\Application\Model\UserPayment $oPayment order payment
+     *
+     * @return bool
+     */
+    protected function _sendOrderByEmail($oUser = null, $oBasket = null, $oPayment = null)
+    {
+        $blParentReturn = parent::_sendOrderByEmail($oUser, $oBasket, $oPayment);
+        $this->mollieHandleOrderFinished();
+        return $blParentReturn;
+    }
+
+    /**
+     * Method for tasks that need to be done when the order is finished all the way
+     *
+     * @return void
+     */
+    protected function mollieHandleOrderFinished()
+    {
+        $this->mollieSetOrderIsLocked(0);
+    }
+
+    /**
+     * Sets locked status
+     *
+     * @param  int  $iLockedStatus
+     * @param  bool $blRecalculatingOrder
+     * @return void
+     */
+    protected function mollieSetOrderIsLocked($iLockedStatus, $blRecalculatingOrder = false)
+    {
+        if ($blRecalculatingOrder === false) {
+            $sQuery = "UPDATE oxorder SET mollieorderislocked = ? WHERE oxid = ?";
+            DatabaseProvider::getDb()->Execute($sQuery, [$iLockedStatus, $this->getId()]);
+
+            $this->oxorder__mollieorderislocked = new Field($iLockedStatus);
+        }
+    }
+
+    /**
+     * Determines if the Mollie webhook may access the order
+     * Since Mollie sends a webhook instantly when a payment is done this can lead to problems with
+     * finalizeOrder() AND webhook changing order status at the same time and information getting lost
+     *
+     * @return bool
+     */
+    public function mollieOrderIsWebhookReady()
+    {
+        // NOT_FINISHED orders are probably still in process and should not be changed by the webhook
+        // Allowing webhook access after a certain timegap to not lockout the order of status changes, assuming something went wrong
+        $iNotFinishedTimegap = (60 * 10); // 10 minutes
+        if ($this->oxorder__oxtransstatus->value == "NOT_FINISHED" && (strtotime($this->oxorder__oxorderdate->value) > (time() - $iNotFinishedTimegap))) {
+            return false;
+        }
+
+        // Orders are set to locked = 1 when a Mollie payment order reaches the finalizeOrder step and is set back to locked = 0 when finalizeOrder is done
+        // Allowing webhook access after a certain timegap to not lockout the order of status changes, assuming something went wrong
+        $iLockedTimegap = (60 * 10); // 10 minutes
+        if ($this->oxorder__mollieorderislocked->value == 1 && (strtotime($this->oxorder__oxorderdate->value) > (time() - $iLockedTimegap))) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
