@@ -67,11 +67,11 @@ abstract class Base
      */
     public function processTransaction(Order $oOrder, $sType = 'webhook')
     {
-        /** @var PaymentBase $oPaymentModel */
-        $oPaymentModel = $oOrder->mollieGetPaymentModel();
-
         try {
-            $oTransaction = $oPaymentModel->getApiEndpointByOrder($oOrder)->get($oOrder->oxorder__oxtransid->value, ["embed" => "payments"]);
+            $oTransaction = $oOrder->mollieGetTransaction();
+            if (empty($oTransaction)) {
+                throw new \Exception('Could not get transaction');
+            }
 
             $aResult = $this->handleTransactionStatus($oTransaction, $oOrder, $sType);
         } catch(\Exception $exc) {

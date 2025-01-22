@@ -67,6 +67,24 @@ class Order extends Order_parent
     protected $mollieRecalculateOrder = null;
 
     /**
+     * Property to store the Mollie transaction in the order object
+     *
+     * @var object
+     */
+    protected $mollieTransaction = null;
+
+    /**
+     * Array with every status that allows instant access for the webhook
+     *
+     * @var array
+     */
+    protected $mollieInstantWebhookStatusWhitelist = [
+        'failed',
+        'canceled',
+        'expired',
+    ];
+
+    /**
      * Used to trigger the _setNumber() method before the payment-process during finalizeOrder to have the order-number there already
      *
      * @return void
@@ -578,6 +596,11 @@ class Order extends Order_parent
      */
     public function mollieOrderIsWebhookReady()
     {
+        // Every status in $this->mollieInstantWebhookStatusWhitelist may be handled instantly since these don't go through finalizeOrder
+        if (in_array($this->mollieGetTransactionStatus(), $this->mollieInstantWebhookStatusWhitelist) === true) {
+            return true;
+        }
+
         // NOT_FINISHED orders are probably still in process and should not be changed by the webhook
         // Allowing webhook access after a certain timegap to not lockout the order of status changes, assuming something went wrong
         $iNotFinishedTimegap = (60 * 10); // 10 minutes
@@ -593,6 +616,38 @@ class Order extends Order_parent
         }
 
         return true;
+    }
+
+    /**
+     * Returns mollie transaction
+     *
+     * @return object|false
+     */
+    public function mollieGetTransaction()
+    {
+        if ($this->mollieTransaction === null) {
+            $oPaymentModel = $this->mollieGetPaymentModel();
+            try {
+                $this->mollieTransaction = $oPaymentModel->getApiEndpointByOrder($this)->get($this->oxorder__oxtransid->value, ["embed" => "payments"]);
+            } catch(\Exception $exc) {
+                $this->mollieTransaction = false;
+            }
+        }
+        return $this->mollieTransaction;
+    }
+
+    /**
+     * Returns transaction status
+     *
+     * @return string
+     */
+    public function mollieGetTransactionStatus()
+    {
+        $oTransaction = $this->mollieGetTransaction();
+        if (!empty($oTransaction) && !empty($oTransaction->status)) {
+            return $oTransaction->status;
+        }
+        return 'error';
     }
 
     /**
