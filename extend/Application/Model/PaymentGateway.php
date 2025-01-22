@@ -37,7 +37,7 @@ class PaymentGateway extends PaymentGateway_parent
         if(!PaymentHelper::getInstance()->isMolliePaymentMethod($oOrder->oxorder__oxpaymenttype->value)) {
             return parent::executePayment($dAmount, $oOrder);
         }
-        return $this->handleMolliePayment($oOrder, $dAmount);;
+        return $this->handleMolliePayment($oOrder, $dAmount);
     }
 
     /**
