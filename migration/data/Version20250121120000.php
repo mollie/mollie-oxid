@@ -35,6 +35,6 @@ class Version20250121120000 extends BaseMigration
      */
     protected function addNewColumns(Schema $schema): void
     {
-        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEORDERISLOCKED', Types::SMALLINT, ['columnDefinition' => 'tinyint(1) UNSIGNED NOT NULL', 'default' => 0]);
+        $this->addColumnIfNotExists($schema, 'oxorder', 'MOLLIEORDERISLOCKED', Types::SMALLINT, ['columnDefinition' => 'tinyint(1) UNSIGNED NOT NULL DEFAULT 0', 'default' => 0]);
     }
 }
