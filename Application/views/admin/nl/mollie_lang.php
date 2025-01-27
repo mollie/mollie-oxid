@@ -92,6 +92,7 @@ $aLang = array(
     'MOLLIE_REFUND_FREE_3'                              => 'terugbetaald. Resterend restitueerbaar bedrag',
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'Deze bestelling is al volledig terugbetaald',
     'MOLLIE_NOT_YET_PAID'                               => 'Deze bestelling is nog niet gemarkeerd als betaald en kan daarom nog niet worden terugbetaald.',
+    'MOLLIE_TRANSACTION_NOT_USABLE'                     => 'Er is een fout opgetreden bij deze bestelling. Er bestaat geen geldige Mollie-transactie-ID.',
     'MOLLIE_REFUND_REMAINING'                           => 'Betaal resterend bedrag terug',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'Deze bestelling is inclusief vouchers of korting. Die kunnen niet gedeeltelijk worden terugbetaald. Ze moeten worden afgehandeld met de volledige of resterende terugbetaling',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Creditcard data',

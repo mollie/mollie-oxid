@@ -91,6 +91,7 @@ $aLang = array(
     'MOLLIE_REFUND_FREE_3'                              => 'sono già stati rimborsati. Importo rimborsabile residuo',
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'Questo ordine è già stato rimborsato completamente.',
     'MOLLIE_NOT_YET_PAID'                               => 'Questo ordine non è ancora contrassegnato come pagato e pertanto non può ancora essere rimborsato.',
+    'MOLLIE_TRANSACTION_NOT_USABLE'                     => 'Si è verificato un errore con questo ordine. Non esiste un ID di transazione Mollie valido.',
     'MOLLIE_REFUND_REMAINING'                           => 'Importo rimanente del rimborso',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'Questo ordine include voucher o sconti. Questi non possono essere rimborsati parzialmente, devono essere gestiti con il rimborso totale o residuo.',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Dati della carta di credito',

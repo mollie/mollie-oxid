@@ -92,6 +92,7 @@ $aLang = array(
     'MOLLIE_REFUND_FREE_3'                              => 'a déjà été remboursé. Montant remboursable restant',
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'Cette commande a déjà été intégralement remboursée.',
     'MOLLIE_NOT_YET_PAID'                               => 'Cette commande n\'est pas encore marquée comme payée et ne peut donc pas encore être remboursée.',
+    'MOLLIE_TRANSACTION_NOT_USABLE'                     => 'Une erreur est survenue avec cette commande. Il n\'existe pas d\'ID de transaction Mollie valide.',
     'MOLLIE_REFUND_REMAINING'                           => 'Rembourser la somme restante',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'Cette commande comprend des coupons ou des rabais. Ceux-ci ne peuvent pas être remboursés partiellement, ils doivent être traités via le remboursement total ou restant.',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Données de carte de crédit',

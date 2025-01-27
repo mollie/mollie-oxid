@@ -91,6 +91,7 @@ $aLang = array(
     'MOLLIE_REFUND_FREE_3'                              => 'ya han sido reembolsados. Importe reembolsable restante',
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'Este pedido ya ha sido reembolsado por completo.',
     'MOLLIE_NOT_YET_PAID'                               => 'Este pedido aún no está marcado como pagado y, por lo tanto, aún no se puede reembolsar.',
+    'MOLLIE_TRANSACTION_NOT_USABLE'                     => 'Ha ocurrido un error con este pedido. No existe una ID de transacción de Mollie válida.',
     'MOLLIE_REFUND_REMAINING'                           => 'Reembolso de la suma restante',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'Este pedido incluye vales o descuentos. Estos no pueden ser reembolsados parcialmente, sino que deben ser gestionados con el reembolso total o restante.',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Datos de la tarjeta de crédito',

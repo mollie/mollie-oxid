@@ -739,10 +739,23 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
 
         $oApiOrder = $this->getMollieApiOrder();
 
-        if (empty($oApiOrder->amountRefunded) || $oApiOrder->amountRefunded->value != $oApiOrder->amount->value) {
+        if ($oApiOrder !== null && (empty($oApiOrder->amountRefunded) || $oApiOrder->amountRefunded->value != $oApiOrder->amount->value)) {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Checks if a usable Mollie transaction was returned from Mollie
+     *
+     * @return bool
+     */
+    public function isTransactionUsable()
+    {
+        if ($this->getMollieApiOrder() === null) {
+            return false;
+        }
+        return true;
     }
 
     /**
