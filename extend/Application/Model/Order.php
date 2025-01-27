@@ -971,11 +971,13 @@ class Order extends Order_parent
             return $this->oxorder__oxtransid->value;
         }
 
-        $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpointByOrder($this);
-        $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value, ["embed" => "payments"]);
-        if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order && !empty($oMollieApiOrder->_embedded) && !empty($oMollieApiOrder->_embedded->payments)) {
-            $oPayment = array_shift($oMollieApiOrder->_embedded->payments);
-            return $oPayment->id;
+        if (!empty($this->oxorder__oxtransid->value)) {
+            $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpointByOrder($this);
+            $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value, ["embed" => "payments"]);
+            if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order && !empty($oMollieApiOrder->_embedded) && !empty($oMollieApiOrder->_embedded->payments)) {
+                $oPayment = array_shift($oMollieApiOrder->_embedded->payments);
+                return $oPayment->id;
+            }
         }
         return false;
     }

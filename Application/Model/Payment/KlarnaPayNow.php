@@ -24,11 +24,4 @@ class KlarnaPayNow extends Base
      * @var bool
      */
     protected $blIsOnlyOrderApiSupported = true;
-
-    /**
-     * Determines if the payment methods supports the order expiry mechanism
-     *
-     * @var bool
-     */
-    protected $blIsOrderExpirySupported = false;
 }
