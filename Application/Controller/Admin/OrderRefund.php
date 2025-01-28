@@ -174,12 +174,13 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     public function captureOrder()
     {
         $oRequestLog = oxNew(RequestLog::class);
+        $aParams = [];
         $oOrder = $this->getOrder();
-        $aParams = $this->getCaptureParams();
         try {
+            $aParams = $this->getCaptureParams();
             $oOrder->mollieCaptureOrder($aParams);
             $this->_blSuccessCapture = true;
-        } catch (ApiException $e) {
+        } catch (\Exception $e) {
             $oRequestLog->logExceptionResponse($aParams, $e->getCode(), $e->getMessage(), 'capture', $oOrder->getId(), $this->getConfig()->getShopId());
             $this->setErrorMessage($e->getMessage());
             $this->_blSuccessCapture = false;
@@ -574,12 +575,13 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function freeRefund()
     {
-        $dFreeAmount = Registry::getRequest()->getRequestEscapedParameter('free_amount');
-        $dFreeAmount = OrderHelper::getInstance()->fixPrice($dFreeAmount);
-        $aParams = $this->getRefundParameters(false, $dFreeAmount);
-
         $oRequestLog = oxNew(RequestLog::class);
+        $aParams = [];
         try {
+            $dFreeAmount = Registry::getRequest()->getRequestEscapedParameter('free_amount');
+            $dFreeAmount = OrderHelper::getInstance()->fixPrice($dFreeAmount);
+            $aParams = $this->getRefundParameters(false, $dFreeAmount);
+
             $oPaymentTransaction = $this->getMolliePaymentTransaction();
 
             $oResponse = $oPaymentTransaction->refund($aParams);
@@ -600,10 +602,11 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function fullRefund()
     {
-        $aParams = $this->getRefundParameters();
-
         $oRequestLog = oxNew(RequestLog::class);
+        $aParams = [];
         try {
+            $aParams = $this->getRefundParameters();
+
             $oMollieApiOrder = $this->getMollieApiOrder();
             if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment) {
                 $oResponse = $oMollieApiOrder->refund($aParams);
@@ -628,13 +631,15 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function partialRefund()
     {
-        $aParams = $this->getRefundParameters(false);
-        if (empty($aParams['lines'])) {
-            $this->setErrorMessage('Lines array is empty - something went wrong!');
-            return;
-        }
         $oRequestLog = oxNew(RequestLog::class);
+        $aParams = [];
         try {
+            $aParams = $this->getRefundParameters(false);
+            if (empty($aParams['lines'])) {
+                $this->setErrorMessage('Lines array is empty - something went wrong!');
+                return;
+            }
+
             $oMollieApiOrder = $this->getMollieApiOrder();
             if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order && $this->hasHadFreeAmountRefund() === false) {
                 unset($aParams['amount']);

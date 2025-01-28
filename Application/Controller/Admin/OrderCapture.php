@@ -379,12 +379,13 @@ class OrderCapture extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     public function freeRefund()
     {
-        $dFreeAmount = Registry::getRequest()->getRequestEscapedParameter('free_amount');
-        $dFreeAmount = OrderHelper::getInstance()->fixPrice($dFreeAmount);
-        $aParams = $this->getRefundParameters(false, $dFreeAmount);
-
         $oRequestLog = oxNew(RequestLog::class);
+        $aParams = [];
         try {
+            $dFreeAmount = Registry::getRequest()->getRequestEscapedParameter('free_amount');
+            $dFreeAmount = OrderHelper::getInstance()->fixPrice($dFreeAmount);
+            $aParams = $this->getRefundParameters(false, $dFreeAmount);
+
             $oPaymentTransaction = $this->getMolliePaymentTransaction();
 
             $oResponse = $oPaymentTransaction->refund($aParams);
