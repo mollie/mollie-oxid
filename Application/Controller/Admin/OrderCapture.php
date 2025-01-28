@@ -4,6 +4,7 @@ namespace Mollie\Payment\Application\Controller\Admin;
 
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
+use Mollie\Payment\Application\Helper\Order as OrderHelper;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Payment\Application\Model\RequestLog;
@@ -379,7 +380,7 @@ class OrderCapture extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     public function freeRefund()
     {
         $dFreeAmount = Registry::getRequest()->getRequestEscapedParameter('free_amount');
-        $dFreeAmount = str_replace(',', '.', $dFreeAmount);
+        $dFreeAmount = OrderHelper::getInstance()->fixPrice($dFreeAmount);
         $aParams = $this->getRefundParameters(false, $dFreeAmount);
 
         $oRequestLog = oxNew(RequestLog::class);

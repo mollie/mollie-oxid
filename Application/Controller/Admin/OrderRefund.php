@@ -4,6 +4,7 @@ namespace Mollie\Payment\Application\Controller\Admin;
 
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
+use Mollie\Payment\Application\Helper\Order as OrderHelper;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Payment\Application\Model\RequestLog;
@@ -191,7 +192,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     protected function getCaptureParams()
     {
        $amount =  Registry::getRequest()->getRequestParameter('capture_partial');
-       $amount = str_replace(',', '.', $amount);
+       $amount = OrderHelper::getInstance()->fixPrice($amount);
        if (!empty($amount)) {
            $dAmount = $this->formatPrice($amount);
        }
@@ -265,7 +266,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $aRefundItems = Registry::getRequest()->getRequestEscapedParameter('aOrderArticles');
         foreach ($aRefundItems as $sKey => $aRefundItem) {
             foreach ($aRefundItem as $sItemKey => $item) {
-                $aRefundItem[$sItemKey] = str_replace(',', '.', $aRefundItem[$sItemKey]);
+                $aRefundItem[$sItemKey] = OrderHelper::getInstance()->fixPrice($aRefundItem[$sItemKey]);
             }
             if (isset($aRefundItem[$sSelectKey])) {
                 $dValue = $aRefundItem[$sSelectKey];
@@ -574,7 +575,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     public function freeRefund()
     {
         $dFreeAmount = Registry::getRequest()->getRequestEscapedParameter('free_amount');
-        $dFreeAmount = str_replace(',', '.', $dFreeAmount);
+        $dFreeAmount = OrderHelper::getInstance()->fixPrice($dFreeAmount);
         $aParams = $this->getRefundParameters(false, $dFreeAmount);
 
         $oRequestLog = oxNew(RequestLog::class);

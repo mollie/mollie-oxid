@@ -42,4 +42,21 @@ class Order
         }
         Registry::getSession()->deleteVariable('sess_challenge');
     }
+
+
+    /**
+     * Fix usual string representation to a workable float value
+     *
+     * @param string $sPrice
+     * @return string
+     */
+    public function fixPrice($sPrice)
+    {
+        $iPosComma = strpos($sPrice, ",");
+        $iPosPoint = strpos($sPrice, ".");
+        if ($iPosPoint !== false && $iPosComma !== false && $iPosPoint < $iPosComma) {
+            $sPrice = str_replace('.', '', $sPrice); // Assuming  a price like "1.499,95" - fix it to "1499,95"
+        }
+        return str_replace(',', '.', $sPrice); // Fix price from "1499,95" to "1499.95"
+    }
 }
