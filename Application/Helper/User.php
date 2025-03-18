@@ -53,7 +53,7 @@ class User
         return array(
             'street' => isset($aMatch[1]) ? $aMatch[1] : $aStreet[0],
             'number' => isset($aMatch[2]) ? $aMatch[2] : '',
-            'addinfo' => !empty($aStreet) ? implode($aStreet, ' ') : '',
+            'addinfo' => !empty($aStreet) ? implode(' ', $aStreet) : '',
         );
     }
 
@@ -216,8 +216,10 @@ class User
      */
     protected function getUserIdByEmail($sApplePayEmail)
     {
-        $sQuery = "SELECT oxid FROM oxuser WHERE oxusername = ? LIMIT 1";
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQuery, array($sApplePayEmail));
+        $sShopId = Registry::getConfig()->getShopId();
+
+        $sQuery = "SELECT oxid FROM oxuser WHERE oxusername = ? AND oxshopid = ? LIMIT 1";
+        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQuery, [$sApplePayEmail, $sShopId]);
     }
 
     /**
