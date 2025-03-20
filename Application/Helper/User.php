@@ -341,8 +341,10 @@ class User
      */
     protected function getUserIdByEmail($sApplePayEmail)
     {
-        $sQuery = "SELECT oxid FROM oxuser WHERE oxusername = ? LIMIT 1";
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQuery, array($sApplePayEmail));
+        $sShopId = Registry::getConfig()->getShopId();
+
+        $sQuery = "SELECT oxid FROM oxuser WHERE oxusername = ? AND oxshopid = ? LIMIT 1";
+        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQuery, [$sApplePayEmail, $sShopId]);
     }
 
     /**

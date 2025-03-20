@@ -118,6 +118,7 @@ $aLang = array(
     'MOLLIE_REFUND_FREE_3'                              => 'have already been refunded. Remaining refundable amount',
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'This order has been refunded completely already.',
     'MOLLIE_NOT_YET_PAID'                               => 'This order is not yet marked as paid and therefore can not be refunded yet.',
+    'MOLLIE_TRANSACTION_NOT_USABLE'                     => 'An error has occurred with this order. There is no valid Mollie transaction ID.',
     'MOLLIE_REFUND_REMAINING'                           => 'Refund remaining sum',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'This order includes vouchers or discount. These cant be refunded partially, they must be handled with the full or remaining refund.',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Creditcard data',
@@ -179,4 +180,5 @@ $aLang = array(
     'MOLLIE_CAPTURE_SUCCESSFUL'                         => 'Amount captured successfully.',
     'MOLLIE_CREDITCARD_CAPTURE'                         => 'Capture Method',
     'MOLLIE_CREDITCARD_CAPTURE_METHOD_HELP'             => 'This option defines which capture method is used.<br><strong>Authenticate credit card before capture</strong>:The amount will be authorized and you have to manually capture the amount via the mollie tab within the order or via provided cron job<br><strong>Directly capture credit card amounts:</strong> The amount will be directly captured<br><strong>Automatically capture credit card amounts:</strong> The amount will be automatically captured by mollie after X days',
+    'MOLLIE_AMOUNT_FORMAT_ERROR'                        => "Error with your input „%s“. Please correct the format of the amount. Only a '.' or ',' is allowed as the decimal separator.",
 );

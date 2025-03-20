@@ -48,9 +48,10 @@ class Twint extends Base
      */
     public function getPaymentSpecificParameters(Order $oOrder)
     {
-        $aParams = [
-            'locale' => 'de_CH',
-        ];
+        $aParams = [];
+        if ($this->getApiMethod($oOrder) == 'payment') {
+            $aParams['locale'] = 'de_CH';
+        }
         return $aParams;
     }
 }

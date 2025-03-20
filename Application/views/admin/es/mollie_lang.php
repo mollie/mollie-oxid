@@ -114,6 +114,7 @@ $aLang = array(
     'MOLLIE_REFUND_FREE_3'                              => 'ya han sido reembolsados. Importe reembolsable restante',
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'Este pedido ya ha sido reembolsado por completo.',
     'MOLLIE_NOT_YET_PAID'                               => 'Este pedido aún no está marcado como pagado y, por lo tanto, aún no se puede reembolsar.',
+    'MOLLIE_TRANSACTION_NOT_USABLE'                     => 'Ha ocurrido un error con este pedido. No existe una ID de transacción de Mollie válida.',
     'MOLLIE_REFUND_REMAINING'                           => 'Reembolso de la suma restante',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'Este pedido incluye vales o descuentos. Estos no pueden ser reembolsados parcialmente, sino que deben ser gestionados con el reembolso total o restante.',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Datos de la tarjeta de crédito',
@@ -162,4 +163,5 @@ $aLang = array(
     'MOLLIE_CREDITCARD_CAPTURE'                         => 'Capture Method',
     'MOLLIE_CREDITCARD_CAPTURE_METHOD_HELP'             => 'This option defines which capture method is used.<br><strong>Authenticate credit card before capture</strong>:The amount will be authorized and you have to manually capture the amount via the mollie tab within the order or via provided cron job<br><strong>Directly capture credit card amounts:</strong> The amount will be directly captured<br><strong>Automatically capture credit card amounts:</strong> The amount will be automatically captured by mollie after X days',
     'HELP_SHOP_MODULE_sMollieCronCaptureOrdersActive'   => 'This option works only if you have <strong>Authenticate credit card before capture</strong> as capture method selected. This cronjob captures orders which are fullfilled and you normally would need to capture manually.',
+    'MOLLIE_AMOUNT_FORMAT_ERROR'                        => 'Error en su entrada „%s“. Por favor, corrija el formato de la cantidad. Solo se permite el « . » o « , » como separador decimal.',
 );

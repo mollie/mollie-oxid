@@ -115,6 +115,7 @@ $aLang = array(
     'MOLLIE_REFUND_FREE_3'                              => 'a déjà été remboursé. Montant remboursable restant',
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'Cette commande a déjà été intégralement remboursée.',
     'MOLLIE_NOT_YET_PAID'                               => 'Cette commande n\'est pas encore marquée comme payée et ne peut donc pas encore être remboursée.',
+    'MOLLIE_TRANSACTION_NOT_USABLE'                     => 'Une erreur est survenue avec cette commande. Il n\'existe pas d\'ID de transaction Mollie valide.',
     'MOLLIE_REFUND_REMAINING'                           => 'Rembourser la somme restante',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'Cette commande comprend des coupons ou des rabais. Ceux-ci ne peuvent pas être remboursés partiellement, ils doivent être traités via le remboursement total ou restant.',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Données de carte de crédit',
@@ -163,4 +164,5 @@ $aLang = array(
     'MOLLIE_CREDITCARD_CAPTURE'                         => 'Méthode de capture',
     'MOLLIE_CREDITCARD_CAPTURE_METHOD_HELP'             => 'Cette option définit quelle méthode de capture est utilisée.<br><strong>Authentifier la carte de crédit avant la capture</strong> : Le montant sera autorisé et vous devrez capturer manuellement le montant via l\'onglet Mollie dans la commande ou via le cron fourni <br><strong>Capturer directement les montants des cartes de crédit :</strong> Le montant sera directement capturé<br><strong>Capturer automatiquement les montants des cartes de crédit :</strong> Le montant sera automatiquement capturé par Mollie après X jours',
     'HELP_SHOP_MODULE_sMollieCronCaptureOrdersActive'   => 'Cette option ne fonctionne que si vous avez sélectionné <strong>Authentifier la carte de crédit avant la capture</strong> comme méthode de capture. Cette tâche cron capture les commandes qui sont exécutées et que vous auriez normalement besoin de capturer manuellement',
+    'MOLLIE_AMOUNT_FORMAT_ERROR'                        => 'Erreur avec votre saisie „%s“. Veuillez corriger le format du montant. Seuls le « . » ou la « , » sont autorisés comme séparateurs décimaux.',
 );

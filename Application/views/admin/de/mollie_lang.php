@@ -119,6 +119,7 @@ $aLang = array(
     'MOLLIE_REFUND_FREE_3'                              => 'erstattet. Restbetrag',
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'Diese Bestellung wurde bereits vollst&auml;ndig erstattet.',
     'MOLLIE_NOT_YET_PAID'                               => 'Diese Bestellung ist noch nicht als bezahlt markiert und kann daher noch nicht erstattet werden.',
+    'MOLLIE_TRANSACTION_NOT_USABLE'                     => 'Bei dieser Bestellung ist ein Fehler aufgetreten. Es existiert keine gültige Mollie Transaktions ID!',
     'MOLLIE_REFUND_REMAINING'                           => 'Verbliebene Summe erstatten',
     'MOLLIE_CAPTURE_TITLE'                              => 'Zahlungen einziehen (Capture)',
     'MOLLIE_CAPTURE_STATUS'                             => 'Status',
@@ -179,4 +180,5 @@ $aLang = array(
     'MOLLIE_EXTERNAL_TRANSACTION_ID'                    => 'Externe Transaktions ID',
     'MOLLIE_PAYMENT_DISABLED_ACTIVATION'                => 'Diese Mollie Zahlungsart kann nicht mehr aktiviert werden, da diese demnächst entfernt wird!',
     'MOLLIE_CREDITCARD_CAPTURE_METHOD_HELP'             => 'Diese Option bestimmt, welche Capture Methode verwendet wird<br><strong>Kreditkartbeträge erst Autorisieren</strong>:Der Betrag wird autorisiert und Sie müssen den Betrag manuell einziehen, entweder über das Mollie-Tab bei den Bestellungen oder via bereitgestellten Cronjob.<br><strong>Kreditkartbeträge direkt einziehen:</strong> Der Betrag wird dirkt eingezogen.<br><strong>Kreditkartbeträge automatisch einziehen:</strong> Der Betrag wird automatisch nach x Tagen von Mollie eingezogen.',
+    'MOLLIE_AMOUNT_FORMAT_ERROR'                        => 'Fehler mit ihrer Eingabe „%s“. Bitte korrigieren Sie das Format des Betrags. Als Dezimaltrennzeichen ist nur ein „.“ oder „,“ zulässig.',
 );

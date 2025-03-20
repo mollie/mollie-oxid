@@ -114,6 +114,7 @@ $aLang = array(
     'MOLLIE_REFUND_FREE_3'                              => 'sono già stati rimborsati. Importo rimborsabile residuo',
     'MOLLIE_ORDER_NOT_REFUNDABLE'                       => 'Questo ordine è già stato rimborsato completamente.',
     'MOLLIE_NOT_YET_PAID'                               => 'Questo ordine non è ancora contrassegnato come pagato e pertanto non può ancora essere rimborsato.',
+    'MOLLIE_TRANSACTION_NOT_USABLE'                     => 'Si è verificato un errore con questo ordine. Non esiste un ID di transazione Mollie valido.',
     'MOLLIE_REFUND_REMAINING'                           => 'Importo rimanente del rimborso',
     'MOLLIE_VOUCHERS_EXISTING'                          => 'Questo ordine include voucher o sconti. Questi non possono essere rimborsati parzialmente, devono essere gestiti con il rimborso totale o residuo.',
     'MOLLIE_CREDITCARD_DATA_INPUT'                      => 'Dati della carta di credito',
@@ -162,4 +163,5 @@ $aLang = array(
     'MOLLIE_CREDITCARD_CAPTURE'                         => 'Capture Method',
     'MOLLIE_CREDITCARD_CAPTURE_METHOD_HELP'             => 'This option defines which capture method is used.<br><strong>Authenticate credit card before capture</strong>:The amount will be authorized and you have to manually capture the amount via the mollie tab within the order or via provided cron job<br><strong>Directly capture credit card amounts:</strong> The amount will be directly captured<br><strong>Automatically capture credit card amounts:</strong> The amount will be automatically captured by mollie after X days',
     'HELP_SHOP_MODULE_sMollieCronCaptureOrdersActive'   => 'This option works only if you have <strong>Authenticate credit card before capture</strong> as capture method selected. This cronjob captures orders which are fullfilled and you normally would need to capture manually.',
+    'MOLLIE_AMOUNT_FORMAT_ERROR'                        => "Errore nel suo inserimento „%s“. Per favore, corregga il formato dell'importo. Solo il « . » o la « , » sono consentiti come separatori decimali.",
 );
