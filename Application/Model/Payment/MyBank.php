@@ -17,4 +17,9 @@ class MyBank extends Base
      * @var string
      */
     protected $sMolliePaymentCode = 'mybank';
+
+    /**
+     * @var bool
+     */
+    protected $blNeedsExtendedAddress = true;
 }

@@ -127,6 +127,11 @@ abstract class Base
     protected $blMethodIsDeprecated = false;
 
     /**
+     * @var bool
+     */
+    protected $blNeedsExtendedAddress = false;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -618,12 +623,22 @@ abstract class Base
     }
 
     /**
-     * Returns im this method is deprecated
+     * Returns if this method is deprecated
      *
      * @return bool
      */
     public function isMethodDeprecated()
     {
         return $this->blMethodIsDeprecated;
+    }
+
+    /**
+     * Returns if payment methods needs extended address info
+     *
+     * @return bool
+     */
+    public function isExtendedAddressNeeded()
+    {
+        return $this->blNeedsExtendedAddress;
     }
 }

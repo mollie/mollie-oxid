@@ -111,7 +111,7 @@ abstract class Base
         if (!empty((string)$oOrder->oxorder__oxbillcompany->value) && $this instanceof Order) {
             $aReturn['organizationName'] = $oOrder->oxorder__oxbillcompany->value;
         }
-        if ($this->blNeedsExtendedAddress === true) {
+        if ($this->blNeedsExtendedAddress === true || $oOrder->mollieGetPaymentModel()->isExtendedAddressNeeded() === true) {
             $sTranslatedSalutation = Registry::getLang()->translateString($oOrder->oxorder__oxbillsal->value);
             if (!empty($sTranslatedSalutation)) {
                 $aReturn['title'] = $sTranslatedSalutation;
@@ -143,7 +143,7 @@ abstract class Base
         if (!empty((string)$oOrder->oxorder__oxdelcompany->value) && $this instanceof Order) {
             $aReturn['organizationName'] = $oOrder->oxorder__oxdelcompany->value;
         }
-        if ($this->blNeedsExtendedAddress === true) {
+        if ($this->blNeedsExtendedAddress === true || $oOrder->mollieGetPaymentModel()->isExtendedAddressNeeded() === true) {
             $sTranslatedSalutation = Registry::getLang()->translateString($oOrder->oxorder__oxdelsal->value);
             if (!empty($sTranslatedSalutation)) {
                 $aReturn['title'] = $sTranslatedSalutation;
