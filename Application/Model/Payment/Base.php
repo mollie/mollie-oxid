@@ -641,4 +641,47 @@ abstract class Base
     {
         return $this->blNeedsExtendedAddress;
     }
+
+    /**
+     * Returns if current order is being considered as a B2B order
+     *
+     * @param  Basket $oBasket
+     * @return bool
+     */
+    protected function isB2BOrder($oBasket)
+    {
+        $oUser = $oBasket->getBasketUser();
+        if (!empty($oUser->oxuser__oxcompany->value)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns if payment method is available for the current basket situation. The limiting factors are:
+     *
+     * 1. Payment method not activated in the Mollie dashboard or for the current billing country, basket amount, currency situation
+     * 2. BasketSum is outside of the min-/max-limits of the payment method
+     * 3. Payment method has a billing country restriction and customer is not from that country
+     * 4. Payment method is only available for B2B orders and current order is not a B2B order
+     * 5. Currently selected currency is not supported by payment method
+     * 6. Payment method is deprecated
+     *
+     * @return bool
+     */
+    public function isMethodAvailable($oBasket)
+    {
+        $sBillingCountryCode = User::getInstance()->getBillingCountry($oBasket);
+        $sCurrency = $oBasket->getBasketCurrency()->name;
+        if ($this->isMolliePaymentActive($sBillingCountryCode, $oBasket->getPrice()->getBruttoPrice(), $sCurrency) === false ||
+            $this->mollieIsBasketSumInLimits($oBasket->getPrice()->getBruttoPrice(), $sBillingCountryCode, $sCurrency) === false ||
+            $this->mollieIsMethodAvailableForCountry($sBillingCountryCode) === false ||
+            ($this->isOnlyB2BSupported() === true && $this->isB2BOrder($oBasket) === false) ||
+            $this->isCurrencySupported($sCurrency) === false ||
+            $this->isMethodDeprecated() === true
+        ) {
+            return false;
+        }
+        return true;
+    }
 }
