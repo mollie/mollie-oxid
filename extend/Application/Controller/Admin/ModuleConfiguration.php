@@ -34,14 +34,14 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     }
 
     /**
-     * Returns array with options for iMollieCronSecondChanceTimeDiff config option
+     * Returns array with options for time diff config options
      *
      * @return array
      */
-    public function mollieSecondChanceDayDiffs()
+    public function mollieDayDiffs($iFrom, $iTo)
     {
         $aReturn = [];
-        for ($i = 1; $i <= 14; $i++) {
+        for ($i = $iFrom; $i <= $iTo; $i++) {
             $aReturn[] = $i;
         }
         return $aReturn;

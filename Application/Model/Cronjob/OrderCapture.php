@@ -28,11 +28,10 @@ class OrderCapture extends \Mollie\Payment\Application\Model\Cronjob\Base
      *
      * @return array
      */
-    protected function getSendedOrders()
+    protected function getUncapturedOrders()
     {
         $aOrders = [];
 
-        $sProcessingFolder = Registry::getConfig()->getShopConfVar('sMollieStatusProcessing');
         $sTriggerDate = date('Y-m-d H:i:s', time() - (60 * 60 * 24));
         $sQuery = " SELECT
                         OXID
@@ -43,11 +42,10 @@ class OrderCapture extends \Mollie\Payment\Application\Model\Cronjob\Base
                         oxpaymenttype LIKE '%mollie%' AND
                         oxorderdate < ? AND
                         oxtransstatus = 'OK' AND
-                        oxfolder = ? AND
                         OXSENDDATE != '0000-00-00 00:00:00' AND
                         MOLLIEWASCAPTURED = '0' AND
                         MOLLIECAPTUREMETHOD = 'manual'";
-        $aParams = [$sTriggerDate, $sProcessingFolder];
+        $aParams = [$sTriggerDate];
         if ($this->getShopId() !== false) {
             $sQuery .= " AND oxshopid = ? ";
             $aParams[] = $this->getShopId();
@@ -61,31 +59,54 @@ class OrderCapture extends \Mollie\Payment\Application\Model\Cronjob\Base
     }
 
     /**
+     * @param Order $oOrder
+     * @return bool
+     */
+    protected function isOrderAuthorized($oOrder)
+    {
+        $oTransaction = $oOrder->mollieGetTransaction();
+        if ($oTransaction && $oTransaction->isAuthorized() === true) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Collects exired order ids and captures the authorized amount
      *
      * @return bool
      */
     protected function handleCronjob(): bool
     {
-        $aUnfinishedOrders = $this->getSendedOrders();
-        foreach ($aUnfinishedOrders as $sUnfinishedOrderId) {
+        $aUncapturedOrders = $this->getUncapturedOrders();
+        foreach ($aUncapturedOrders as $sOrderId) {
             $oOrder = oxNew(Order::class);
-            if ($oOrder->load($sUnfinishedOrderId) ) {
+
+            self::outputExtendedInfo("Check if payment can be captured", $sOrderId);
+            if ($oOrder->load($sOrderId) && $this->isOrderAuthorized($oOrder) === true) {
                 $dAmount = (double)$oOrder->oxorder__oxtotalordersum->value;
                 $aParams['amount'] = [
                     "currency" => $oOrder->oxorder__oxcurrency->value,
                     "value" => $this->formatPrice($dAmount)
                 ];
+
+                self::outputExtendedInfo("Send capture request: ".print_r($aParams, true), $oOrder->getId());
+
                 $result = $oOrder->mollieCaptureOrder($aParams);
                 if ($result) {
-                    $this->outputInfo("Finished Order with ID ".$oOrder->getId());
+                    self::outputStandardInfo("Successfully captured order", $oOrder->getId());
                     $oOrder->oxorder__molliewascaptured = new Field(1);
                     $oOrder->save();
+                } else {
+                    self::outputExtendedInfo("Received no response for capture -> Capture failed.", $oOrder->getId());
                 }
+            } else {
+                self::outputExtendedInfo("Payment is not in a captureable state", $sOrderId);
             }
         }
         return true;
     }
+
     /**
      * Format prices to always have 2 decimal places
      *

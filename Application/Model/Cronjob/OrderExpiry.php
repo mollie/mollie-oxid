@@ -96,8 +96,9 @@ class OrderExpiry extends \Mollie\Payment\Application\Model\Cronjob\Base
         foreach ($aExpiredOrders as $sExpiredOrderId) {
             $oOrder = oxNew(Order::class);
             if ($oOrder->load($sExpiredOrderId)) {
-                echo 'Cancel '.$oOrder->getId()."\n";
+                self::outputStandardInfo("Cancelling order", $oOrder->getId());
                 $oOrder->cancelOrder();
+                self::outputStandardInfo("Order has been cancelled", $oOrder->getId());
             }
         }
         return true;

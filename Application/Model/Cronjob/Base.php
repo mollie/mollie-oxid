@@ -8,6 +8,10 @@ use OxidEsales\Eshop\Core\Registry;
 
 class Base
 {
+    const LOGLEVEL_STANDARD = "standard";
+    const LOGLEVEL_EXTENDED = "extended";
+    const LOGLEVEL_NONE = "none";
+
     /**
      * Id of current cronjob
      *
@@ -27,7 +31,14 @@ class Base
      *
      * @var string
      */
-    protected $sLogFileName = 'MollieCronjobErrors.log';
+    protected static $sLogFileName = 'MollieCronjobLog.log';
+
+    /**
+     * Logfile name
+     *
+     * @var string
+     */
+    protected static $sErrorLogFileName = 'MollieCronjobErrors.log';
 
     /**
      * Data from cronjob table
@@ -150,14 +161,97 @@ class Base
     }
 
     /**
+     * @return string
+     */
+    public static function getConfiguredLogLevel()
+    {
+        $sLogLevel = Registry::getConfig()->getShopConfVar('sMollieCronjobLogLevel');
+        if (empty($sLogLevel)) {
+            return self::LOGLEVEL_STANDARD; // default
+        }
+        return $sLogLevel;
+    }
+
+    /**
+     * Determines if message has to be logged
+     *
+     * @param  string $sMessageLogLevel
+     * @return bool
+     */
+    public static function hasMessageToBeLogged($sMessageLogLevel = self::LOGLEVEL_STANDARD)
+    {
+        $sConfiguredLogLevel = self::getConfiguredLogLevel();
+        if ($sConfiguredLogLevel === self::LOGLEVEL_NONE) {
+            return false;
+        }
+
+        if ($sConfiguredLogLevel === self::LOGLEVEL_STANDARD && $sMessageLogLevel === self::LOGLEVEL_EXTENDED) {
+            return false;
+        }
+
+        return true; // remaining cases are 'configured level and message level are standard' or 'configured level is extended' - log in both cases
+    }
+
+    /**
+     * Log info message if configured log level is matching the messages log level
+     *
+     * @param  string $sMessage
+     * @param  string $sMessageLogLevel
+     * @return void
+     */
+    public static function logInfo($sMessage, $sMessageLogLevel = self::LOGLEVEL_STANDARD)
+    {
+        if (self::hasMessageToBeLogged($sMessageLogLevel) === false) {
+            return;
+        }
+
+        Logger::logMessage($sMessage, getShopBasePath().'/log/'.self::$sLogFileName);
+    }
+
+    /**
      * Echoes given information
      *
      * @param  string $sMessage
      * @return void
      */
-    public static function outputInfo($sMessage)
+    public static function outputInfo($sMessage, $sMessageLogLevel = self::LOGLEVEL_STANDARD)
     {
         echo date('Y-m-d H:i:s - ').$sMessage."\n";
+
+        self::logInfo($sMessage, $sMessageLogLevel);
+    }
+
+    /**
+     * @param string $sMessage
+     * @param string $sOrderId
+     * @return string
+     */
+    protected static function prependOrderId($sMessage, $sOrderId)
+    {
+        if ($sOrderId !== false) {
+            $sMessage = "Order ID ".$sOrderId." - ".$sMessage;
+        }
+        return $sMessage;
+    }
+
+    /**
+     * @param string $sMessage
+     * @param string $sOrderId
+     * @return void
+     */
+    public static function outputStandardInfo($sMessage, $sOrderId = false)
+    {
+        self::outputInfo(self::prependOrderId($sMessage, $sOrderId), self::LOGLEVEL_STANDARD);
+    }
+
+    /**
+     * @param string $sMessage
+     * @param string $sOrderId
+     * @return void
+     */
+    public static function outputExtendedInfo($sMessage, $sOrderId = false)
+    {
+        self::outputInfo(self::prependOrderId($sMessage, $sOrderId), self::LOGLEVEL_EXTENDED);
     }
 
     /**
@@ -184,7 +278,7 @@ class Base
     {
         Cronjob::getInstance()->markCronjobAsFinished($this->getCronjobId(), $this->getShopId());
         if ($blResult === false) {
-            Logger::logMessage('Cron "'.$this->getCronjobId().'" failed'.($sError !== false ? " (Error: ".$sError.")" : ""), getShopBasePath().'/log/'.$this->sLogFileName);
+            Logger::logMessage('Cron "'.$this->getCronjobId().'" failed'.($sError !== false ? " (Error: ".$sError.")" : ""), getShopBasePath().'/log/'.self::$sErrorLogFileName);
         }
     }
 
