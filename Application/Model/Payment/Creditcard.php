@@ -118,7 +118,7 @@ class Creditcard extends Base
      */
     public function isManualCaptureNeeded(Order $oOrder)
     {
-        if ($this->getCaptureMethod() == 'manual') {
+        if ($oOrder->mollieIsManualCaptureMethod() === true) {
             return true;
         }
         return parent::isManualCaptureNeeded($oOrder);

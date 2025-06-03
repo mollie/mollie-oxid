@@ -2,6 +2,8 @@
 
 namespace Mollie\Payment\Application\Model\Payment;
 
+use OxidEsales\Eshop\Application\Model\Order;
+
 class Riverty extends Base
 {
     /**
@@ -51,4 +53,18 @@ class Riverty extends Base
         'DE',
         'AT',
     ];
+
+    /**
+     * Returns if payment has to be captured manually
+     *
+     * @param Order $oOrder
+     * @return bool
+     */
+    public function isManualCaptureNeeded(Order $oOrder)
+    {
+        if ($oOrder->mollieIsManualCaptureMethod() === true) {
+            return true;
+        }
+        return parent::isManualCaptureNeeded($oOrder);
+    }
 }
