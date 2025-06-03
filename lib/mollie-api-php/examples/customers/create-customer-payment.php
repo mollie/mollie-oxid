@@ -1,6 +1,6 @@
 <?php
 
-namespace _PhpScoperf7c63b60b99d;
+namespace _PhpScoperfb65c95ebc2e;
 
 /*
  * How to create a new customer in the Mollie API.
@@ -38,7 +38,7 @@ try {
     /*
      * In this example we store the order with its payment status in a database.
      */
-    \_PhpScoperf7c63b60b99d\database_write($orderId, $payment->status);
+    \_PhpScoperfb65c95ebc2e\database_write($orderId, $payment->status);
     /*
      * Send the customer off to complete the payment.
      * This request should always be a GET, thus we enforce 303 http response code

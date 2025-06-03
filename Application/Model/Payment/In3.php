@@ -19,11 +19,9 @@ class In3 extends Base
     protected $sMolliePaymentCode = 'in3';
 
     /**
-     * Determines if the payment methods only supports the order API
-     *
      * @var bool
      */
-    protected $blIsOnlyOrderApiSupported = true;
+    protected $blNeedsExtendedAddress = true;
 
     /**
      * Array with country-codes the payment method is restricted to

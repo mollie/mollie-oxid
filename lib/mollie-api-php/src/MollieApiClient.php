@@ -5,6 +5,7 @@ namespace Mollie\Api;
 use Mollie\Api\Endpoints\BalanceEndpoint;
 use Mollie\Api\Endpoints\BalanceReportEndpoint;
 use Mollie\Api\Endpoints\BalanceTransactionEndpoint;
+use Mollie\Api\Endpoints\CapabilityEndpoint;
 use Mollie\Api\Endpoints\ChargebackEndpoint;
 use Mollie\Api\Endpoints\ClientEndpoint;
 use Mollie\Api\Endpoints\ClientLinkEndpoint;
@@ -13,6 +14,7 @@ use Mollie\Api\Endpoints\CustomerPaymentsEndpoint;
 use Mollie\Api\Endpoints\InvoiceEndpoint;
 use Mollie\Api\Endpoints\MandateEndpoint;
 use Mollie\Api\Endpoints\MethodEndpoint;
+use Mollie\Api\Endpoints\MethodIssuerEndpoint;
 use Mollie\Api\Endpoints\OnboardingEndpoint;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\Endpoints\OrderLineEndpoint;
@@ -24,16 +26,23 @@ use Mollie\Api\Endpoints\PaymentCaptureEndpoint;
 use Mollie\Api\Endpoints\PaymentChargebackEndpoint;
 use Mollie\Api\Endpoints\PaymentEndpoint;
 use Mollie\Api\Endpoints\PaymentLinkEndpoint;
+use Mollie\Api\Endpoints\PaymentLinkPaymentEndpoint;
 use Mollie\Api\Endpoints\PaymentRefundEndpoint;
 use Mollie\Api\Endpoints\PaymentRouteEndpoint;
 use Mollie\Api\Endpoints\PermissionEndpoint;
 use Mollie\Api\Endpoints\ProfileEndpoint;
 use Mollie\Api\Endpoints\ProfileMethodEndpoint;
 use Mollie\Api\Endpoints\RefundEndpoint;
+use Mollie\Api\Endpoints\SalesInvoiceEndpoint;
+use Mollie\Api\Endpoints\SessionEndpoint;
+use Mollie\Api\Endpoints\SettlementCaptureEndpoint;
+use Mollie\Api\Endpoints\SettlementChargebackEndpoint;
 use Mollie\Api\Endpoints\SettlementPaymentEndpoint;
+use Mollie\Api\Endpoints\SettlementRefundEndpoint;
 use Mollie\Api\Endpoints\SettlementsEndpoint;
 use Mollie\Api\Endpoints\ShipmentEndpoint;
 use Mollie\Api\Endpoints\SubscriptionEndpoint;
+use Mollie\Api\Endpoints\SubscriptionPaymentEndpoint;
 use Mollie\Api\Endpoints\TerminalEndpoint;
 use Mollie\Api\Endpoints\WalletEndpoint;
 use Mollie\Api\Exceptions\ApiException;
@@ -46,7 +55,7 @@ class MollieApiClient
     /**
      * Version of our client.
      */
-    public const CLIENT_VERSION = "2.61.0";
+    public const CLIENT_VERSION = "2.79.1";
     /**
      * Endpoint of the remote API.
      */
@@ -87,6 +96,14 @@ class MollieApiClient
      */
     public $profileMethods;
     /**
+     * @var \Mollie\Api\Endpoints\MethodIssuerEndpoint
+     */
+    public $methodIssuers;
+    /**
+     * @var \Mollie\Api\Endpoints\CapabilityEndpoint
+     */
+    public $capabilities;
+    /**
      * RESTful Customers resource.
      *
      * @var CustomerEndpoint
@@ -99,11 +116,29 @@ class MollieApiClient
      */
     public $customerPayments;
     /**
+     * RESTful Sales Invoice resource.
+     *
+     * @var SalesInvoiceEndpoint
+     */
+    public $salesInvoices;
+    /**
      * RESTful Settlement resource.
      *
      * @var SettlementsEndpoint
      */
     public $settlements;
+    /**
+     * RESTful Settlement capture resource.
+     *
+     * @var \Mollie\Api\Endpoints\SettlementCaptureEndpoint
+     */
+    public $settlementCaptures;
+    /**
+     * RESTful Settlement chargeback resource.
+     *
+     * @var \Mollie\Api\Endpoints\SettlementChargebackEndpoint
+     */
+    public $settlementChargebacks;
     /**
      * RESTful Settlement payment resource.
      *
@@ -111,11 +146,23 @@ class MollieApiClient
      */
     public $settlementPayments;
     /**
+     * RESTful Settlement refund resource.
+     *
+     * @var \Mollie\Api\Endpoints\SettlementRefundEndpoint
+     */
+    public $settlementRefunds;
+    /**
      * RESTful Subscription resource.
      *
      * @var SubscriptionEndpoint
      */
     public $subscriptions;
+    /**
+     * RESTful Subscription Payments resource.
+     *
+     * @var SubscriptionPaymentEndpoint
+     */
+    public $subscriptionPayments;
     /**
      * RESTful Mandate resource.
      *
@@ -233,6 +280,12 @@ class MollieApiClient
      */
     public $orderRefunds;
     /**
+     * RESTful Payment Link Payment resource.
+     *
+     * @var PaymentLinkPaymentEndpoint
+     */
+    public $paymentLinkPayments;
+    /**
      * Manages Payment Links requests
      *
      * @var PaymentLinkEndpoint
@@ -256,6 +309,24 @@ class MollieApiClient
      * @var WalletEndpoint
      */
     public $wallets;
+    /**
+     * RESTful Client resource.
+     *
+     * @var ClientEndpoint
+     */
+    public $clients;
+    /**
+     * RESTful Client resource.
+     *
+     * @var ClientLinkEndpoint
+     */
+    public $clientLinks;
+    /**
+     * RESTful Session resource.
+     *
+     * @var SessionEndpoint
+     */
+    public $sessions;
     /**
      * @var string
      */
@@ -282,18 +353,6 @@ class MollieApiClient
      */
     protected $versionStrings = [];
     /**
-     * RESTful Client resource.
-     *
-     * @var ClientEndpoint
-     */
-    public $clients;
-    /**
-     * RESTful Client resource.
-     *
-     * @var ClientLinkEndpoint
-     */
-    public $clientLinks;
-    /**
      * @param \GuzzleHttp\ClientInterface|\Mollie\Api\HttpAdapter\MollieHttpAdapterInterface|null $httpClient
      * @param \Mollie\Api\HttpAdapter\MollieHttpAdapterPickerInterface|null $httpAdapterPicker,
      * @param \Mollie\Api\Idempotency\IdempotencyKeyGeneratorContract $idempotencyKeyGenerator,
@@ -311,40 +370,49 @@ class MollieApiClient
     }
     public function initializeEndpoints()
     {
-        $this->payments = new \Mollie\Api\Endpoints\PaymentEndpoint($this);
-        $this->methods = new \Mollie\Api\Endpoints\MethodEndpoint($this);
-        $this->profileMethods = new \Mollie\Api\Endpoints\ProfileMethodEndpoint($this);
-        $this->customers = new \Mollie\Api\Endpoints\CustomerEndpoint($this);
-        $this->settlements = new \Mollie\Api\Endpoints\SettlementsEndpoint($this);
-        $this->settlementPayments = new \Mollie\Api\Endpoints\SettlementPaymentEndpoint($this);
-        $this->subscriptions = new \Mollie\Api\Endpoints\SubscriptionEndpoint($this);
-        $this->customerPayments = new \Mollie\Api\Endpoints\CustomerPaymentsEndpoint($this);
-        $this->mandates = new \Mollie\Api\Endpoints\MandateEndpoint($this);
-        $this->balances = new \Mollie\Api\Endpoints\BalanceEndpoint($this);
-        $this->balanceTransactions = new \Mollie\Api\Endpoints\BalanceTransactionEndpoint($this);
         $this->balanceReports = new \Mollie\Api\Endpoints\BalanceReportEndpoint($this);
+        $this->balanceTransactions = new \Mollie\Api\Endpoints\BalanceTransactionEndpoint($this);
+        $this->balances = new \Mollie\Api\Endpoints\BalanceEndpoint($this);
+        $this->capabilities = new \Mollie\Api\Endpoints\CapabilityEndpoint($this);
+        $this->chargebacks = new \Mollie\Api\Endpoints\ChargebackEndpoint($this);
+        $this->clientLinks = new \Mollie\Api\Endpoints\ClientLinkEndpoint($this);
+        $this->clients = new \Mollie\Api\Endpoints\ClientEndpoint($this);
+        $this->customerPayments = new \Mollie\Api\Endpoints\CustomerPaymentsEndpoint($this);
+        $this->customers = new \Mollie\Api\Endpoints\CustomerEndpoint($this);
         $this->invoices = new \Mollie\Api\Endpoints\InvoiceEndpoint($this);
-        $this->permissions = new \Mollie\Api\Endpoints\PermissionEndpoint($this);
-        $this->profiles = new \Mollie\Api\Endpoints\ProfileEndpoint($this);
+        $this->mandates = new \Mollie\Api\Endpoints\MandateEndpoint($this);
+        $this->methods = new \Mollie\Api\Endpoints\MethodEndpoint($this);
+        $this->methodIssuers = new \Mollie\Api\Endpoints\MethodIssuerEndpoint($this);
         $this->onboarding = new \Mollie\Api\Endpoints\OnboardingEndpoint($this);
-        $this->organizations = new \Mollie\Api\Endpoints\OrganizationEndpoint($this);
-        $this->orders = new \Mollie\Api\Endpoints\OrderEndpoint($this);
         $this->orderLines = new \Mollie\Api\Endpoints\OrderLineEndpoint($this);
         $this->orderPayments = new \Mollie\Api\Endpoints\OrderPaymentEndpoint($this);
         $this->orderRefunds = new \Mollie\Api\Endpoints\OrderRefundEndpoint($this);
-        $this->shipments = new \Mollie\Api\Endpoints\ShipmentEndpoint($this);
-        $this->refunds = new \Mollie\Api\Endpoints\RefundEndpoint($this);
-        $this->paymentRefunds = new \Mollie\Api\Endpoints\PaymentRefundEndpoint($this);
-        $this->paymentCaptures = new \Mollie\Api\Endpoints\PaymentCaptureEndpoint($this);
-        $this->paymentRoutes = new \Mollie\Api\Endpoints\PaymentRouteEndpoint($this);
-        $this->chargebacks = new \Mollie\Api\Endpoints\ChargebackEndpoint($this);
-        $this->paymentChargebacks = new \Mollie\Api\Endpoints\PaymentChargebackEndpoint($this);
-        $this->wallets = new \Mollie\Api\Endpoints\WalletEndpoint($this);
-        $this->paymentLinks = new \Mollie\Api\Endpoints\PaymentLinkEndpoint($this);
-        $this->terminals = new \Mollie\Api\Endpoints\TerminalEndpoint($this);
+        $this->orders = new \Mollie\Api\Endpoints\OrderEndpoint($this);
         $this->organizationPartners = new \Mollie\Api\Endpoints\OrganizationPartnerEndpoint($this);
-        $this->clients = new \Mollie\Api\Endpoints\ClientEndpoint($this);
-        $this->clientLinks = new \Mollie\Api\Endpoints\ClientLinkEndpoint($this);
+        $this->organizations = new \Mollie\Api\Endpoints\OrganizationEndpoint($this);
+        $this->paymentCaptures = new \Mollie\Api\Endpoints\PaymentCaptureEndpoint($this);
+        $this->paymentChargebacks = new \Mollie\Api\Endpoints\PaymentChargebackEndpoint($this);
+        $this->paymentLinkPayments = new \Mollie\Api\Endpoints\PaymentLinkPaymentEndpoint($this);
+        $this->paymentLinks = new \Mollie\Api\Endpoints\PaymentLinkEndpoint($this);
+        $this->paymentRefunds = new \Mollie\Api\Endpoints\PaymentRefundEndpoint($this);
+        $this->paymentRoutes = new \Mollie\Api\Endpoints\PaymentRouteEndpoint($this);
+        $this->payments = new \Mollie\Api\Endpoints\PaymentEndpoint($this);
+        $this->permissions = new \Mollie\Api\Endpoints\PermissionEndpoint($this);
+        $this->profileMethods = new \Mollie\Api\Endpoints\ProfileMethodEndpoint($this);
+        $this->profiles = new \Mollie\Api\Endpoints\ProfileEndpoint($this);
+        $this->refunds = new \Mollie\Api\Endpoints\RefundEndpoint($this);
+        $this->salesInvoices = new \Mollie\Api\Endpoints\SalesInvoiceEndpoint($this);
+        $this->settlementCaptures = new \Mollie\Api\Endpoints\SettlementCaptureEndpoint($this);
+        $this->settlementChargebacks = new \Mollie\Api\Endpoints\SettlementChargebackEndpoint($this);
+        $this->settlementPayments = new \Mollie\Api\Endpoints\SettlementPaymentEndpoint($this);
+        $this->settlementRefunds = new \Mollie\Api\Endpoints\SettlementRefundEndpoint($this);
+        $this->settlements = new \Mollie\Api\Endpoints\SettlementsEndpoint($this);
+        $this->sessions = new \Mollie\Api\Endpoints\SessionEndpoint($this);
+        $this->shipments = new \Mollie\Api\Endpoints\ShipmentEndpoint($this);
+        $this->subscriptionPayments = new \Mollie\Api\Endpoints\SubscriptionPaymentEndpoint($this);
+        $this->subscriptions = new \Mollie\Api\Endpoints\SubscriptionEndpoint($this);
+        $this->terminals = new \Mollie\Api\Endpoints\TerminalEndpoint($this);
+        $this->wallets = new \Mollie\Api\Endpoints\WalletEndpoint($this);
     }
     protected function initializeVersionStrings()
     {
