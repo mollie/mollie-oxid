@@ -3,10 +3,10 @@
 namespace Mollie\Api\Resources;
 
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
 class Order extends \Mollie\Api\Resources\BaseResource
 {
+    use HasPresetOptions;
     /**
      * Id of the order.
      *
@@ -70,7 +70,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public $orderNumber;
     /**
-     * The person and the address the order is billed to.
+     * The person and the address the order is shipped to.
      *
      * @var \stdClass
      */
@@ -416,11 +416,7 @@ class Order extends \Mollie\Api\Resources\BaseResource
      */
     public function refunds()
     {
-        if (!isset($this->_links->refunds->href)) {
-            return new \Mollie\Api\Resources\RefundCollection($this->client, 0, null);
-        }
-        $result = $this->client->performHttpCallToFullUrl(\Mollie\Api\MollieApiClient::HTTP_GET, $this->_links->refunds->href);
-        return \Mollie\Api\Resources\ResourceFactory::createCursorResourceCollection($this->client, $result->_embedded->refunds, \Mollie\Api\Resources\Refund::class, $result->_links);
+        return $this->client->orderRefunds->pageFor($this);
     }
     /**
      * Saves the order's updated billingAddress and/or shippingAddress.
@@ -458,28 +454,5 @@ class Order extends \Mollie\Api\Resources\BaseResource
             return null;
         }
         return \Mollie\Api\Resources\ResourceFactory::createCursorResourceCollection($this->client, $this->_embedded->payments, \Mollie\Api\Resources\Payment::class);
-    }
-    /**
-     * When accessed by oAuth we want to pass the testmode by default
-     *
-     * @return array
-     */
-    private function getPresetOptions()
-    {
-        $options = [];
-        if ($this->client->usesOAuth()) {
-            $options["testmode"] = $this->mode === "test" ? \true : \false;
-        }
-        return $options;
-    }
-    /**
-     * Apply the preset options.
-     *
-     * @param array $options
-     * @return array
-     */
-    private function withPresetOptions(array $options)
-    {
-        return \array_merge($this->getPresetOptions(), $options);
     }
 }

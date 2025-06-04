@@ -19,9 +19,7 @@ class KlarnaSliceIt extends Base
     protected $sMolliePaymentCode = 'klarnasliceit';
 
     /**
-     * Determines if the payment methods only supports the order API
-     *
      * @var bool
      */
-    protected $blIsOnlyOrderApiSupported = true;
+    protected $blNeedsExtendedAddress = true;
 }

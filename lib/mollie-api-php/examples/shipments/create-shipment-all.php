@@ -1,6 +1,6 @@
 <?php
 
-namespace _PhpScoperf7c63b60b99d;
+namespace _PhpScoperfb65c95ebc2e;
 
 /*
  * Create a shipment for an entire order using the Mollie API.

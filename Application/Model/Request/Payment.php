@@ -55,5 +55,6 @@ class Payment extends Base
         parent::addRequestParameters($oOrder, $dAmount, $sReturnUrl);
 
         $this->addParameter('description', $this->getFilledDescriptionText($oOrder));
+        $this->addParameter('lines', $this->getBasketItems($oOrder, true));
     }
 }

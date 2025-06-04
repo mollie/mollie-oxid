@@ -1,6 +1,6 @@
 <?php
 
-namespace _PhpScoperf7c63b60b99d;
+namespace _PhpScoperfb65c95ebc2e;
 
 /*
  * How to show a return page to the customer.
@@ -13,7 +13,18 @@ namespace _PhpScoperf7c63b60b99d;
  * Please use a real database like MySQL in production code.
  */
 require_once "../functions.php";
-$status = \_PhpScoperf7c63b60b99d\database_read($_GET["order_id"]);
+$status = \_PhpScoperfb65c95ebc2e\database_read($_GET["order_id"]);
+/*
+ * The order status is normally updated by the webhook.
+ * In case the webhook did not yet arrive, we can poll the API synchronously.
+ */
+if ($status !== "paid") {
+    $payment = $mollie->payments->get($_GET["order_id"]);
+    $status = $payment->status;
+    /*
+     * Optionally, update the database here, or wait for the webhook to arrive.
+     */
+}
 /*
  * Determine the url parts to these example files.
  */

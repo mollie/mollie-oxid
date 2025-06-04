@@ -42,10 +42,12 @@ class Giftcard extends Base
      */
     public function getPaymentSpecificParameters(Order $oOrder)
     {
+        $aParams = parent::getPaymentSpecificParameters($oOrder);
+
         $sIssuer = $this->getDynValueParameter('mollie_giftcard_issuer');
         if (!empty($sIssuer)) {
-            return ['issuer' => $sIssuer];
+            $aParams['issuer'] = $sIssuer;
         }
-        return parent::getPaymentSpecificParameters($oOrder);
+        return $aParams;
     }
 }

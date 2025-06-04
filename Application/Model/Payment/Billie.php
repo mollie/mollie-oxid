@@ -19,11 +19,9 @@ class Billie extends Base
     protected $sMolliePaymentCode = 'billie';
 
     /**
-     * Determines if the payment methods only supports the order API
-     *
      * @var bool
      */
-    protected $blIsOnlyOrderApiSupported = true;
+    protected $blNeedsExtendedAddress = true;
 
     /**
      * Determines if the payment method is only available for B2B orders

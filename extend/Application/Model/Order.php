@@ -314,8 +314,11 @@ class Order extends Order_parent
      * @return bool
      */
     public function mollieIsManualCaptureMethod() {
-        $orderCaptureMethod = $this->oxorder__molliecapturemethod->value;
-        return $orderCaptureMethod === 'manual';
+        $sCaptureMethod = $this->oxorder__molliecapturemethod->value;
+        if ($sCaptureMethod == 'manual') {
+            return true;
+        }
+        return false;
     }
     /**
      * Determines if the current call is a return from a redirect payment

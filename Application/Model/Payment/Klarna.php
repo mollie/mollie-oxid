@@ -19,9 +19,7 @@ class Klarna extends Base
     protected $sMolliePaymentCode = 'klarna';
 
     /**
-     * Determines if the payment methods only supports the order API
-     *
      * @var bool
      */
-    protected $blIsOnlyOrderApiSupported = true;
+    protected $blNeedsExtendedAddress = true;
 }

@@ -2,6 +2,7 @@
 
 namespace Mollie\Api\Endpoints;
 
+use Mollie\Api\Resources\LazyCollection;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentCollection;
 class SettlementPaymentEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
@@ -36,5 +37,21 @@ class SettlementPaymentEndpoint extends \Mollie\Api\Endpoints\CollectionEndpoint
     {
         $this->parentId = $settlementId;
         return $this->rest_list($from, $limit, $parameters);
+    }
+    /**
+     * Create an iterator for iterating over payments for the given settlement id, retrieved from Mollie.
+     *
+     * @param string $settlementId
+     * @param string $from The first resource ID you want to include in your list.
+     * @param int $limit
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iteratorForId(string $settlementId, ?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
+    {
+        $this->parentId = $settlementId;
+        return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }
 }

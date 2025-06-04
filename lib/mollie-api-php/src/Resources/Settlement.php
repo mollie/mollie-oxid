@@ -3,7 +3,6 @@
 namespace Mollie\Api\Resources;
 
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\SettlementStatus;
 class Settlement extends \Mollie\Api\Resources\BaseResource
 {
@@ -80,7 +79,7 @@ class Settlement extends \Mollie\Api\Resources\BaseResource
         return $this->status === \Mollie\Api\Types\SettlementStatus::STATUS_PENDING;
     }
     /**
-     * Is this settlement paidout?
+     * Is this settlement paid out?
      *
      * @return bool
      */
@@ -89,7 +88,7 @@ class Settlement extends \Mollie\Api\Resources\BaseResource
         return $this->status === \Mollie\Api\Types\SettlementStatus::STATUS_PAIDOUT;
     }
     /**
-     * Is this settlement failed?
+     * Has this settlement failed?
      *
      * @return bool
      */
@@ -98,57 +97,51 @@ class Settlement extends \Mollie\Api\Resources\BaseResource
         return $this->status === \Mollie\Api\Types\SettlementStatus::STATUS_FAILED;
     }
     /**
-     * Retrieves all payments associated with this settlement
+     * Retrieve the first page of payments associated with this settlement.
      *
      * @param int|null $limit
      * @param array $parameters
      * @return PaymentCollection
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function payments(int $limit = null, array $parameters = []) : \Mollie\Api\Resources\PaymentCollection
+    public function payments(?int $limit = null, array $parameters = []) : \Mollie\Api\Resources\PaymentCollection
     {
         return $this->client->settlementPayments->pageForId($this->id, null, $limit, $parameters);
     }
     /**
-     * Retrieves all refunds associated with this settlement
+     * Retrieve the first page of refunds associated with this settlement.
      *
+     * @param int|null $limit
+     * @param array $parameters
      * @return RefundCollection
      * @throws ApiException
      */
-    public function refunds()
+    public function refunds(?int $limit = null, array $parameters = [])
     {
-        if (!isset($this->_links->refunds->href)) {
-            return new \Mollie\Api\Resources\RefundCollection($this->client, 0, null);
-        }
-        $result = $this->client->performHttpCallToFullUrl(\Mollie\Api\MollieApiClient::HTTP_GET, $this->_links->refunds->href);
-        return \Mollie\Api\Resources\ResourceFactory::createCursorResourceCollection($this->client, $result->_embedded->refunds, \Mollie\Api\Resources\Refund::class, $result->_links);
+        return $this->client->settlementRefunds->pageForId($this->id, null, $limit, $parameters);
     }
     /**
-     * Retrieves all chargebacks associated with this settlement
+     * Retrieve the first page of chargebacks associated with this settlement.
      *
+     * @param int|null $limit
+     * @param array $parameters
      * @return ChargebackCollection
      * @throws ApiException
      */
-    public function chargebacks()
+    public function chargebacks(?int $limit = null, array $parameters = [])
     {
-        if (!isset($this->_links->chargebacks->href)) {
-            return new \Mollie\Api\Resources\ChargebackCollection($this->client, 0, null);
-        }
-        $result = $this->client->performHttpCallToFullUrl(\Mollie\Api\MollieApiClient::HTTP_GET, $this->_links->chargebacks->href);
-        return \Mollie\Api\Resources\ResourceFactory::createCursorResourceCollection($this->client, $result->_embedded->chargebacks, \Mollie\Api\Resources\Chargeback::class, $result->_links);
+        return $this->client->settlementChargebacks->pageForId($this->id, null, $limit, $parameters);
     }
     /**
-     * Retrieves all captures associated with this settlement
+     * Retrieve the first page of cap associated with this settlement.
      *
+     * @param int|null $limit
+     * @param array $parameters
      * @return CaptureCollection
      * @throws ApiException
      */
-    public function captures()
+    public function captures(?int $limit = null, array $parameters = [])
     {
-        if (!isset($this->_links->captures->href)) {
-            return new \Mollie\Api\Resources\CaptureCollection($this->client, 0, null);
-        }
-        $result = $this->client->performHttpCallToFullUrl(\Mollie\Api\MollieApiClient::HTTP_GET, $this->_links->captures->href);
-        return \Mollie\Api\Resources\ResourceFactory::createCursorResourceCollection($this->client, $result->_embedded->captures, \Mollie\Api\Resources\Capture::class, $result->_links);
+        return $this->client->settlementCaptures->pageForId($this->id, null, $limit, $parameters);
     }
 }

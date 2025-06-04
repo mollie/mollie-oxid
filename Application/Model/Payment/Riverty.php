@@ -2,6 +2,8 @@
 
 namespace Mollie\Payment\Application\Model\Payment;
 
+use OxidEsales\Eshop\Application\Model\Order;
+
 class Riverty extends Base
 {
     /**
@@ -19,11 +21,16 @@ class Riverty extends Base
     protected $sMolliePaymentCode = 'riverty';
 
     /**
-     * Determines if the payment methods only supports the order API
-     *
      * @var bool
      */
-    protected $blIsOnlyOrderApiSupported = true;
+    protected $blNeedsExtendedAddress = true;
+
+    /**
+     * Riverty only supports manual capture mode with Payments API
+     *
+     * @var string|false
+     */
+    protected $sCaptureMethod = 'manual';
 
     /**
      * If filled, the payment method will only be shown if one of the allowed currencies is active in checkout
@@ -46,4 +53,18 @@ class Riverty extends Base
         'DE',
         'AT',
     ];
+
+    /**
+     * Returns if payment has to be captured manually
+     *
+     * @param Order $oOrder
+     * @return bool
+     */
+    public function isManualCaptureNeeded(Order $oOrder)
+    {
+        if ($oOrder->mollieIsManualCaptureMethod() === true) {
+            return true;
+        }
+        return parent::isManualCaptureNeeded($oOrder);
+    }
 }
