@@ -37,6 +37,15 @@ class Creditcard extends Base
     protected $sCustomFrontendTemplate = 'molliecreditcard.tpl';
 
     /**
+     * @var array|null
+     */
+    protected $aAvailableCaptureMethods = [
+        'authorize_capture',
+        'direct_capture',
+        'automatic_capture',
+    ];
+
+    /**
      * Returns current Mollie profileId
      *
      * @return string
@@ -101,10 +110,10 @@ class Creditcard extends Base
      */
     public function getCaptureMethod()
     {
-        $sCaptureMethod = $this->getConfigParam('creditcard_capture_method');
-        if ($sCaptureMethod == 'creditcard_authorize_capture') {
+        $sCaptureMethod = $this->getConfigParam('capture_method');
+        if ($sCaptureMethod == 'authorize_capture') {
             return 'manual';
-        } elseif ($sCaptureMethod == 'creditcard_automatic_capture') {
+        } elseif ($sCaptureMethod == 'automatic_capture') {
             return 'automatic';
         }
         return parent::getCaptureMethod();

@@ -19,6 +19,13 @@ class KlarnaPayLater extends Base
     protected $sMolliePaymentCode = 'klarnapaylater';
 
     /**
+     * Determines if the payment methods only supports the order API
+     *
+     * @var bool
+     */
+    protected $blIsOnlyOrderApiSupported = true;
+
+    /**
      * @var bool
      */
     protected $blNeedsExtendedAddress = true;

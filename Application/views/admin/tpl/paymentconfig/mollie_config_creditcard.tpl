@@ -11,52 +11,6 @@
     </td>
 
 </tr>
-<tr class="mollieOnlyPaymentApi" [{if $paymentModel->getApiMethod() != 'payment'}]style="display:none;"[{/if}]>
-    <td class="edittext" width="70">
-        [{oxmultilang ident="MOLLIE_CREDITCARD_CAPTURE"}]
-    </td>
-    <td  class="edittext" width="150">
-        <script type="text/javascript">
-            <!--
-            function mollieHandleCaptureMethodChange(oSelect, sApiMethod)
-            {
-                let oDaysRow = document.getElementById('mollieAutomaticCaptureDays');
-                let sDisplay = 'none';
-                if (sApiMethod !== "order" && oSelect.value === 'creditcard_automatic_capture') {
-                    sDisplay = '';
-                }
-                oDaysRow.style.display = sDisplay;
-            }
-
-            function mollieCustomApiChange(sApiMethod)
-            {
-                let oSelect = document.getElementById('mollieSelectCaptureMethod');
-                mollieHandleCaptureMethodChange(oSelect, sApiMethod);
-            }
-            -->
-        </script>
-        <select id="mollieSelectCaptureMethod" name="mollie[creditcard_capture_method]" style="width:177px;" onchange="mollieHandleCaptureMethodChange(this, '')" [{$readonly}]>
-            <option value="creditcard_authorize_capture" [{if $paymentModel->getConfigParam('creditcard_capture_method') == 'creditcard_authorize_capture' }]selected[{/if}]>[{oxmultilang ident="MOLLIE_CC_CAPTURE_AUTH"}]</option>
-            <option value="creditcard_direct_capture"    [{if $paymentModel->getConfigParam('creditcard_capture_method') == 'creditcard_direct_capture'    }]selected[{/if}]>[{oxmultilang ident="MOLLIE_CC_CAPTURE_DIRECT"}]</option>
-            <option value="creditcard_automatic_capture" [{if $paymentModel->getConfigParam('creditcard_capture_method') == 'creditcard_automatic_capture' }]selected[{/if}]>[{oxmultilang ident="MOLLIE_CC_CAPTURE_AUTOMATIC"}]</option>
-        </select>
-        [{oxinputhelp ident="MOLLIE_CREDITCARD_CAPTURE_METHOD_HELP"}]
-    </td>
-
-</tr>
-<tr id="mollieAutomaticCaptureDays" class="mollieOnlyPaymentApi" [{if $paymentModel->getApiMethod() != 'payment' || $paymentModel->getConfigParam('creditcard_capture_method') != 'creditcard_automatic_capture' }]style="display:none;"[{/if}]>
-    <td class="edittext" width="70">
-        [{oxmultilang ident="MOLLIE_CAPTURE_DAYS"}]
-    </td>
-    <td class="edittext">
-        <select name="mollie[captureDays]" [{$readonly}]>
-            [{foreach from=$oView->mollieGetAutomaticCaptureDays() item=title key=days}]
-                <option value="[{$days}]" [{if $paymentModel->getCaptureDays() == $days}]selected[{/if}]>[{$title}]</option>
-            [{/foreach}]
-        </select>
-        [{oxinputhelp ident="MOLLIE_CAPTURE_DAYS_HELP"}]
-    </td>
-</tr>
 <tr>
     <td class="edittext" width="70">
         [{oxmultilang ident="MOLLIE_SINGLE_CLICK"}]

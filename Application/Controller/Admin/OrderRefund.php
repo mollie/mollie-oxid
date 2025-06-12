@@ -145,7 +145,8 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * @return bool
      */
-    public function orderNeedsManualCapture() {
+    public function orderNeedsManualCapture()
+    {
         $oOrder = $this->getOrder();
         return $oOrder->mollieGetPaymentModel()->isManualCaptureNeeded($oOrder);
     }

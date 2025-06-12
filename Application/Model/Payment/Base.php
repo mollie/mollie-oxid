@@ -137,6 +137,11 @@ abstract class Base
     protected $sCaptureMethod = false;
 
     /**
+     * @var array|null
+     */
+    protected $aAvailableCaptureMethods = null;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -666,6 +671,14 @@ abstract class Base
     public function getCaptureMethod()
     {
         return $this->sCaptureMethod;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getAvailableCaptureMethods()
+    {
+        return $this->aAvailableCaptureMethods;
     }
 
     /**

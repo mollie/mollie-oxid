@@ -4,6 +4,8 @@ namespace Mollie\Payment\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
+use Mollie\Payment\Application\Model\Payment\Creditcard;
+use Mollie\Payment\Application\Model\PaymentConfig;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use Mollie\Payment\Application\Model\BaseMigration;
@@ -12,9 +14,6 @@ class Version20250527120000 extends BaseMigration
 {
     protected $aOrderAPIMethods = [
         'mollieklarna',
-        'mollieklarnapaylater',
-        'mollieklarnapaynow',
-        'mollieklarnasliceit',
         'molliein3',
         'molliebillie',
         'mollieriverty',
@@ -34,6 +33,12 @@ class Version20250527120000 extends BaseMigration
     {
         $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
+        $this->setOrderAPIField();
+        $this->renameCaptureMethodConfig();
+    }
+
+    protected function setOrderAPIField()
+    {
         // In this version the Order API only methods have been enabled for Payments API too.
         // A config entry has to be created for them for Order API if not already existing
         // otherwise they would change from Order API to Payments API on module update.
@@ -55,5 +60,19 @@ class Version20250527120000 extends BaseMigration
             return true;
         }
         return false;
+    }
+
+    protected function renameCaptureMethodConfig()
+    {
+        $oPaymentConfig = oxNew(PaymentConfig::class);
+        $aCreditcardConfig = $oPaymentConfig->getPaymentConfig('molliecreditcard');
+        if (!empty($aCreditcardConfig['creditcard_capture_method'])) {
+            $aCreditcardConfig['capture_method'] = $aCreditcardConfig['creditcard_capture_method'];
+            unset($aCreditcardConfig['creditcard_capture_method']);
+
+            $aCreditcardConfig['capture_method'] = str_replace("creditcard_", "", $aCreditcardConfig['capture_method']);
+
+            $oPaymentConfig->savePaymentConfig('molliecreditcard', $aCreditcardConfig);
+        }
     }
 }
