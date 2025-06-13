@@ -45,6 +45,7 @@ class Events
     public static $aRemovedPaymentMethods = [
         'molliebitcoin',
         'mollieinghomepay',
+        'molliesofort',
     ];
     
     /**
