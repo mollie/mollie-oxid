@@ -132,6 +132,16 @@ abstract class Base
     protected $blNeedsExtendedAddress = false;
 
     /**
+     * @var string|false
+     */
+    protected $sCaptureMethod = false;
+
+    /**
+     * @var array|null
+     */
+    protected $aAvailableCaptureMethods = null;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -568,7 +578,18 @@ abstract class Base
      */
     public function getPaymentSpecificParameters(Order $oOrder)
     {
-        return [];
+        $aParams = [];
+
+        $sCaptureMethod = $this->getCaptureMethod();
+        if ($this->getApiMethod($oOrder) == 'payment' && $sCaptureMethod !== false) { // Merchant capture only available for Payment API
+            $oOrder->mollieSetCaptureMode($sCaptureMethod);
+            $aParams['captureMode'] = $sCaptureMethod;
+            if ($sCaptureMethod === 'automatic') {
+                $aParams['captureDelay'] = $this->getCaptureDays().' days';
+            }
+        }
+
+        return $aParams;
     }
 
     /**
@@ -640,6 +661,24 @@ abstract class Base
     public function isExtendedAddressNeeded()
     {
         return $this->blNeedsExtendedAddress;
+    }
+
+    /**
+     * Returns the capture method
+     *
+     * @return string|false
+     */
+    public function getCaptureMethod()
+    {
+        return $this->sCaptureMethod;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getAvailableCaptureMethods()
+    {
+        return $this->aAvailableCaptureMethods;
     }
 
     /**

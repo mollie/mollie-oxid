@@ -24,4 +24,9 @@ class KlarnaPayNow extends Base
      * @var bool
      */
     protected $blIsOnlyOrderApiSupported = true;
+
+    /**
+     * @var bool
+     */
+    protected $blNeedsExtendedAddress = true;
 }

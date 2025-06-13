@@ -6,6 +6,7 @@ namespace Mollie\Api\Endpoints;
 use Mollie\Api\Resources\Balance;
 use Mollie\Api\Resources\BalanceTransaction;
 use Mollie\Api\Resources\BalanceTransactionCollection;
+use Mollie\Api\Resources\LazyCollection;
 class BalanceTransactionEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     /**
@@ -44,6 +45,19 @@ class BalanceTransactionEndpoint extends \Mollie\Api\Endpoints\CollectionEndpoin
         return $this->listForId($balance->id, $parameters);
     }
     /**
+     * Create an iterator for iterating over balance transactions for the given balance retrieved from Mollie.
+     *
+     * @param Balance $balance
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iteratorFor(\Mollie\Api\Resources\Balance $balance, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
+    {
+        return $this->iteratorForId($balance->id, $parameters, $iterateBackwards);
+    }
+    /**
      * List the transactions for a specific Balance ID.
      *
      * @param string $balanceId
@@ -58,6 +72,20 @@ class BalanceTransactionEndpoint extends \Mollie\Api\Endpoints\CollectionEndpoin
         return parent::rest_list(null, null, $parameters);
     }
     /**
+     * Create an iterator for iterating over balance transactions for the given balance id retrieved from Mollie.
+     *
+     * @param string $balanceId
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iteratorForId(string $balanceId, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
+    {
+        $this->parentId = $balanceId;
+        return $this->rest_iterator(null, null, $parameters, $iterateBackwards);
+    }
+    /**
      * List the transactions for the primary Balance.
      *
      * @param array $parameters
@@ -69,5 +97,18 @@ class BalanceTransactionEndpoint extends \Mollie\Api\Endpoints\CollectionEndpoin
     {
         $this->parentId = "primary";
         return parent::rest_list(null, null, $parameters);
+    }
+    /**
+     * Create an iterator for iterating over transactions for the primary balance retrieved from Mollie.
+     *
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iteratorForPrimary(array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
+    {
+        $this->parentId = "primary";
+        return $this->rest_iterator(null, null, $parameters, $iterateBackwards);
     }
 }

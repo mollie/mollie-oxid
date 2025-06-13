@@ -2,7 +2,7 @@
 
 namespace Mollie\Api\HttpAdapter;
 
-use Composer\CaBundle;
+use Mollie\Api\HttpAdapter\CaBundle;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Exceptions\CurlConnectTimeoutException;
 use Mollie\Api\MollieApiClient;
@@ -16,10 +16,6 @@ final class CurlMollieHttpAdapter implements \Mollie\Api\HttpAdapter\MollieHttpA
      * Default connect timeout (in seconds).
      */
     public const DEFAULT_CONNECT_TIMEOUT = 2;
-    /**
-     * HTTP status code for an empty ok response.
-     */
-    public const HTTP_NO_CONTENT = 204;
     /**
      * The maximum number of retries
      */
@@ -66,7 +62,7 @@ final class CurlMollieHttpAdapter implements \Mollie\Api\HttpAdapter\MollieHttpA
         \curl_setopt($curl, \CURLOPT_CONNECTTIMEOUT, self::DEFAULT_CONNECT_TIMEOUT);
         \curl_setopt($curl, \CURLOPT_TIMEOUT, self::DEFAULT_TIMEOUT);
         \curl_setopt($curl, \CURLOPT_SSL_VERIFYPEER, \true);
-        \curl_setopt($curl, \CURLOPT_CAINFO, CaBundle\CaBundle::getBundledCaBundlePath());
+        \curl_setopt($curl, \CURLOPT_CAINFO, \Mollie\Api\HttpAdapter\CaBundle::getBundledCaBundlePath());
         switch ($httpMethod) {
             case \Mollie\Api\MollieApiClient::HTTP_POST:
                 \curl_setopt($curl, \CURLOPT_POST, \true);
@@ -149,11 +145,8 @@ final class CurlMollieHttpAdapter implements \Mollie\Api\HttpAdapter\MollieHttpA
      */
     protected function parseResponseBody($response, $statusCode, $httpBody)
     {
-        if (empty($response)) {
-            if ($statusCode === self::HTTP_NO_CONTENT) {
-                return null;
-            }
-            throw new \Mollie\Api\Exceptions\ApiException("No response body found.");
+        if (empty($response) && $statusCode >= 200 && $statusCode < 300) {
+            return null;
         }
         $body = @\json_decode($response);
         // GUARDS
