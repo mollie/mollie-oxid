@@ -21,6 +21,7 @@ class PaymentController extends PaymentController_parent
             OrderHelper::getInstance()->cancelCurrentOrder();
         }
         Registry::getSession()->deleteVariable('mollieIsRedirected');
+        Registry::getSession()->deleteVariable('mollieRedirectUrl');
         parent::init();
     }
 

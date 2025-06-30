@@ -19,6 +19,7 @@ class OrderController extends OrderController_parent
             OrderHelper::getInstance()->cancelCurrentOrder();
         }
         Registry::getSession()->deleteVariable('mollieIsRedirected');
+        Registry::getSession()->deleteVariable('mollieRedirectUrl');
         return parent::render();
     }
 
@@ -63,6 +64,7 @@ class OrderController extends OrderController_parent
         $oPayment = $this->getPayment();
         if ($oPayment && $oPayment->isMolliePaymentMethod()) {
             Registry::getSession()->deleteVariable('mollieIsRedirected');
+            Registry::getSession()->deleteVariable('mollieRedirectUrl');
 
             $oOrder = $this->mollieGetOrder();
             if (!$oOrder) {
