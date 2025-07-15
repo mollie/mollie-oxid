@@ -535,17 +535,34 @@ class Order extends Order_parent
      */
     public function finalizeOrder(Basket $oBasket, $oUser, $blRecalculatingOrder = false)
     {
-        $this->mollieRecalculateOrder = $blRecalculatingOrder;
-        if (PaymentHelper::getInstance()->isMolliePaymentMethod($oBasket->getPaymentId()) === true) {
-            $this->mollieSetOrderIsLocked(1, $blRecalculatingOrder);
-            if ($this->mollieIsReturnAfterPayment() === true) {
-                $this->blMollieFinalizeReturnMode = true;
-            }
+        if (PaymentHelper::getInstance()->isMolliePaymentMethod($oBasket->getPaymentId()) === false) {
+            return parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
         }
+
+        $this->mollieRecalculateOrder = $blRecalculatingOrder;
+
+        $this->mollieSetOrderIsLocked(1, $blRecalculatingOrder);
+        if ($this->mollieIsReturnAfterPayment() === true) {
+            $this->blMollieFinalizeReturnMode = true;
+
+            // update order date to now, to refresh webhook lock timer
+            // webhook has a 10-minute lock timer when order is not yet finished
+            // when customer was on the redirect payment page for more than 10 minutes this could cause a race condition otherwise
+            $this->_updateOrderDate();
+        }
+
         if (Registry::getSession()->getVariable('mollieReinitializePaymentMode')) {
             $this->blMollieReinitializePaymentMode = true;
         }
-        return parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
+
+        $iRet = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
+        if ($iRet === self::ORDER_STATE_ORDEREXISTS) { // order already exists - probably a multiple clicks on "buy" button case
+            $sRedirectUrl = Registry::getSession()->getVariable('mollieRedirectUrl');
+            if (!empty($sRedirectUrl)) {
+                Registry::getUtils()->redirect($sRedirectUrl);
+            }
+        }
+        return $iRet;
     }
 
     /**
