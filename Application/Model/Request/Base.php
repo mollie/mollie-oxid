@@ -289,9 +289,10 @@ abstract class Base
      * @param CoreOrder $oOrder
      * @param array $aItems
      * @param double $dMismatchSum
+     * @param string $sNameField
      * @return array
      */
-    protected function getFixedItemArray(CoreOrder $oOrder, $aItems, $dMismatchSum)
+    protected function getFixedItemArray(CoreOrder $oOrder, $aItems, $dMismatchSum, $sNameField)
     {
         $blFixed = false;
 
@@ -318,9 +319,9 @@ abstract class Base
 
         if ($blFixed === false) {
             $aItems[] = [
-                'name' => Registry::getLang()->translateString('MOLLIE_ROUNDINGCORRECTION'),
+                $sNameField => Registry::getLang()->translateString('MOLLIE_ROUNDINGCORRECTION'),
                 'sku' => 'adjustment',
-                'type' => 'surcharge',
+                'type' => ($dMismatchSum < 0) ? 'discount' : 'surcharge',
                 'quantity' => 1,
                 'unitPrice' => $this->getAmountArray($dMismatchSum, $oOrder->oxorder__oxcurrency->value),
                 'discountAmount' => $this->getAmountArray(0, $oOrder->oxorder__oxcurrency->value),
@@ -403,7 +404,7 @@ abstract class Base
 
         $dMismatchSum = bcsub($oOrder->oxorder__oxtotalbrutsum->value, $dProductSum, 2);
         if ($dMismatchSum != 0) {
-            $aItems = $this->getFixedItemArray($oOrder, $aItems, $dMismatchSum);
+            $aItems = $this->getFixedItemArray($oOrder, $aItems, $dMismatchSum, $sNameField);
         }
 
         if ($oOrder->oxorder__oxdelcost->value != 0) {
