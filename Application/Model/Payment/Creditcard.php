@@ -110,7 +110,7 @@ class Creditcard extends Base
      */
     public function getCaptureMethod()
     {
-        $sCaptureMethod = $this->getConfigParam('capture_method');
+        $sCaptureMethod = $this->getConfiguredCaptureMode();
         if ($sCaptureMethod == 'authorize_capture') {
             return 'manual';
         } elseif ($sCaptureMethod == 'automatic_capture') {

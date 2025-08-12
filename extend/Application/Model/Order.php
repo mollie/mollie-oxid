@@ -141,6 +141,22 @@ class Order extends Order_parent
     }
 
     /**
+     * @return bool
+     */
+    public function mollieCanMarkOrderAsShipped()
+    {
+        if ($this->oxorder__mollieapi->value === 'order') {
+            return true;
+        }
+
+        if ($this->oxorder__mollieapi->value === 'payment' && $this->mollieGetPaymentModel()->getConfiguredCaptureMode() == "shipped_capture") {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Marks order as shipped in Mollie API
      *
      * @return void
@@ -165,7 +181,7 @@ class Order extends Order_parent
                 $oRequestLog->logRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
 
                 DatabaseProvider::getDb()->Execute("UPDATE oxorder SET mollieshipmenthasbeenmarked = 1 WHERE oxid = ?", array($this->getId()));
-            } elseif ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment && $this->mollieGetPaymentModel()->getConfigParam('capture_method') == "shipped_capture") {
+            } elseif ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment && $this->mollieGetPaymentModel()->getConfiguredCaptureMode() == "shipped_capture") {
                 $oResponse = $this->mollieCaptureOrder();
                 $oRequestLog->logRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
             }

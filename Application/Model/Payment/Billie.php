@@ -46,7 +46,7 @@ class Billie extends Base
      */
     public function getCaptureMethod()
     {
-        $sCaptureMethod = $this->getConfigParam('capture_method');
+        $sCaptureMethod = $this->getConfiguredCaptureMode();
         if ($sCaptureMethod == 'shipped_capture') {
             return 'manual';
         }
