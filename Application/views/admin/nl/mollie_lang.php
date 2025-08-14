@@ -16,6 +16,8 @@ $aLang = array(
     'SHOP_MODULE_sMollieLiveToken'                      => 'Live API Key',
     'SHOP_MODULE_blMollieShowIcons'                     => 'Toon iconen',
     'SHOP_MODULE_blMollieLogTransactionInfo'            => 'Logresultaten van transactieverwerking',
+    'SHOP_MODULE_GROUP_MOLLIE_REFUNDS'                  => 'Terugbetalingen',
+    'SHOP_MODULE_sMollieAutomaticRefundOnCancel'        => 'Automatische terugbetaling bij annulering van bestelling',
     'SHOP_MODULE_GROUP_MOLLIE_STATUS_MAPPING'           => 'Status In kaart brengen',
     'SHOP_MODULE_sMollieStatusPending'                  => 'Status In behandeling',
     'SHOP_MODULE_sMollieStatusProcessing'               => 'Status Verwerken',
@@ -39,6 +41,7 @@ $aLang = array(
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Toon betaaliconen tijdens checkout',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Log file hier te vinden: SHOPROOT/log/MollieTransactions.log',
+    'HELP_SHOP_MODULE_sMollieAutomaticRefundOnCancel'   => 'Als een bestelling wordt geannuleerd, wordt automatisch een terugbetaling uitgevoerd voor een reeds vastgelegde bestelling of wordt de bestaande autorisatie geannuleerd. Deze functie is alleen beschikbaar via de Payments API.',
     'HELP_SHOP_MODULE_sMollieCronjobLogLevel'           => 'Log file hier te vinden: SHOPROOT/log/MollieCronjobLog.log',
     'HELP_SHOP_MODULE_sMollieStatusPending'             => 'Stel de bestelstatus in voordat de klant wordt doorgestuurd naar Payment Gateway',
     'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Stel de bestelstatus in voor Completed Payments',

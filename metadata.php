@@ -163,6 +163,7 @@ ni costes de configuración. Solo va a pagar por las transacciones exitosas. Y s
         ['group' => 'MOLLIE_GENERAL',           'name' => 'sMollieTestToken',                   'type' => 'str',        'value' => '',          'position' => 30],
         ['group' => 'MOLLIE_GENERAL',           'name' => 'blMollieLogTransactionInfo',         'type' => 'bool',       'value' => '1',         'position' => 33],
         ['group' => 'MOLLIE_GENERAL',           'name' => 'blMollieShowIcons',                  'type' => 'bool',       'value' => '1',         'position' => 40],
+        ['group' => 'MOLLIE_REFUNDS',           'name' => 'sMollieAutomaticRefundOnCancel',     'type' => 'bool',       'value' => '0',         'position' => 45],
         ['group' => 'MOLLIE_STATUS_MAPPING',    'name' => 'sMollieStatusPending',               'type' => 'select',     'value' => '',          'position' => 50],
         ['group' => 'MOLLIE_STATUS_MAPPING',    'name' => 'sMollieStatusProcessing',            'type' => 'select',     'value' => '',          'position' => 60],
         ['group' => 'MOLLIE_STATUS_MAPPING',    'name' => 'sMollieStatusCancelled',             'type' => 'select',     'value' => '',          'position' => 70],

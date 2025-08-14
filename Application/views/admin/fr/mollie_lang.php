@@ -16,6 +16,8 @@ $aLang = array(
     'SHOP_MODULE_sMollieLiveToken'                      => 'Clé API Live',
     'SHOP_MODULE_blMollieShowIcons'                     => 'Afficher les icônes',
     'SHOP_MODULE_blMollieLogTransactionInfo'            => 'Journaliser le résultat du traitement des transactions',
+    'SHOP_MODULE_GROUP_MOLLIE_REFUNDS'                  => 'Remboursements',
+    'SHOP_MODULE_sMollieAutomaticRefundOnCancel'        => 'Remboursement automatique en cas d’annulation de commande',
     'SHOP_MODULE_GROUP_MOLLIE_STATUS_MAPPING'           => 'Correspondances des statuts',
     'SHOP_MODULE_sMollieStatusPending'                  => 'Statut En attente',
     'SHOP_MODULE_sMollieStatusProcessing'               => 'Statut En traitement',
@@ -39,6 +41,7 @@ $aLang = array(
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Afficher les icônes de paiement sur le Checkout',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Le fichier de journalisation se trouve ici: SHOPROOT/log/MollieTransactions.log',
+    'HELP_SHOP_MODULE_sMollieAutomaticRefundOnCancel'   => 'Si une commande est annulée, un remboursement automatique sera effectué pour une commande déjà capturée ou l’autorisation existante sera annulée. Cette fonction est uniquement disponible via la Payments API.',
     'HELP_SHOP_MODULE_sMollieCronjobLogLevel'           => 'Le fichier de journalisation se trouve ici: SHOPROOT/log/MollieCronjobLog.log',
     'HELP_SHOP_MODULE_sMollieStatusPending'             => 'Définir le statut de commande avant que le client ne soit redirigé vers le portail de paiement',
     'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Définir le statut de commande pour les paiement achevés',

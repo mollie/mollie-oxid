@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Controller\Admin;
 
+use Mollie\Payment\Application\Helper\Api;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
 use Mollie\Payment\Application\Helper\Order as OrderHelper;
@@ -106,7 +107,7 @@ class OrderCapture extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     protected function formatPrice($dPrice)
     {
-        return number_format($dPrice, 2, '.', '');
+        return Api::getInstance()->formatPrice($dPrice);
     }
 
     /**
@@ -203,10 +204,7 @@ class OrderCapture extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     protected function getRefundParameters($blFull = true, $dFreeAmount = null)
     {
         if(!empty($dFreeAmount)) {
-            $aParams = ["amount" => [
-                "currency" => $this->getOrder()->oxorder__oxcurrency->value,
-                "value" => $this->formatPrice($dFreeAmount)
-            ]];
+            $aParams = ["amount" => Api::getInstance()->getAmountArray($dFreeAmount, $this->getOrder()->oxorder__oxcurrency->value)];
         } elseif($blFull === false) {
             $aParams = $this->getPartialRefundParameters();
         } else {
@@ -215,10 +213,7 @@ class OrderCapture extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
                 $dAmount = $this->getRemainingRefundableAmount();
             }
 
-            $aParams = ["amount" => [
-                "currency" => $this->getOrder()->oxorder__oxcurrency->value,
-                "value" => $this->formatPrice($dAmount)
-            ]];
+            $aParams = ["amount" => Api::getInstance()->getAmountArray($dAmount, $this->getOrder()->oxorder__oxcurrency->value)];
         }
 
         $sDescription = Registry::getRequest()->getRequestEscapedParameter('refund_description');
