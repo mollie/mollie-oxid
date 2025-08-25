@@ -41,7 +41,6 @@ class OrderShipment extends \Mollie\Payment\Application\Model\Cronjob\Base
                         oxorder 
                     WHERE 
                         oxpaymenttype LIKE '%mollie%' AND
-                        oxtransid LIKE '%ord_%' AND
                         oxsenddate >= ? AND
                         mollieshipmenthasbeenmarked = 0";
         $aParams = [$sMinSendDate];
@@ -67,7 +66,7 @@ class OrderShipment extends \Mollie\Payment\Application\Model\Cronjob\Base
         $aUnmarkedOrders = $this->getUnmarkedShippedOrders();
         foreach ($aUnmarkedOrders as $sUnmarkedOrderId) {
             $oOrder = oxNew(Order::class);
-            if ($oOrder->load($sUnmarkedOrderId) && $oOrder->mollieIsMolliePaymentUsed()) {
+            if ($oOrder->load($sUnmarkedOrderId) && $oOrder->mollieIsMolliePaymentUsed() && $oOrder->mollieCanMarkOrderAsShipped()) {
                 $oOrder->mollieMarkOrderAsShipped();
                 self::outputStandardInfo("Order has been marked as shipped for Mollie", $oOrder->getId());
             }

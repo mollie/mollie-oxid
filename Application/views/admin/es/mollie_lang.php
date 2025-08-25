@@ -16,6 +16,8 @@ $aLang = array(
     'SHOP_MODULE_sMollieLiveToken'                      => 'Clave de API activa',
     'SHOP_MODULE_blMollieShowIcons'                     => 'Mostrar iconos',
     'SHOP_MODULE_blMollieLogTransactionInfo'            => 'Registrar resultado de la gestión de la transacción',
+    'SHOP_MODULE_GROUP_MOLLIE_REFUNDS'                  => 'Reembolsos',
+    'SHOP_MODULE_sMollieAutomaticRefundOnCancel'        => 'Reembolso automático por cancelación de pedido',
     'SHOP_MODULE_GROUP_MOLLIE_STATUS_MAPPING'           => 'Estado asignación',
     'SHOP_MODULE_sMollieStatusPending'                  => 'Estado pendiente',
     'SHOP_MODULE_sMollieStatusProcessing'               => 'Estado procesando',
@@ -61,6 +63,7 @@ $aLang = array(
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Mostrar iconos de pago en la finalización de la compra',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'El archivo de registro se encuentra aquí: SHOPROOT/log/MollieTransactions.log',
+    'HELP_SHOP_MODULE_sMollieAutomaticRefundOnCancel'   => 'Si se cancela un pedido, se emitirá un reembolso automático para un pedido ya capturado o se anulará la autorización existente. Esta función solo está disponible a través de la Payments API.',
     'HELP_SHOP_MODULE_sMollieCronjobLogLevel'           => 'El archivo de registro se encuentra aquí: SHOPROOT/log/MollieCronjobLog.log',
     'HELP_SHOP_MODULE_sMollieStatusPending'             => 'Establecer el estado del pedido antes de que el cliente sea redirigido a la pasarela de pago',
     'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Establecer el estado del pedido para los pagos completados',

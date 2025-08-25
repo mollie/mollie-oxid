@@ -16,6 +16,8 @@ $aLang = array(
     'SHOP_MODULE_sMollieLiveToken'                      => 'Live API Key',
     'SHOP_MODULE_blMollieShowIcons'                     => 'Show icons',
     'SHOP_MODULE_blMollieLogTransactionInfo'            => 'Log result of transaction handling',
+    'SHOP_MODULE_GROUP_MOLLIE_REFUNDS'                  => 'Refunds',
+    'SHOP_MODULE_sMollieAutomaticRefundOnCancel'        => 'Automatic refund for order cancellation',
     'SHOP_MODULE_GROUP_MOLLIE_STATUS_MAPPING'           => 'Status Mapping',
     'SHOP_MODULE_sMollieStatusPending'                  => 'Status Pending',
     'SHOP_MODULE_sMollieStatusProcessing'               => 'Status Processing',
@@ -63,6 +65,7 @@ $aLang = array(
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Show Payment Icons on Checkout',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Log file to be found here: SHOPROOT/log/MollieTransactions.log',
+    'HELP_SHOP_MODULE_sMollieAutomaticRefundOnCancel'   => 'If an order is cancelled, an automatic refund will be issued for an already captured order, or the existing authorization will be voided. This function is only available via the Payments API.',
     'HELP_SHOP_MODULE_sMollieCronjobLogLevel'           => 'Log file to be found here: SHOPROOT/log/MollieCronjobLog.log',
     'HELP_SHOP_MODULE_sMollieStatusPending'             => 'Set the order status before the customer is redirected to Payment Gateway',
     'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Set the order status for Completed Payments',

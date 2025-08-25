@@ -5,6 +5,7 @@ namespace Mollie\Payment\extend\Application\Model;
 use Exception;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Capture;
+use Mollie\Payment\Application\Helper\Api;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
 use Mollie\Payment\Application\Model\Payment\Base;
@@ -142,6 +143,22 @@ class Order extends Order_parent
     }
 
     /**
+     * @return bool
+     */
+    public function mollieCanMarkOrderAsShipped()
+    {
+        if ($this->oxorder__mollieapi->value === 'order') {
+            return true;
+        }
+
+        if ($this->oxorder__mollieapi->value === 'payment' && $this->mollieGetPaymentModel()->getConfiguredCaptureMode() == "shipped_capture") {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Marks order as shipped in Mollie API
      *
      * @return void
@@ -166,7 +183,7 @@ class Order extends Order_parent
                 $oRequestLog->logRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
 
                 DatabaseProvider::getDb()->Execute("UPDATE oxorder SET mollieshipmenthasbeenmarked = 1 WHERE oxid = ?", array($this->getId()));
-            } elseif ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment && $this->mollieGetPaymentModel()->getConfigParam('capture_method') == "shipped_capture") {
+            } elseif ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment && $this->mollieGetPaymentModel()->getConfiguredCaptureMode() == "shipped_capture") {
                 $oResponse = $this->mollieCaptureOrder();
                 $oRequestLog->logRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
             }
@@ -772,14 +789,66 @@ class Order extends Order_parent
 
             $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpointByOrder($this);
             $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value);
-            if ($this->isMolliePaymentCancelable($oMollieApiOrder)) {
-                try {
-                    $oApiEndpoint->cancel($this->oxorder__oxtransid->value);
-                } catch (\Throwable $exc) {
-                    // cancel call can throw an exception but still lead to the desired behaviour
+            try {
+                if ($this->isMolliePaymentAutomaticallyRefundable($oMollieApiOrder)) {
+                    $this->mollieRefundPayment($oMollieApiOrder, $this->oxorder__oxcurrency->value);
+                } elseif ($this->isMolliePaymentCancelable($oMollieApiOrder)) {
+                    $this->mollieCancelPayment($oApiEndpoint);
                 }
+            } catch (\Throwable $exc) {
+                // cancel call can throw an exception but still lead to the desired behaviour
             }
         }
+    }
+
+    /**
+     * @param $oMollieApiOrder
+     * @return bool
+     */
+    protected function isMolliePaymentAutomaticallyRefundable($oMollieApiOrder)
+    {
+        if (!$oMollieApiOrder instanceof \Mollie\Api\Resources\Payment || (bool)Registry::getConfig()->getShopConfVar('sMollieAutomaticRefundOnCancel') === false) {
+            return false;
+        }
+
+        if ($oMollieApiOrder->isPaid() && $oMollieApiOrder->getSettlementAmount() > 0 && $oMollieApiOrder->getAmountRemaining() > 0) { // amount remaining is amount remaining to be refunded
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Refunds payment and logs api request and response
+     *
+     * @param object $oMollieApiOrder
+     * @param string $sCurrency
+     * @return void
+     */
+    protected function mollieRefundPayment($oMollieApiOrder, $sCurrency)
+    {
+        $dRemainingAmount = $oMollieApiOrder->getAmountRemaining();
+
+        $aParams = [
+            "amount" => Api::getInstance()->getAmountArray($dRemainingAmount, $sCurrency),
+        ];
+
+        $oResponse = $oMollieApiOrder->refund($aParams);
+
+        Api::getInstance()->logApiRequest($aParams, $oResponse, $this->getId(), $this->getConfig()->getShopId());
+    }
+
+    /**
+     * Cancels payment and logs api request and response
+     *
+     * @param $oApiEndpoint
+     * @return void
+     */
+    protected function mollieCancelPayment($oApiEndpoint)
+    {
+        $oResponse = $oApiEndpoint->cancel($this->oxorder__oxtransid->value);
+
+        Api::getInstance()->logApiRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
     }
 
     /**
@@ -794,7 +863,6 @@ class Order extends Order_parent
         if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment && // Merchant capture only available in Payment API
             !$oMollieApiOrder->isCancelable && // Order will say it is not cancelable - thats normal
             $oMollieApiOrder->status == 'authorized' && // authorized means it isn't paid yet
-            $oMollieApiOrder->captureMode == 'automatic' && // automatic means that the payment will be captured after a certain amount of days
             !empty($oMollieApiOrder->captureBefore) && // captureBefore will be empty when it was cancelled, before that it will have a date as value (format: YYYY-MM-DD)
             strtotime(date('Y-m-d')) <= strtotime($oMollieApiOrder->captureBefore) // check if todays date is the same or lower than the captureBefore date
         ) {

@@ -16,6 +16,8 @@ $aLang = array(
     'SHOP_MODULE_sMollieLiveToken'                      => 'Chiave API live',
     'SHOP_MODULE_blMollieShowIcons'                     => 'Mostra icone',
     'SHOP_MODULE_blMollieLogTransactionInfo'            => 'Registra risultato della gestione delle transazioni',
+    'SHOP_MODULE_GROUP_MOLLIE_REFUNDS'                  => 'Rimborsi',
+    'SHOP_MODULE_sMollieAutomaticRefundOnCancel'        => 'Rimborso automatico in caso di annullamento dell’ordine',
     'SHOP_MODULE_GROUP_MOLLIE_STATUS_MAPPING'           => 'Registrazione dello stato',
     'SHOP_MODULE_sMollieStatusPending'                  => 'Stato in sospeso',
     'SHOP_MODULE_sMollieStatusProcessing'               => 'Stato in elaborazione',
@@ -61,6 +63,7 @@ $aLang = array(
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Mostra le icone di pagamento al checkout',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Il file di log è disponibile qui: SHOPROOT/log/MollieTransactions.log',
+    'HELP_SHOP_MODULE_sMollieAutomaticRefundOnCancel'   => 'Se un ordine viene annullato, verrà emesso un rimborso automatico per un ordine già acquisito oppure l’autorizzazione esistente verrà annullata. Questa funzione è disponibile solo tramite la Payments API.',
     'HELP_SHOP_MODULE_sMollieCronjobLogLevel'           => 'Il file di log è disponibile qui: SHOPROOT/log/MollieCronjobLog.log',
     'HELP_SHOP_MODULE_sMollieStatusPending'             => 'Impostare lo stato dell\'ordine prima che il cliente venga reindirizzato al gateway di pagamento',
     'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Impostare lo stato dell\'ordine per Pagamenti completati',

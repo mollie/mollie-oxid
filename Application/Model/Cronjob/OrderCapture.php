@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Model\Cronjob;
 
+use Mollie\Payment\Application\Helper\Api;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
@@ -85,10 +86,7 @@ class OrderCapture extends \Mollie\Payment\Application\Model\Cronjob\Base
             self::outputExtendedInfo("Check if payment can be captured", $sOrderId);
             if ($oOrder->load($sOrderId) && $this->isOrderAuthorized($oOrder) === true) {
                 $dAmount = (double)$oOrder->oxorder__oxtotalordersum->value;
-                $aParams['amount'] = [
-                    "currency" => $oOrder->oxorder__oxcurrency->value,
-                    "value" => $this->formatPrice($dAmount)
-                ];
+                $aParams['amount'] = Api::getInstance()->getAmountArray($dAmount, $oOrder->oxorder__oxcurrency->value);
 
                 self::outputExtendedInfo("Send capture request: ".print_r($aParams, true), $oOrder->getId());
 
@@ -106,16 +104,4 @@ class OrderCapture extends \Mollie\Payment\Application\Model\Cronjob\Base
         }
         return true;
     }
-
-    /**
-     * Format prices to always have 2 decimal places
-     *
-     * @param double $dPrice
-     * @return string
-     */
-    protected function formatPrice($dPrice)
-    {
-        return number_format($dPrice, 2, '.', '');
-    }
-
 }

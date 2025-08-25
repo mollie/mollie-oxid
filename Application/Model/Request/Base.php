@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Model\Request;
 
+use Mollie\Payment\Application\Helper\Api;
 use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Basket;
@@ -49,21 +50,6 @@ abstract class Base
     public function addParameter($sKey, $mValue)
     {
         $this->aParameters[$sKey] = $mValue;
-    }
-
-    /**
-     * Get amount array
-     *
-     * @param CoreOrder $oOrder
-     * @param double $dAmount
-     * @return array
-     */
-    protected function getAmountParameters(CoreOrder $oOrder, $dAmount)
-    {
-        return [
-            'currency' => $oOrder->oxorder__oxcurrency->value,
-            'value' => number_format($dAmount, 2, '.', ''),
-        ];
     }
 
     /**
@@ -188,7 +174,7 @@ abstract class Base
      */
     protected function formatPrice($dPrice)
     {
-        return number_format($dPrice, 2, '.', '');
+        return Api::getInstance()->formatPrice($dPrice);
     }
 
     /**
@@ -200,10 +186,7 @@ abstract class Base
      */
     protected function getAmountArray($dPrice, $sCurrency)
     {
-        return [
-            'value' => $this->formatPrice($dPrice),
-            'currency' => $sCurrency
-        ];
+        return Api::getInstance()->getAmountArray($dPrice, $sCurrency);
     }
 
     /**
@@ -510,7 +493,7 @@ abstract class Base
         $oPaymentModel = $oOrder->mollieGetPaymentModel();
 
         $this->addParameter('method', $oPaymentModel->getMolliePaymentCode());
-        $this->addParameter('amount', $this->getAmountParameters($oOrder, $dAmount));
+        $this->addParameter('amount', $this->getAmountArray($dAmount, $oOrder->oxorder__oxcurrency->value));
 
         if ($oPaymentModel->isRedirectUrlNeeded($oOrder) === true) {
             $this->addParameter('redirectUrl', $sReturnUrl);

@@ -16,6 +16,8 @@ $aLang = array(
     'SHOP_MODULE_sMollieLiveToken'                      => 'Live API Key',
     'SHOP_MODULE_blMollieShowIcons'                     => 'Icons Anzeigen',
     'SHOP_MODULE_blMollieLogTransactionInfo'            => 'Ergebnisse von Transaktions-Verarbeitung loggen',
+    'SHOP_MODULE_GROUP_MOLLIE_REFUNDS'                  => 'Rückerstattungen',
+    'SHOP_MODULE_sMollieAutomaticRefundOnCancel'        => 'Automatische Rückerstattung bei Bestellstornierung',
     'SHOP_MODULE_GROUP_MOLLIE_STATUS_MAPPING'           => 'Status Mapping',
     'SHOP_MODULE_sMollieStatusPending'                  => 'Status Ausstehend',
     'SHOP_MODULE_sMollieStatusProcessing'               => 'Status in Bearbeitung',
@@ -63,6 +65,7 @@ $aLang = array(
 
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Zahlungs-Icons beim Bezahlen Anzeigen',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Log-Datei zu finden unter SHOPROOT/log/MollieTransactions.log',
+    'HELP_SHOP_MODULE_sMollieAutomaticRefundOnCancel'   => 'Wenn eine Bestellung storniert wird, findet eine automatische Rückerstattung bereits eingezogener Bezahlungen statt oder das existierende Authorize wird aufgelöst. Diese Funktion steht nur über die Payments API zu Verfügung.',
     'HELP_SHOP_MODULE_sMollieCronjobLogLevel'           => 'Log-Datei zu finden unter SHOPROOT/log/MollieCronjobLog.log',
     'HELP_SHOP_MODULE_sMollieStatusPending'             => 'Legen Sie den Bestell-Status fest, bevor der Kunde zum Zahlungs-Gateway umgeleitet wird',
     'HELP_SHOP_MODULE_sMollieStatusProcessing'          => 'Legen Sie den Bestell-Status für Abgeschlossene Zahlungen fest',
