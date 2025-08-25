@@ -121,9 +121,24 @@ class MandateEndpoint extends CollectionEndpointAbstract
     }
 
     /**
+     * Create an iterator for iterating over mandates for the given customer, retrieved from Mollie.
+     *
+     * @param Customer $customer
+     * @param string $from The first resource ID you want to include in your list.
+     * @param int $limit
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iteratorFor(\Mollie\Api\Resources\Customer $customer, ?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
+    {
+        return $this->iteratorForId($customer->id, $from, $limit, $parameters, $iterateBackwards);
+    }
+    /**
      * @param string $customerId
-     * @param null $from
-     * @param null $limit
+     * @param string|null $from
+     * @param int|null $limit
      * @param array $parameters
      *
      * @return \Mollie\Api\Resources\MandateCollection
@@ -154,6 +169,22 @@ class MandateEndpoint extends CollectionEndpointAbstract
         return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }
 
+    /**
+     * Create an iterator for iterating over mandates for the given customer id, retrieved from Mollie.
+     *
+     * @param string $customerId
+     * @param string $from The first resource ID you want to include in your list.
+     * @param int $limit
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iteratorForId(string $customerId, ?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
+    {
+        $this->parentId = $customerId;
+        return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
+    }
     /**
      * @param Customer $customer
      * @param string $mandateId

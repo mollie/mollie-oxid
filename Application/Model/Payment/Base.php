@@ -135,6 +135,21 @@ abstract class Base
     protected $blMethodIsDeprecated = false;
 
     /**
+     * @var bool
+     */
+    protected $blNeedsExtendedAddress = false;
+
+    /**
+     * @var string|false
+     */
+    protected $sCaptureMethod = false;
+
+    /**
+     * @var array|null
+     */
+    protected $aAvailableCaptureMethods = null;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -581,7 +596,18 @@ abstract class Base
      */
     public function getPaymentSpecificParameters(Order $oOrder)
     {
-        return [];
+        $aParams = [];
+
+        $sCaptureMethod = $this->getCaptureMethod();
+        if ($this->getApiMethod($oOrder) == 'payment' && $sCaptureMethod !== false) { // Merchant capture only available for Payment API
+            $oOrder->mollieSetCaptureMode($sCaptureMethod);
+            $aParams['captureMode'] = $sCaptureMethod;
+            if ($sCaptureMethod === 'automatic') {
+                $aParams['captureDelay'] = $this->getCaptureDays().' days';
+            }
+        }
+
+        return $aParams;
     }
 
     /**
@@ -636,7 +662,7 @@ abstract class Base
     }
 
     /**
-     * Returns im this method is deprecated
+     * Returns if this method is deprecated
      *
      * @return bool
      */
@@ -654,5 +680,78 @@ abstract class Base
     public function handlePaymentError(ApiException $exc)
     {
         // do nothing here - method can be overloaded by child classes
+    }
+
+    /**
+     * Returns if payment methods needs extended address info
+     *
+     * @return bool
+     */
+    public function isExtendedAddressNeeded()
+    {
+        return $this->blNeedsExtendedAddress;
+    }
+
+    /**
+     * Returns the capture method
+     *
+     * @return string|false
+     */
+    public function getCaptureMethod()
+    {
+        return $this->sCaptureMethod;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getAvailableCaptureMethods()
+    {
+        return $this->aAvailableCaptureMethods;
+    }
+
+    /**
+     * Returns if current order is being considered as a B2B order
+     *
+     * @param  Basket $oBasket
+     * @return bool
+     */
+    protected function isB2BOrder($oBasket)
+    {
+        $oUser = $oBasket->getBasketUser();
+        if (!empty($oUser->oxuser__oxcompany->value)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns if payment method is available for the current basket situation. The limiting factors are:
+     *
+     * 1. Payment method not activated in the Mollie dashboard or for the current billing country, basket amount, currency situation
+     * 2. BasketSum is outside of the min-/max-limits of the payment method
+     * 3. Payment method has a billing country restriction and customer is not from that country
+     * 4. Payment method is only available for B2B orders and current order is not a B2B order
+     * 5. Currently selected currency is not supported by payment method
+     * 6. Method is not displayable in the payment list
+     * 7. Payment method is deprecated
+     *
+     * @return bool
+     */
+    public function isMethodAvailable($oBasket)
+    {
+        $sBillingCountryCode = User::getInstance()->getBillingCountry($oBasket);
+        $sCurrency = $oBasket->getBasketCurrency()->name;
+        if ($this->isMolliePaymentActive($sBillingCountryCode, $oBasket->getPrice()->getBruttoPrice(), $sCurrency) === false ||
+            $this->mollieIsBasketSumInLimits($oBasket->getPrice()->getBruttoPrice(), $sBillingCountryCode, $sCurrency) === false ||
+            $this->mollieIsMethodAvailableForCountry($sBillingCountryCode) === false ||
+            ($this->isOnlyB2BSupported() === true && $this->isB2BOrder($oBasket) === false) ||
+            $this->isCurrencySupported($sCurrency) === false ||
+            $this->isMethodDisplayableInPaymentList() === false ||
+            $this->isMethodDeprecated() === true
+        ) {
+            return false;
+        }
+        return true;
     }
 }

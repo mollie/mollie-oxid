@@ -1,30 +1,25 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Mollie\Api\Endpoints;
 
 use Mollie\Api\Resources\Capture;
 use Mollie\Api\Resources\CaptureCollection;
 use Mollie\Api\Resources\LazyCollection;
-
-class SettlementCaptureEndpoint extends CollectionEndpointAbstract
+class SettlementCaptureEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     protected $resourcePath = "settlements_captures";
-
     /**
      * @inheritDoc
      */
     protected function getResourceObject()
     {
-        return new Capture($this->client);
+        return new \Mollie\Api\Resources\Capture($this->client);
     }
-
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new CaptureCollection($this->client, $count, $_links);
+        return new \Mollie\Api\Resources\CaptureCollection($this->client, $count, $_links);
     }
-
     /**
      * Retrieves a collection of Settlement Captures from Mollie.
      *
@@ -36,13 +31,11 @@ class SettlementCaptureEndpoint extends CollectionEndpointAbstract
      * @return mixed
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function pageForId(string $settlementId, string $from = null, int $limit = null, array $parameters = [])
+    public function pageForId(string $settlementId, ?string $from = null, ?int $limit = null, array $parameters = [])
     {
         $this->parentId = $settlementId;
-
         return $this->rest_list($from, $limit, $parameters);
     }
-
     /**
      * Create an iterator for iterating over captures for the given settlement id, retrieved from Mollie.
      *
@@ -54,10 +47,9 @@ class SettlementCaptureEndpoint extends CollectionEndpointAbstract
      *
      * @return LazyCollection
      */
-    public function iteratorForId(string $settlementId, ?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    public function iteratorForId(string $settlementId, ?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
     {
         $this->parentId = $settlementId;
-
         return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }
 }

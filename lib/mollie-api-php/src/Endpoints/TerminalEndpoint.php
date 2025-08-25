@@ -6,24 +6,20 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\LazyCollection;
 use Mollie\Api\Resources\Terminal;
 use Mollie\Api\Resources\TerminalCollection;
-
-class TerminalEndpoint extends CollectionEndpointAbstract
+class TerminalEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     protected $resourcePath = "terminals";
-
     /**
      * @var string
      */
     public const RESOURCE_ID_PREFIX = 'term_';
-
     /**
      * @return Terminal
      */
     protected function getResourceObject()
     {
-        return new Terminal($this->client);
+        return new \Mollie\Api\Resources\Terminal($this->client);
     }
-
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -34,9 +30,8 @@ class TerminalEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new TerminalCollection($this->client, $count, $_links);
+        return new \Mollie\Api\Resources\TerminalCollection($this->client, $count, $_links);
     }
-
     /**
      * Retrieve terminal from Mollie.
      *
@@ -49,13 +44,11 @@ class TerminalEndpoint extends CollectionEndpointAbstract
      */
     public function get($terminalId, array $parameters = [])
     {
-        if (empty($terminalId) || strpos($terminalId, self::RESOURCE_ID_PREFIX) !== 0) {
-            throw new ApiException("Invalid terminal ID: '{$terminalId}'. A terminal ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
+        if (empty($terminalId) || \strpos($terminalId, self::RESOURCE_ID_PREFIX) !== 0) {
+            throw new \Mollie\Api\Exceptions\ApiException("Invalid terminal ID: '{$terminalId}'. A terminal ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
         }
-
         return parent::rest_read($terminalId, $parameters);
     }
-
     /**
      * Retrieves a collection of Terminals from Mollie for the current organization / profile, ordered from newest to oldest.
      *
@@ -70,7 +63,6 @@ class TerminalEndpoint extends CollectionEndpointAbstract
     {
         return $this->rest_list($from, $limit, $parameters);
     }
-
     /**
      * Create an iterator for iterating over terminals retrieved from Mollie.
      *
@@ -81,7 +73,7 @@ class TerminalEndpoint extends CollectionEndpointAbstract
      *
      * @return LazyCollection
      */
-    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
     {
         return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }

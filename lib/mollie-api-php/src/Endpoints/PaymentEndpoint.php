@@ -157,6 +157,20 @@ class PaymentEndpoint extends CollectionEndpointAbstract
     }
 
     /**
+     * Create an iterator for iterating over payments retrieved from Mollie.
+     *
+     * @param string $from The first resource ID you want to include in your list.
+     * @param int $limit
+     * @param array $parameters
+     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
+     *
+     * @return LazyCollection
+     */
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
+    {
+        return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
+    }
+    /**
      * Issue a refund for the given payment.
      *
      * The $data parameter may either be an array of endpoint parameters, a float value to
@@ -180,5 +194,19 @@ class PaymentEndpoint extends CollectionEndpointAbstract
         $result = $this->client->performHttpCall(self::REST_CREATE, $resource, $body);
 
         return ResourceFactory::createFromApiResult($result, new Refund($this->client));
+    }
+    /**
+     * Release the authorization for the given payment.
+     *
+     * @param Payment|string $paymentId
+     *
+     * @return void
+     * @throws ApiException
+     */
+    public function releaseAuthorization($paymentId) : void
+    {
+        $paymentId = $paymentId instanceof \Mollie\Api\Resources\Payment ? $paymentId->id : $paymentId;
+        $resource = "{$this->getResourcePath()}/" . \urlencode($paymentId) . "/release-authorization";
+        $this->client->performHttpCall(self::REST_CREATE, $resource);
     }
 }

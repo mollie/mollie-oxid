@@ -166,6 +166,9 @@ class Order extends Order_parent
                 $oRequestLog->logRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
 
                 DatabaseProvider::getDb()->Execute("UPDATE oxorder SET mollieshipmenthasbeenmarked = 1 WHERE oxid = ?", array($this->getId()));
+            } elseif ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment && $this->mollieGetPaymentModel()->getConfigParam('capture_method') == "shipped_capture") {
+                $oResponse = $this->mollieCaptureOrder();
+                $oRequestLog->logRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
             }
         } catch (Exception $exc) {
             $oRequestLog->logExceptionResponse([], $exc->getCode(), $exc->getMessage(), 'shipAll', $this->getId(), $this->getConfig()->getShopId());
@@ -314,9 +317,13 @@ class Order extends Order_parent
     /**
      * @return bool
      */
-    public function mollieIsManualCaptureMethod() {
-        $orderCaptureMethod = $this->oxorder__molliecapturemethod->value;
-        return $orderCaptureMethod === 'manual';
+    public function mollieIsManualCaptureMethod()
+    {
+        $sCaptureMethod = $this->oxorder__molliecapturemethod->value;
+        if ($sCaptureMethod == 'manual') {
+            return true;
+        }
+        return false;
     }
     /**
      * Determines if the current call is a return from a redirect payment
@@ -529,17 +536,34 @@ class Order extends Order_parent
      */
     public function finalizeOrder(Basket $oBasket, $oUser, $blRecalculatingOrder = false)
     {
-        $this->mollieRecalculateOrder = $blRecalculatingOrder;
-        if (PaymentHelper::getInstance()->isMolliePaymentMethod($oBasket->getPaymentId()) === true) {
-            $this->mollieSetOrderIsLocked(1, $blRecalculatingOrder);
-            if ($this->mollieIsReturnAfterPayment() === true) {
-                $this->blMollieFinalizeReturnMode = true;
-            }
+        if (PaymentHelper::getInstance()->isMolliePaymentMethod($oBasket->getPaymentId()) === false) {
+            return parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
         }
+
+        $this->mollieRecalculateOrder = $blRecalculatingOrder;
+
+        $this->mollieSetOrderIsLocked(1, $blRecalculatingOrder);
+        if ($this->mollieIsReturnAfterPayment() === true) {
+            $this->blMollieFinalizeReturnMode = true;
+
+            // update order date to now, to refresh webhook lock timer
+            // webhook has a 10-minute lock timer when order is not yet finished
+            // when customer was on the redirect payment page for more than 10 minutes this could cause a race condition otherwise
+            $this->_updateOrderDate();
+        }
+
         if (Registry::getSession()->getVariable('mollieReinitializePaymentMode')) {
             $this->blMollieReinitializePaymentMode = true;
         }
-        return parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
+
+        $iRet = parent::finalizeOrder($oBasket, $oUser, $blRecalculatingOrder);
+        if ($iRet === self::ORDER_STATE_ORDEREXISTS) { // order already exists - probably a multiple clicks on "buy" button case
+            $sRedirectUrl = Registry::getSession()->getVariable('mollieRedirectUrl');
+            if (!empty($sRedirectUrl)) {
+                Registry::getUtils()->redirect($sRedirectUrl);
+            }
+        }
+        return $iRet;
     }
 
     /**

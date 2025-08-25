@@ -6,19 +6,16 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Client;
 use Mollie\Api\Resources\ClientCollection;
 use Mollie\Api\Resources\LazyCollection;
-
-class ClientEndpoint extends CollectionEndpointAbstract
+class ClientEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     protected $resourcePath = "clients";
-
     /**
      * @return Client
      */
     protected function getResourceObject()
     {
-        return new Client($this->client);
+        return new \Mollie\Api\Resources\Client($this->client);
     }
-
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -29,9 +26,8 @@ class ClientEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new ClientCollection($this->client, $count, $_links);
+        return new \Mollie\Api\Resources\ClientCollection($this->client, $count, $_links);
     }
-
     /**
      * Retrieve a client from Mollie.
      *
@@ -47,12 +43,10 @@ class ClientEndpoint extends CollectionEndpointAbstract
     public function get($clientId, array $parameters = [])
     {
         if (empty($clientId)) {
-            throw new ApiException("Client ID is empty.");
+            throw new \Mollie\Api\Exceptions\ApiException("Client ID is empty.");
         }
-
         return parent::rest_read($clientId, $parameters);
     }
-
     /**
      * Retrieves a page of clients from Mollie.
      *
@@ -67,7 +61,6 @@ class ClientEndpoint extends CollectionEndpointAbstract
     {
         return $this->rest_list($from, $limit, $parameters);
     }
-
     /**
      * Create an iterator for iterating over clients retrieved from Mollie.
      *
@@ -78,7 +71,7 @@ class ClientEndpoint extends CollectionEndpointAbstract
      *
      * @return LazyCollection
      */
-    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
     {
         return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }

@@ -37,6 +37,15 @@ class Creditcard extends Base
     protected $sCustomFrontendTemplate = 'molliecreditcard.tpl';
 
     /**
+     * @var array|null
+     */
+    protected $aAvailableCaptureMethods = [
+        'authorize_capture',
+        'direct_capture',
+        'automatic_capture',
+    ];
+
+    /**
      * Returns current Mollie profileId
      *
      * @return string
@@ -46,7 +55,7 @@ class Creditcard extends Base
     {
         return Payment::getInstance()->getProfileId();
     }
-
+    
     /**
      * Returns configured mollie mode
      *
@@ -75,7 +84,7 @@ class Creditcard extends Base
      */
     public function getPaymentSpecificParameters(Order $oOrder)
     {
-        $aParams = [];
+        $aParams = parent::getPaymentSpecificParameters($oOrder);
 
         $oUser = $oOrder->getUser();
         // Feature is only activared for live mode, because Mollie throws an error when you send a request to live API with a test customerId which was created during testing before switching to live mode
@@ -84,15 +93,6 @@ class Creditcard extends Base
                 User::getInstance()->createMollieUser($oUser);
             }
             $aParams['customerId'] = (string)$oUser->oxuser__molliecustomerid->value;
-        }
-
-        $sMethod = $this->getCaptureMethod();
-        if ($this->getApiMethod($oOrder) == 'payment' && $sMethod !== false) { // Merchant capture only available for Payment API
-            $oOrder->mollieSetCaptureMode($sMethod);
-            $aParams['captureMode'] = $sMethod;
-            if ($sMethod === 'automatic') {
-                $aParams['captureDelay'] = $this->getCaptureDays().' days';
-            }
         }
 
         $sCCToken = $this->getDynValueParameter('mollieCCToken');
@@ -108,15 +108,15 @@ class Creditcard extends Base
      *
      * @return string|false
      */
-    protected function getCaptureMethod()
+    public function getCaptureMethod()
     {
-        $sCaptureMethod = $this->getConfigParam('creditcard_capture_method');
-        if ($sCaptureMethod == 'creditcard_authorize_capture') {
+        $sCaptureMethod = $this->getConfigParam('capture_method');
+        if ($sCaptureMethod == 'authorize_capture') {
             return 'manual';
-        } elseif ($sCaptureMethod == 'creditcard_automatic_capture') {
+        } elseif ($sCaptureMethod == 'automatic_capture') {
             return 'automatic';
         }
-        return false;
+        return parent::getCaptureMethod();
     }
 
     /**

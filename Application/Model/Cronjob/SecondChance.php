@@ -78,8 +78,12 @@ class SecondChance extends \Mollie\Payment\Application\Model\Cronjob\Base
         $aUnfinishedOrders = $this->getUnfinishedOrders();
         foreach ($aUnfinishedOrders as $sUnfinishedOrderId) {
             $oOrder = oxNew(Order::class);
+            self::outputExtendedInfo("Check if order is eligible for a second chance email", $sUnfinishedOrderId);
             if ($oOrder->load($sUnfinishedOrderId) && $oOrder->mollieIsEligibleForPaymentFinish(true)) {
                 $oOrder->mollieSendSecondChanceEmail();
+                self::outputStandardInfo("Second chance email has been sent", $oOrder->getId());
+            } else {
+                self::outputExtendedInfo("Order is not eligible for a second chance email", $sUnfinishedOrderId);
             }
         }
         return true;

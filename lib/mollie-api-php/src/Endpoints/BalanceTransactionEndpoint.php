@@ -1,42 +1,36 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Mollie\Api\Endpoints;
 
 use Mollie\Api\Resources\Balance;
 use Mollie\Api\Resources\BalanceTransaction;
 use Mollie\Api\Resources\BalanceTransactionCollection;
 use Mollie\Api\Resources\LazyCollection;
-
-class BalanceTransactionEndpoint extends CollectionEndpointAbstract
+class BalanceTransactionEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     /**
      * @var string
      */
     const RESOURCE_ID_PREFIX = 'baltr_';
-
     /**
      * @var string
      */
     protected $resourcePath = "balances_transactions";
-
     /**
      * @inheritDoc
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new BalanceTransactionCollection($this->client, $count, $_links);
+        return new \Mollie\Api\Resources\BalanceTransactionCollection($this->client, $count, $_links);
     }
-
     /**
      * @inheritDoc
      */
     protected function getResourceObject()
     {
-        return new BalanceTransaction($this->client);
+        return new \Mollie\Api\Resources\BalanceTransaction($this->client);
     }
-
     /**
      * List the transactions for a specific Balance.
      *
@@ -46,11 +40,10 @@ class BalanceTransactionEndpoint extends CollectionEndpointAbstract
      *
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function listFor(Balance $balance, array $parameters = [])
+    public function listFor(\Mollie\Api\Resources\Balance $balance, array $parameters = [])
     {
         return $this->listForId($balance->id, $parameters);
     }
-
     /**
      * Create an iterator for iterating over balance transactions for the given balance retrieved from Mollie.
      *
@@ -60,11 +53,10 @@ class BalanceTransactionEndpoint extends CollectionEndpointAbstract
      *
      * @return LazyCollection
      */
-    public function iteratorFor(Balance $balance, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    public function iteratorFor(\Mollie\Api\Resources\Balance $balance, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
     {
         return $this->iteratorForId($balance->id, $parameters, $iterateBackwards);
     }
-
     /**
      * List the transactions for a specific Balance ID.
      *
@@ -77,10 +69,8 @@ class BalanceTransactionEndpoint extends CollectionEndpointAbstract
     public function listForId(string $balanceId, array $parameters = [])
     {
         $this->parentId = $balanceId;
-
         return parent::rest_list(null, null, $parameters);
     }
-
     /**
      * Create an iterator for iterating over balance transactions for the given balance id retrieved from Mollie.
      *
@@ -90,13 +80,11 @@ class BalanceTransactionEndpoint extends CollectionEndpointAbstract
      *
      * @return LazyCollection
      */
-    public function iteratorForId(string $balanceId, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    public function iteratorForId(string $balanceId, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
     {
         $this->parentId = $balanceId;
-
         return $this->rest_iterator(null, null, $parameters, $iterateBackwards);
     }
-
     /**
      * List the transactions for the primary Balance.
      *
@@ -108,10 +96,8 @@ class BalanceTransactionEndpoint extends CollectionEndpointAbstract
     public function listForPrimary(array $parameters = [])
     {
         $this->parentId = "primary";
-
         return parent::rest_list(null, null, $parameters);
     }
-
     /**
      * Create an iterator for iterating over transactions for the primary balance retrieved from Mollie.
      *
@@ -120,10 +106,9 @@ class BalanceTransactionEndpoint extends CollectionEndpointAbstract
      *
      * @return LazyCollection
      */
-    public function iteratorForPrimary(array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    public function iteratorForPrimary(array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
     {
         $this->parentId = "primary";
-
         return $this->rest_iterator(null, null, $parameters, $iterateBackwards);
     }
 }

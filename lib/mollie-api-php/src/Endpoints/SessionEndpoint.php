@@ -6,16 +6,13 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\LazyCollection;
 use Mollie\Api\Resources\Session;
 use Mollie\Api\Resources\SessionCollection;
-
-class SessionEndpoint extends CollectionEndpointAbstract
+class SessionEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     protected $resourcePath = "sessions";
-
     /**
      * @var string
      */
     public const RESOURCE_ID_PREFIX = 'sess_';
-
     /**
      * Get the object that is used by this API endpoint. Every API endpoint uses one
      * type of object.
@@ -24,9 +21,8 @@ class SessionEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceObject()
     {
-        return new Session($this->client);
+        return new \Mollie\Api\Resources\Session($this->client);
     }
-
     /**
      * Get the collection object that is used by this API endpoint. Every API
      * endpoint uses one type of collection object.
@@ -38,9 +34,8 @@ class SessionEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new SessionCollection($this->client, $count, $_links);
+        return new \Mollie\Api\Resources\SessionCollection($this->client, $count, $_links);
     }
-
     /**
      * Creates a session in Mollie.
      *
@@ -54,7 +49,6 @@ class SessionEndpoint extends CollectionEndpointAbstract
     {
         return $this->rest_create($data, $filters);
     }
-
     /**
      * Update a specific Session resource
      *
@@ -68,13 +62,11 @@ class SessionEndpoint extends CollectionEndpointAbstract
      */
     public function update($resourceId, array $data = [])
     {
-        if (empty($resourceId) || strpos($resourceId, self::RESOURCE_ID_PREFIX) !== 0) {
-            throw new ApiException("Invalid session ID: '{$resourceId}'. A session ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
+        if (empty($resourceId) || \strpos($resourceId, self::RESOURCE_ID_PREFIX) !== 0) {
+            throw new \Mollie\Api\Exceptions\ApiException("Invalid session ID: '{$resourceId}'. A session ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
         }
-
         return parent::rest_update($resourceId, $data);
     }
-
     /**
      * Retrieve a single session from Mollie.
      *
@@ -87,13 +79,11 @@ class SessionEndpoint extends CollectionEndpointAbstract
      */
     public function get($resourceId, array $parameters = [])
     {
-        if (empty($resourceId) || strpos($resourceId, self::RESOURCE_ID_PREFIX) !== 0) {
-            throw new ApiException("Invalid session ID: '{$resourceId}'. A session ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
+        if (empty($resourceId) || \strpos($resourceId, self::RESOURCE_ID_PREFIX) !== 0) {
+            throw new \Mollie\Api\Exceptions\ApiException("Invalid session ID: '{$resourceId}'. A session ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
         }
-
         return parent::rest_read($resourceId, $parameters);
     }
-
     /**
      * Cancel the given Session.
      *
@@ -106,7 +96,6 @@ class SessionEndpoint extends CollectionEndpointAbstract
     {
         return $this->rest_delete($resourceId, $parameters);
     }
-
     /**
      * Retrieves a collection of Sessions from Mollie.
      *
@@ -121,7 +110,6 @@ class SessionEndpoint extends CollectionEndpointAbstract
     {
         return $this->rest_list($from, $limit, $parameters);
     }
-
     /**
      * Create an iterator for iterating over sessions retrieved from Mollie.
      *
@@ -132,7 +120,7 @@ class SessionEndpoint extends CollectionEndpointAbstract
      *
      * @return LazyCollection
      */
-    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
     {
         return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }

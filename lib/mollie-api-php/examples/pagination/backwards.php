@@ -1,4 +1,7 @@
 <?php
+
+namespace _PhpScoperfb65c95ebc2e;
+
 /*
  * How to use pagination with the Mollie API.
  *
@@ -28,31 +31,25 @@
  * - subscriptions
  * - terminals
  */
-
 try {
     /*
- * Initialize the Mollie API library with your API key or OAuth access token.
- */
+     * Initialize the Mollie API library with your API key or OAuth access token.
+     */
     require "../initialize.php";
-
     $orderId = 'ord_8wmqcHMN4U';
-
     // cursor paginating backwards through all orders
     $page = $mollie->orders->page($orderId);
-
     while ($page->hasPrevious()) {
         foreach ($page as $order) {
-            echo($order->id);
+            echo $order->id;
         }
-
         $page = $page->previous();
     }
-
     // iterating backwards using the iterator by passing iterateBackwards = true
     // in php 8.0+ you could also use the named parameter syntax iterator(iterateBackwards: true)
-    foreach ($mollie->orders->iterator(null, null, [], true) as $order) {
-        echo($order->id);
+    foreach ($mollie->orders->iterator(null, null, [], \true) as $order) {
+        echo $order->id;
     }
 } catch (\Mollie\Api\Exceptions\ApiException $e) {
-    echo "API call failed: " . htmlspecialchars($e->getMessage());
+    echo "API call failed: " . \htmlspecialchars($e->getMessage());
 }

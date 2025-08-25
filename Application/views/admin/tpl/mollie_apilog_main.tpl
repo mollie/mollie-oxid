@@ -98,7 +98,7 @@
                             [{/if}]
                         [{/if}]
                     [{/foreach}]
-                    [{if $request.lines && $request.lines|count > 2}]
+                    [{if $request.lines && $request.lines|@count > 0}]
                         [{foreach from=$request.lines item=line name=lines}]
                             <div class="linebox">
                                 <h2>[{$smarty.foreach.lines.iteration}]. Position</h2>
@@ -171,7 +171,7 @@
                             [{/if}]
                         [{/if}]
                     [{/foreach}]
-                    [{if $response.lines && $response.lines|count > 2}]
+                    [{if $response.lines && $response.lines|@count > 0}]
                         [{foreach from=$response.lines item=line name=lines}]
                             <div class="linebox">
                                 <h2>[{$smarty.foreach.lines.iteration}]. Position</h2>

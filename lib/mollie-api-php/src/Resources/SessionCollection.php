@@ -2,7 +2,7 @@
 
 namespace Mollie\Api\Resources;
 
-class SessionCollection extends CursorCollection
+class SessionCollection extends \Mollie\Api\Resources\CursorCollection
 {
     /**
      * @return string
@@ -11,12 +11,11 @@ class SessionCollection extends CursorCollection
     {
         return "sessions";
     }
-
     /**
      * @return BaseResource
      */
     protected function createResourceObject()
     {
-        return new Session($this->client);
+        return new \Mollie\Api\Resources\Session($this->client);
     }
 }

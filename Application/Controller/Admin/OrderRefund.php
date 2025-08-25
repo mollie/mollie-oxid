@@ -145,7 +145,8 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * @return bool
      */
-    public function orderNeedsManualCapture() {
+    public function orderNeedsManualCapture()
+    {
         $oOrder = $this->getOrder();
         return $oOrder->mollieGetPaymentModel()->isManualCaptureNeeded($oOrder);
     }
@@ -956,7 +957,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
                 'id' => $aBasketItem['sku'],
                 'type' => $sType,
                 'artnum' => $aBasketItem['sku'],
-                'title' => $aBasketItem['name'],
+                'title' => isset($aBasketItem['name']) ? $aBasketItem['name'] : $aBasketItem['description'],
                 'singlePrice' => $aBasketItem['unitPrice']['value'],
                 'totalPrice' => $aBasketItem['totalAmount']['value'],
                 'vat' => $aBasketItem['vatRate'],

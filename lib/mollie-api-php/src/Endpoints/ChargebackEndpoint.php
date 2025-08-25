@@ -6,11 +6,9 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Chargeback;
 use Mollie\Api\Resources\ChargebackCollection;
 use Mollie\Api\Resources\LazyCollection;
-
-class ChargebackEndpoint extends CollectionEndpointAbstract
+class ChargebackEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     protected $resourcePath = "chargebacks";
-
     /**
      * Get the object that is used by this API endpoint. Every API endpoint uses one type of object.
      *
@@ -18,9 +16,8 @@ class ChargebackEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceObject()
     {
-        return new Chargeback($this->client);
+        return new \Mollie\Api\Resources\Chargeback($this->client);
     }
-
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -31,9 +28,8 @@ class ChargebackEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new ChargebackCollection($this->client, $count, $_links);
+        return new \Mollie\Api\Resources\ChargebackCollection($this->client, $count, $_links);
     }
-
     /**
      * Retrieves a collection of Chargebacks from Mollie.
      *
@@ -48,7 +44,6 @@ class ChargebackEndpoint extends CollectionEndpointAbstract
     {
         return $this->rest_list($from, $limit, $parameters);
     }
-
     /**
      * Create an iterator for iterating over chargeback retrieved from Mollie.
      *
@@ -59,7 +54,7 @@ class ChargebackEndpoint extends CollectionEndpointAbstract
      *
      * @return LazyCollection
      */
-    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
     {
         return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }

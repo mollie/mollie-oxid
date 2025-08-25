@@ -4,27 +4,52 @@ namespace Mollie\Api\Endpoints;
 
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\LazyCollection;
-use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentLink;
 use Mollie\Api\Resources\PaymentLinkCollection;
-
-class PaymentLinkEndpoint extends CollectionEndpointAbstract
+class PaymentLinkEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     protected $resourcePath = "payment-links";
-
     /**
      * @var string
      */
     public const RESOURCE_ID_PREFIX = 'pl_';
-
+    /**
+     * Update a Payment Link.
+     *
+     * @param string $paymentLinkId
+     * @param array $data
+     * @return PaymentLink
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function update(string $paymentLinkId, array $data)
+    {
+        if (empty($paymentLinkId) || \strpos($paymentLinkId, self::RESOURCE_ID_PREFIX) !== 0) {
+            throw new \Mollie\Api\Exceptions\ApiException("Invalid payment ID: '{$paymentLinkId}'. A Payment Link ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
+        }
+        return $this->rest_update($paymentLinkId, $data);
+    }
+    /**
+     * Delete a Payment Link.
+     *
+     * @param string $paymentLinkId
+     * @param array $data
+     * @return void
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function delete(string $paymentLinkId, array $data = [])
+    {
+        if (empty($paymentLinkId) || \strpos($paymentLinkId, self::RESOURCE_ID_PREFIX) !== 0) {
+            throw new \Mollie\Api\Exceptions\ApiException("Invalid payment ID: '{$paymentLinkId}'. A Payment Link ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
+        }
+        $this->rest_delete($paymentLinkId, $data);
+    }
     /**
      * @return PaymentLink
      */
     protected function getResourceObject()
     {
-        return new PaymentLink($this->client);
+        return new \Mollie\Api\Resources\PaymentLink($this->client);
     }
-
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -35,9 +60,8 @@ class PaymentLinkEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new PaymentLinkCollection($this->client, $count, $_links);
+        return new \Mollie\Api\Resources\PaymentLinkCollection($this->client, $count, $_links);
     }
-
     /**
      * Creates a payment link in Mollie.
      *
@@ -51,7 +75,6 @@ class PaymentLinkEndpoint extends CollectionEndpointAbstract
     {
         return $this->rest_create($data, $filters);
     }
-
     /**
      * Retrieve payment link from Mollie.
      *
@@ -64,13 +87,11 @@ class PaymentLinkEndpoint extends CollectionEndpointAbstract
      */
     public function get($paymentLinkId, array $parameters = [])
     {
-        if (empty($paymentLinkId) || strpos($paymentLinkId, self::RESOURCE_ID_PREFIX) !== 0) {
-            throw new ApiException("Invalid payment link ID: '{$paymentLinkId}'. A payment link ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
+        if (empty($paymentLinkId) || \strpos($paymentLinkId, self::RESOURCE_ID_PREFIX) !== 0) {
+            throw new \Mollie\Api\Exceptions\ApiException("Invalid payment link ID: '{$paymentLinkId}'. A payment link ID should start with '" . self::RESOURCE_ID_PREFIX . "'.");
         }
-
         return parent::rest_read($paymentLinkId, $parameters);
     }
-
     /**
      * Retrieves a collection of Payment Links from Mollie.
      *
@@ -85,7 +106,6 @@ class PaymentLinkEndpoint extends CollectionEndpointAbstract
     {
         return $this->rest_list($from, $limit, $parameters);
     }
-
     /**
      * Create an iterator for iterating over payment links retrieved from Mollie.
      *
@@ -96,7 +116,7 @@ class PaymentLinkEndpoint extends CollectionEndpointAbstract
      *
      * @return LazyCollection
      */
-    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
     {
         return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }

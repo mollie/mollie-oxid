@@ -6,11 +6,9 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\LazyCollection;
 use Mollie\Api\Resources\Settlement;
 use Mollie\Api\Resources\SettlementCollection;
-
-class SettlementsEndpoint extends CollectionEndpointAbstract
+class SettlementsEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     protected $resourcePath = "settlements";
-
     /**
      * Get the object that is used by this API. Every API uses one type of object.
      *
@@ -18,9 +16,8 @@ class SettlementsEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceObject()
     {
-        return new Settlement($this->client);
+        return new \Mollie\Api\Resources\Settlement($this->client);
     }
-
     /**
      * Get the collection object that is used by this API. Every API uses one type of collection object.
      *
@@ -31,9 +28,8 @@ class SettlementsEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new SettlementCollection($this->client, $count, $_links);
+        return new \Mollie\Api\Resources\SettlementCollection($this->client, $count, $_links);
     }
-
     /**
      * Retrieve a single settlement from Mollie.
      *
@@ -48,7 +44,6 @@ class SettlementsEndpoint extends CollectionEndpointAbstract
     {
         return parent::rest_read($settlementId, $parameters);
     }
-
     /**
      * Retrieve the details of the current settlement that has not yet been paid out.
      *
@@ -59,7 +54,6 @@ class SettlementsEndpoint extends CollectionEndpointAbstract
     {
         return parent::rest_read("next", []);
     }
-
     /**
      * Retrieve the details of the open balance of the organization.
      *
@@ -70,7 +64,6 @@ class SettlementsEndpoint extends CollectionEndpointAbstract
     {
         return parent::rest_read("open", []);
     }
-
     /**
      * Retrieves a collection of Settlements from Mollie.
      *
@@ -85,7 +78,6 @@ class SettlementsEndpoint extends CollectionEndpointAbstract
     {
         return $this->rest_list($from, $limit, $parameters);
     }
-
     /**
      * Create an iterator for iterating over settlements retrieved from Mollie.
      *
@@ -96,7 +88,7 @@ class SettlementsEndpoint extends CollectionEndpointAbstract
      *
      * @return LazyCollection
      */
-    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
     {
         return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }

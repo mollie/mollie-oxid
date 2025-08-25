@@ -6,11 +6,9 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Resources\Invoice;
 use Mollie\Api\Resources\InvoiceCollection;
 use Mollie\Api\Resources\LazyCollection;
-
-class InvoiceEndpoint extends CollectionEndpointAbstract
+class InvoiceEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     protected $resourcePath = "invoices";
-
     /**
      * Get the object that is used by this API. Every API uses one type of object.
      *
@@ -18,9 +16,8 @@ class InvoiceEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceObject()
     {
-        return new Invoice($this->client);
+        return new \Mollie\Api\Resources\Invoice($this->client);
     }
-
     /**
      * Get the collection object that is used by this API. Every API uses one type of collection object.
      *
@@ -31,9 +28,8 @@ class InvoiceEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new InvoiceCollection($this->client, $count, $_links);
+        return new \Mollie\Api\Resources\InvoiceCollection($this->client, $count, $_links);
     }
-
     /**
      * Retrieve an Invoice from Mollie.
      *
@@ -49,7 +45,6 @@ class InvoiceEndpoint extends CollectionEndpointAbstract
     {
         return $this->rest_read($invoiceId, $parameters);
     }
-
     /**
      * Retrieves a collection of Invoices from Mollie.
      *
@@ -64,7 +59,6 @@ class InvoiceEndpoint extends CollectionEndpointAbstract
     {
         return $this->rest_list($from, $limit, $parameters);
     }
-
     /**
      * This is a wrapper method for page
      *
@@ -77,7 +71,6 @@ class InvoiceEndpoint extends CollectionEndpointAbstract
     {
         return $this->page(null, null, $parameters);
     }
-
     /**
      * Create an iterator for iterating over invoices retrieved from Mollie.
      *
@@ -88,7 +81,7 @@ class InvoiceEndpoint extends CollectionEndpointAbstract
      *
      * @return LazyCollection
      */
-    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
+    public function iterator(?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = \false) : \Mollie\Api\Resources\LazyCollection
     {
         return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
     }

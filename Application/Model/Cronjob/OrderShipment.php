@@ -69,7 +69,7 @@ class OrderShipment extends \Mollie\Payment\Application\Model\Cronjob\Base
             $oOrder = oxNew(Order::class);
             if ($oOrder->load($sUnmarkedOrderId) && $oOrder->mollieIsMolliePaymentUsed()) {
                 $oOrder->mollieMarkOrderAsShipped();
-                $this->outputInfo("Marked order-id ".$oOrder->getId()." as shipped.");
+                self::outputStandardInfo("Order has been marked as shipped for Mollie", $oOrder->getId());
             }
         }
         return true;

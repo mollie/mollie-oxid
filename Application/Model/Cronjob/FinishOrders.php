@@ -34,7 +34,11 @@ class FinishOrders extends \Mollie\Payment\Application\Model\Cronjob\Base
         $aOrders = [];
 
         $sProcessingFolder = Registry::getConfig()->getShopConfVar('sMollieStatusProcessing');
-        $sTriggerDate = date('Y-m-d H:i:s', time() - (60 * 60 * 24));
+        $iMollieCronFinishOrdersDays = (int)Registry::getConfig()->getShopConfVar('iMollieCronFinishOrdersDays');
+        if (empty($iMollieCronFinishOrdersDays)) {
+            $iMollieCronFinishOrdersDays = 14;
+        }
+        $sTriggerDate = date('Y-m-d H:i:s', time() - (60 * 60 * 24 * $iMollieCronFinishOrdersDays));
         $sMinPaidDate = date('Y-m-d H:i:s', time() - (60 * 2)); // This will prevent finishing legit orders before the customer does
         $sQuery = " SELECT 
                         OXID 
@@ -71,9 +75,13 @@ class FinishOrders extends \Mollie\Payment\Application\Model\Cronjob\Base
         $aUnfinishedOrders = $this->getPaidUnfinishedOrders();
         foreach ($aUnfinishedOrders as $sUnfinishedOrderId) {
             $oOrder = oxNew(Order::class);
+
+            self::outputExtendedInfo("Check if order can be finished", $sUnfinishedOrderId);
             if ($oOrder->load($sUnfinishedOrderId) && $oOrder->mollieIsOrderInUnfinishedState()) {
                 $oOrder->mollieFinishOrder();
-                $this->outputInfo("Finished Order with ID ".$oOrder->getId());
+                self::outputStandardInfo("Successfully finished order", $oOrder->getId());
+            } else {
+                self::outputExtendedInfo("Order is not in a finishable state", $sUnfinishedOrderId);
             }
         }
         return true;

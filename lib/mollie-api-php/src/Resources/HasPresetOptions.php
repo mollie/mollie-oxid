@@ -3,7 +3,6 @@
 namespace Mollie\Api\Resources;
 
 use Mollie\Api\MollieApiClient;
-
 /**
  * @property MollieApiClient $client
  * @property string $mode
@@ -19,12 +18,10 @@ trait HasPresetOptions
     {
         $options = [];
         if ($this->client->usesOAuth()) {
-            $options["testmode"] = $this->mode === "test" ? true : false;
+            $options["testmode"] = $this->mode === "test" ? \true : \false;
         }
-
         return $options;
     }
-
     /**
      * Apply the preset options.
      *
@@ -33,6 +30,6 @@ trait HasPresetOptions
      */
     protected function withPresetOptions(array $options)
     {
-        return array_merge($this->getPresetOptions(), $options);
+        return \array_merge($this->getPresetOptions(), $options);
     }
 }

@@ -108,10 +108,10 @@ abstract class Base
         if (!empty((string)$oOrder->oxorder__oxbillstateid->value)) {
             $aReturn['region'] = $this->getRegionTitle($oOrder->oxorder__oxbillstateid->value);
         }
-        if (!empty((string)$oOrder->oxorder__oxbillcompany->value) && $this instanceof Order) {
+        if (!empty((string)$oOrder->oxorder__oxbillcompany->value)) {
             $aReturn['organizationName'] = $oOrder->oxorder__oxbillcompany->value;
         }
-        if ($this->blNeedsExtendedAddress === true) {
+        if ($this->blNeedsExtendedAddress === true || $oOrder->mollieGetPaymentModel()->isExtendedAddressNeeded() === true) {
             $sTranslatedSalutation = Registry::getLang()->translateString($oOrder->oxorder__oxbillsal->value);
             if (!empty($sTranslatedSalutation)) {
                 $aReturn['title'] = $sTranslatedSalutation;
@@ -140,10 +140,10 @@ abstract class Base
         if (!empty((string)$oOrder->oxorder__oxdelstateid->value)) {
             $aReturn['region'] = $this->getRegionTitle($oOrder->oxorder__oxdelstateid->value);
         }
-        if (!empty((string)$oOrder->oxorder__oxdelcompany->value) && $this instanceof Order) {
+        if (!empty((string)$oOrder->oxorder__oxdelcompany->value)) {
             $aReturn['organizationName'] = $oOrder->oxorder__oxdelcompany->value;
         }
-        if ($this->blNeedsExtendedAddress === true) {
+        if ($this->blNeedsExtendedAddress === true || $oOrder->mollieGetPaymentModel()->isExtendedAddressNeeded() === true) {
             $sTranslatedSalutation = Registry::getLang()->translateString($oOrder->oxorder__oxdelsal->value);
             if (!empty($sTranslatedSalutation)) {
                 $aReturn['title'] = $sTranslatedSalutation;
@@ -289,9 +289,10 @@ abstract class Base
      * @param CoreOrder $oOrder
      * @param array $aItems
      * @param double $dMismatchSum
+     * @param string $sNameField
      * @return array
      */
-    protected function getFixedItemArray(CoreOrder $oOrder, $aItems, $dMismatchSum)
+    protected function getFixedItemArray(CoreOrder $oOrder, $aItems, $dMismatchSum, $sNameField)
     {
         $blFixed = false;
 
@@ -318,9 +319,9 @@ abstract class Base
 
         if ($blFixed === false) {
             $aItems[] = [
-                'name' => Registry::getLang()->translateString('MOLLIE_ROUNDINGCORRECTION'),
+                $sNameField => Registry::getLang()->translateString('MOLLIE_ROUNDINGCORRECTION'),
                 'sku' => 'adjustment',
-                'type' => 'surcharge',
+                'type' => ($dMismatchSum < 0) ? 'discount' : 'surcharge',
                 'quantity' => 1,
                 'unitPrice' => $this->getAmountArray($dMismatchSum, $oOrder->oxorder__oxcurrency->value),
                 'discountAmount' => $this->getAmountArray(0, $oOrder->oxorder__oxcurrency->value),
@@ -336,15 +337,21 @@ abstract class Base
      * Add all different types of basket items to the basketline array
      *
      * @param CoreOrder $oOrder
+     * @param bool      $blIsPaymentAPI
      * @return array
      */
-    public function getBasketItems(CoreOrder $oOrder)
+    public function getBasketItems(CoreOrder $oOrder, $blIsPaymentAPI = false)
     {
         $aItems = [];
 
         $sCurrency = $oOrder->oxorder__oxcurrency->value;
 
         $aOrderArticleList = $oOrder->getOrderArticles();
+
+        $sNameField = 'name';
+        if ($blIsPaymentAPI === true) {
+            $sNameField = 'description';
+        }
 
         $dProductSum = 0;
         foreach ($aOrderArticleList->getArray() as $oOrderarticle) {
@@ -354,7 +361,7 @@ abstract class Base
                 $oArticle->load($oOrderarticle->oxorderarticles__oxartid->value);
             }
             $aItems[] = [
-                'name' => $oOrderarticle->oxorderarticles__oxtitle->value,
+                $sNameField => $oOrderarticle->oxorderarticles__oxtitle->value,
                 'sku' => $oOrderarticle->oxorderarticles__oxartnum->value,
                 'type' => $oArticle->isDownloadable() ? 'digital' : 'physical',
                 'quantity' => $oOrderarticle->oxorderarticles__oxamount->value,
@@ -397,12 +404,12 @@ abstract class Base
 
         $dMismatchSum = bcsub($oOrder->oxorder__oxtotalbrutsum->value, $dProductSum, 2);
         if ($dMismatchSum != 0) {
-            $aItems = $this->getFixedItemArray($oOrder, $aItems, $dMismatchSum);
+            $aItems = $this->getFixedItemArray($oOrder, $aItems, $dMismatchSum, $sNameField);
         }
 
         if ($oOrder->oxorder__oxdelcost->value != 0) {
             $aItems[] = [
-                'name' => Registry::getLang()->translateString('MOLLIE_SHIPPINGCOST').': '.$oOrder->getDelSet()->oxdeliveryset__oxtitle->value,
+                $sNameField => Registry::getLang()->translateString('MOLLIE_SHIPPINGCOST').': '.$oOrder->getDelSet()->oxdeliveryset__oxtitle->value,
                 'sku' => $oOrder->oxorder__oxdeltype->value,
                 'type' => 'shipping_fee',
                 'quantity' => 1,
@@ -416,7 +423,7 @@ abstract class Base
 
         if ($oOrder->oxorder__oxpaycost->value != 0) {
             $aItems[] = [
-                'name' => Registry::getLang()->translateString('MOLLIE_PAYMENTTYPESURCHARGE').': '.$oOrder->getPaymentType()->oxpayments__oxdesc->value,
+                $sNameField => Registry::getLang()->translateString('MOLLIE_PAYMENTTYPESURCHARGE').': '.$oOrder->getPaymentType()->oxpayments__oxdesc->value,
                 'sku' => $oOrder->oxorder__oxpaymenttype->value,
                 'type' => 'surcharge',
                 'quantity' => 1,
@@ -433,7 +440,7 @@ abstract class Base
             $dWrapVatValue = $this->getVatValue($oOrder->getOrderWrappingPrice()->getBruttoPrice(), $iFixedVat);
 
             $aItems[] = [
-                'name' => Registry::getLang()->translateString('MOLLIE_WRAPPING'),
+                $sNameField => Registry::getLang()->translateString('MOLLIE_WRAPPING'),
                 'sku' => 'wrapping',
                 'type' => 'surcharge',
                 'quantity' => 1,
@@ -447,7 +454,7 @@ abstract class Base
 
         if ($oOrder->oxorder__oxgiftcardcost->value != 0) {
             $aItems[] = [
-                'name' => Registry::getLang()->translateString('MOLLIE_GIFTCARD').': '.$oOrder->getGiftCard()->oxwrapping__oxname->value,
+                $sNameField => Registry::getLang()->translateString('MOLLIE_GIFTCARD').': '.$oOrder->getGiftCard()->oxwrapping__oxname->value,
                 'sku' => 'giftcard',
                 'type' => 'surcharge',
                 'quantity' => 1,
@@ -461,7 +468,7 @@ abstract class Base
 
         if ($oOrder->oxorder__oxvoucherdiscount->value != 0) {
             $aItems[] = [
-                'name' => Registry::getLang()->translateString('MOLLIE_VOUCHER'),
+                $sNameField => Registry::getLang()->translateString('MOLLIE_VOUCHER'),
                 'sku' => 'voucher',
                 'type' => 'gift_card',
                 'quantity' => 1,
@@ -475,7 +482,7 @@ abstract class Base
 
         if ($oOrder->oxorder__oxdiscount->value != 0) {
             $aItems[] = [
-                'name' => Registry::getLang()->translateString('MOLLIE_DISCOUNT'),
+                $sNameField => Registry::getLang()->translateString('MOLLIE_DISCOUNT'),
                 'sku' => 'discount',
                 'type' => 'discount',
                 'quantity' => 1,

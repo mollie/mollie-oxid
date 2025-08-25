@@ -155,12 +155,26 @@
             <div class="spacer"></div>
         </dl>
     [{/foreach}]
-[{elseif $module_var == 'iMollieCronSecondChanceTimeDiff'}]
+    [{elseif $module_var == 'iMollieCronSecondChanceTimeDiff'}]
     <dl>
         <dt>
             <select class="select" name="confselects[[{$module_var}]]" [{ $readonly }]>
-                [{foreach from=$oView->mollieSecondChanceDayDiffs() item=iDayDiff}]
-                    <option value="[{$iDayDiff}]" [{if $confselects.$module_var == $iDayDiff}]selected[{/if}]>[{$iDayDiff}]&nbsp;[{if $iDayDiff == 1}][{oxmultilang ident="MOLLIE_DAY"}][{else}][{oxmultilang ident="MOLLIE_DAYS"}][{/if}]</option>
+                [{foreach from=$oView->mollieDayDiffs(1, 14) item=iDayDiff}]
+                <option value="[{$iDayDiff}]" [{if $confselects.$module_var == $iDayDiff}]selected[{/if}]>[{$iDayDiff}]&nbsp;[{if $iDayDiff == 1}][{oxmultilang ident="MOLLIE_DAY"}][{else}][{oxmultilang ident="MOLLIE_DAYS"}][{/if}]</option>
+                [{/foreach}]
+            </select>
+            [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`"}]
+        </dt>
+        <dd>
+            [{oxmultilang ident="SHOP_MODULE_`$module_var`"}]
+        </dd>
+    </dl>
+    [{elseif $module_var == 'iMollieCronFinishOrdersDays'}]
+    <dl>
+        <dt>
+            <select class="select" name="confselects[[{$module_var}]]" [{ $readonly }]>
+                [{foreach from=$oView->mollieDayDiffs(1, 28) item=iDayDiff}]
+                <option value="[{$iDayDiff}]" [{if $confselects.$module_var == $iDayDiff}]selected[{/if}]>[{$iDayDiff}]&nbsp;[{if $iDayDiff == 1}][{oxmultilang ident="MOLLIE_DAY"}][{else}][{oxmultilang ident="MOLLIE_DAYS"}][{/if}]</option>
                 [{/foreach}]
             </select>
             [{oxinputhelp ident="HELP_SHOP_MODULE_`$module_var`"}]
