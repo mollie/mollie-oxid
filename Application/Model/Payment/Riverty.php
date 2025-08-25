@@ -67,4 +67,14 @@ class Riverty extends Base
         }
         return parent::isManualCaptureNeeded($oOrder);
     }
+
+    /**
+     * shipped_capture leads to automatic capture when order is marked as shipped
+     *
+     * @return string|false
+     */
+    public function getConfiguredCaptureMode()
+    {
+        return "shipped_capture";
+    }
 }

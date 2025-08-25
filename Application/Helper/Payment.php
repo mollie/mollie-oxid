@@ -167,7 +167,7 @@ class Payment
         if (empty($this->aPaymentInfo[$sCacheKey])) {
             $aParams = ['resource' => 'orders', 'includeWallets' => 'applepay'];
             if ($dAmount !== false && $sCurrency !== false) {
-                $aParams['amount[value]'] = number_format($dAmount, 2, '.', '');
+                $aParams['amount[value]'] = Api::getInstance()->formatPrice($dAmount);
                 $aParams['amount[currency]'] = $sCurrency;
             }
             if ($sBillingCountryCode !== false) {
