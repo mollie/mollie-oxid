@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Helper;
 
+use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Core\Registry;
 
 class Api
@@ -48,5 +49,18 @@ class Api
             'value' => $this->formatPrice($dPrice),
             'currency' => $sCurrency
         ];
+    }
+
+    /**
+     * @param array $aRequest
+     * @param object $oResponse
+     * @param string|null $sOrderId
+     * @param string|null $sStoreId
+     * @return void
+     */
+    public function logApiRequest($aRequest, $oResponse, $sOrderId = null, $sStoreId = null)
+    {
+        $oRequestLog = oxNew(RequestLog::class);
+        $oRequestLog->logRequest($aRequest, $oResponse, $sOrderId, $sStoreId);
     }
 }

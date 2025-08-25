@@ -790,7 +790,7 @@ class Order extends Order_parent
                 if ($this->isMolliePaymentAutomaticallyRefundable($oMollieApiOrder)) {
                     $this->mollieRefundPayment($oMollieApiOrder, $this->oxorder__oxcurrency->value);
                 } elseif ($this->isMolliePaymentCancelable($oMollieApiOrder)) {
-                    $oApiEndpoint->cancel($this->oxorder__oxtransid->value);
+                    $this->mollieCancelPayment($oApiEndpoint);
                 }
             } catch (\Throwable $exc) {
                 // cancel call can throw an exception but still lead to the desired behaviour
@@ -808,7 +808,7 @@ class Order extends Order_parent
             return false;
         }
 
-        if ($oMollieApiOrder->isPaid() && $oMollieApiOrder->getAmountCaptured() > 0 && $oMollieApiOrder->getAmountRemaining() > 0) { // amount remaining is amount remaining to be refunded
+        if ($oMollieApiOrder->isPaid() && $oMollieApiOrder->getSettlementAmount() > 0 && $oMollieApiOrder->getAmountRemaining() > 0) { // amount remaining is amount remaining to be refunded
             return true;
         }
 
@@ -816,6 +816,8 @@ class Order extends Order_parent
     }
 
     /**
+     * Refunds payment and logs api request and response
+     *
      * @param object $oMollieApiOrder
      * @param string $sCurrency
      * @return void
@@ -824,9 +826,26 @@ class Order extends Order_parent
     {
         $dRemainingAmount = $oMollieApiOrder->getAmountRemaining();
 
-        $oReturn = $oMollieApiOrder->refund([
-            "amount" => Api::getInstance()->getAmountArray($dRemainingAmount, $sCurrency)
-        ]);
+        $aParams = [
+            "amount" => Api::getInstance()->getAmountArray($dRemainingAmount, $sCurrency),
+        ];
+
+        $oResponse = $oMollieApiOrder->refund($aParams);
+
+        Api::getInstance()->logApiRequest($aParams, $oResponse, $this->getId(), $this->getConfig()->getShopId());
+    }
+
+    /**
+     * Cancels payment and logs api request and response
+     *
+     * @param $oApiEndpoint
+     * @return void
+     */
+    protected function mollieCancelPayment($oApiEndpoint)
+    {
+        $oResponse = $oApiEndpoint->cancel($this->oxorder__oxtransid->value);
+
+        Api::getInstance()->logApiRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
     }
 
     /**
