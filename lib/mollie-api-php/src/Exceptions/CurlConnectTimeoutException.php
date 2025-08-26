@@ -2,6 +2,6 @@
 
 namespace Mollie\Api\Exceptions;
 
-class CurlConnectTimeoutException extends ApiException
+class CurlConnectTimeoutException extends \Mollie\Api\Exceptions\ApiException
 {
 }

@@ -2,7 +2,7 @@
 
 namespace Mollie\Api\Resources;
 
-class Client extends BaseResource
+class Client extends \Mollie\Api\Resources\BaseResource
 {
     /**
      * The unique identifier of the client, which corresponds to the ID of the organization
@@ -10,7 +10,6 @@ class Client extends BaseResource
      * @var string
      */
     public $id;
-
     /**
      * UTC datetime the order was created in ISO-8601 format.
      *
@@ -18,17 +17,14 @@ class Client extends BaseResource
      * @var string|null
      */
     public $organizationCreatedAt;
-
     /**
      * @var \stdClass
      */
     public $_links;
-
     /**
      * @var \stdClass[]
      */
     public $_embedded;
-
     /**
      * @var \stdClass|null
      */

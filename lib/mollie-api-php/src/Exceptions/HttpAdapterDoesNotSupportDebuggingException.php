@@ -2,6 +2,6 @@
 
 namespace Mollie\Api\Exceptions;
 
-class HttpAdapterDoesNotSupportDebuggingException extends ApiException
+class HttpAdapterDoesNotSupportDebuggingException extends \Mollie\Api\Exceptions\ApiException
 {
 }

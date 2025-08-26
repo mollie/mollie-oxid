@@ -6,11 +6,9 @@ use Mollie\Api\Resources\LazyCollection;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\Refund;
 use Mollie\Api\Resources\RefundCollection;
-
-class PaymentRefundEndpoint extends CollectionEndpointAbstract
+class PaymentRefundEndpoint extends \Mollie\Api\Endpoints\CollectionEndpointAbstract
 {
     protected $resourcePath = "payments_refunds";
-
     /**
      * Get the object that is used by this API endpoint. Every API endpoint uses one type of object.
      *
@@ -18,9 +16,8 @@ class PaymentRefundEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceObject()
     {
-        return new Refund($this->client);
+        return new \Mollie\Api\Resources\Refund($this->client);
     }
-
     /**
      * Get the collection object that is used by this API endpoint. Every API endpoint uses one type of collection object.
      *
@@ -31,9 +28,8 @@ class PaymentRefundEndpoint extends CollectionEndpointAbstract
      */
     protected function getResourceCollectionObject($count, $_links)
     {
-        return new RefundCollection($this->client, $count, $_links);
+        return new \Mollie\Api\Resources\RefundCollection($this->client, $count, $_links);
     }
-
     /**
      * @param Payment $payment
      * @param string $refundId
@@ -42,11 +38,10 @@ class PaymentRefundEndpoint extends CollectionEndpointAbstract
      * @return Refund
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function getFor(Payment $payment, $refundId, array $parameters = [])
+    public function getFor(\Mollie\Api\Resources\Payment $payment, $refundId, array $parameters = [])
     {
         return $this->getForId($payment->id, $refundId, $parameters);
     }
-
     /**
      * @param string $paymentId
      * @param string $refundId
@@ -58,10 +53,8 @@ class PaymentRefundEndpoint extends CollectionEndpointAbstract
     public function getForId($paymentId, $refundId, array $parameters = [])
     {
         $this->parentId = $paymentId;
-
         return parent::rest_read($refundId, $parameters);
     }
-
     /**
      * @param Payment $payment
      * @param array $parameters
@@ -69,27 +62,10 @@ class PaymentRefundEndpoint extends CollectionEndpointAbstract
      * @return Refund
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function listFor(Payment $payment, array $parameters = [])
+    public function listFor(\Mollie\Api\Resources\Payment $payment, array $parameters = [])
     {
         return $this->listForId($payment->id, $parameters);
     }
-
-    /**
-     * Create an iterator for iterating over refunds for the given payment, retrieved from Mollie.
-     *
-     * @param Payment $payment
-     * @param string $from The first resource ID you want to include in your list.
-     * @param int $limit
-     * @param array $parameters
-     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
-     *
-     * @return LazyCollection
-     */
-    public function iteratorFor(Payment $payment, ?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
-    {
-        return $this->iteratorForId($payment->id, $from, $limit, $parameters, $iterateBackwards);
-    }
-
     /**
      * Create an iterator for iterating over refunds for the given payment, retrieved from Mollie.
      *
@@ -115,29 +91,8 @@ class PaymentRefundEndpoint extends CollectionEndpointAbstract
     public function listForId($paymentId, array $parameters = [])
     {
         $this->parentId = $paymentId;
-
         return parent::rest_list(null, null, $parameters);
     }
-
-    /**
-     * Create an iterator for iterating over refunds for the given payment id, retrieved from Mollie.
-     *
-     * @param string $paymentId
-     * @param string $from The first resource ID you want to include in your list.
-     * @param int $limit
-     * @param array $parameters
-     * @param bool $iterateBackwards Set to true for reverse order iteration (default is false).
-     *
-     * @return LazyCollection
-     */
-    public function iteratorForId(string $paymentId, ?string $from = null, ?int $limit = null, array $parameters = [], bool $iterateBackwards = false): LazyCollection
-    {
-        $this->parentId = $paymentId;
-
-        return $this->rest_iterator($from, $limit, $parameters, $iterateBackwards);
-    }
-
-
     /**
      * Create an iterator for iterating over refunds for the given payment id, retrieved from Mollie.
      *
@@ -164,11 +119,10 @@ class PaymentRefundEndpoint extends CollectionEndpointAbstract
      * @return Refund
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function createFor(Payment $payment, array $data, array $filters = [])
+    public function createFor(\Mollie\Api\Resources\Payment $payment, array $data, array $filters = [])
     {
         return $this->createForId($payment->id, $data, $filters);
     }
-
     /**
      * Creates a refund for a specific payment.
      *
@@ -182,7 +136,6 @@ class PaymentRefundEndpoint extends CollectionEndpointAbstract
     public function createForId(string $paymentId, array $data, array $filters = [])
     {
         $this->parentId = $paymentId;
-
         return parent::rest_create($data, $filters);
     }
     /**

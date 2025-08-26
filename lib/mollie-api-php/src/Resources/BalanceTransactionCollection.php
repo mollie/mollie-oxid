@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Mollie\Api\Resources;
 
-class BalanceTransactionCollection extends CursorCollection
+class BalanceTransactionCollection extends \Mollie\Api\Resources\CursorCollection
 {
     /**
      * @inheritDoc
@@ -13,12 +12,11 @@ class BalanceTransactionCollection extends CursorCollection
     {
         return "balance_transactions";
     }
-
     /**
      * @inheritDoc
      */
     protected function createResourceObject()
     {
-        return new BalanceTransaction($this->client);
+        return new \Mollie\Api\Resources\BalanceTransaction($this->client);
     }
 }
