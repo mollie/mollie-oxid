@@ -72,7 +72,7 @@
                     document.getElementById("sMolliePPEButtonLanguage").addEventListener("change", updatePreviewImgUrl);
                 }
                 function updatePreviewImgUrl() {
-                    let shopBaseUrl = "https://robert.demoshop.fatchip.de/ox65_mollie/source/admin/"; ///@TODO
+                    let shopBaseUrl = window.location.href.split("/admin/")[0] + "/admin/";
 
                     var data = new FormData();
                     data.append('cl', 'module_config');
