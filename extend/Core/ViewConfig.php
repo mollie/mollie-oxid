@@ -102,7 +102,17 @@ class ViewConfig extends ViewConfig_parent
     {
         $oPayPalExpress = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
         if ($oPayPalExpress->load(\Mollie\Payment\Application\Model\Payment\PayPalExpress::OXID)) {
-            if ($oPayPalExpress->oxpayments__oxactive->value == 1) {
+            $oBasket = Registry::getSession()->getBasket();
+
+            $blIsValidPayment = $oPayPalExpress->isValidPayment(
+                null,
+                Registry::getConfig()->getShopId(),
+                $oBasket->getUser(),
+                $oBasket->getPriceForPayment(),
+                $oBasket->getShippingId()
+            );
+
+            if ($blIsValidPayment === true) {
                 $oMolliePayment = $oPayPalExpress->getMolliePaymentModel();
                 if ($oMolliePayment && $oMolliePayment->isMolliePaymentActive()) {
                     return true;
