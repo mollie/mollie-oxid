@@ -21,6 +21,11 @@ class PaymentController extends PaymentController_parent
         if (!empty($sSessChallenge) && $blMollieIsRedirected === true) {
             OrderHelper::getInstance()->cancelCurrentOrder();
         }
+
+        if ($this->mollieHasPayPalExpressAddressBeenChanged() === true) {
+            $this->mollieCancelPayPalExpress();
+        }
+
         Registry::getSession()->deleteVariable('mollieIsRedirected');
         Registry::getSession()->deleteVariable('mollieRedirectUrl');
         parent::init();
@@ -91,5 +96,23 @@ class PaymentController extends PaymentController_parent
     public function mollieGetPayPalExpressPaymentId()
     {
         return \Mollie\Payment\Application\Model\Payment\PayPalExpress::OXID;
+    }
+
+    /**
+     * Checks if the PayPal Express address has been changed by comparing the current address with the stored address hash in the session.
+     *
+     * @return bool True if the address has been changed, false otherwise.
+     */
+    protected function mollieHasPayPalExpressAddressBeenChanged()
+    {
+        if ($this->getUser()->mollieGetEncodedDeliveryAddress() != Registry::getSession()->getVariable('mollie_ppe_addresshash')) {
+            return true;
+        }
+
+        if (Registry::getSession()->getVariable('blshowshipaddress') === false || empty(Registry::getSession()->getVariable('deladrid'))) { // PPE payments will always have differing delivery-address
+            return true;
+        }
+
+        return false;
     }
 }

@@ -143,6 +143,11 @@ class MolliePayPalExpress extends FrontendController
         return $oBasket;
     }
 
+    protected function setSessionFlags($oUser)
+    {
+        Registry::getSession()->setVariable('mollie_ppe_addresshash', $oUser->mollieGetEncodedDeliveryAddress());
+    }
+
     /**
      * Method handles PayPal express errors
      *
@@ -178,6 +183,49 @@ class MolliePayPalExpress extends FrontendController
     }
 
     /**
+     * Splits a full name into firstname and lastname
+     * Splits at last space
+     *
+     * @param $sFullName
+     * @return array
+     */
+    protected function splitName($sFullName)
+    {
+        $aReturn = ['firstname' => '-', 'lastname' => $sFullName]; // default - firstname must not be completely empty
+
+        $sFullName = trim($sFullName);
+        $sFullName = preg_replace('/\s+/', ' ', $sFullName); // Remove multiple spaces
+        $iLastSpacePos = strrpos($sFullName, ' '); // Split at last space
+
+        if ($iLastSpacePos !== false) { // no space found
+            $aReturn['firstname'] = substr($sFullName, 0, $iLastSpacePos);
+            $aReturn['lastname'] = substr($sFullName, $iLastSpacePos + 1);
+        }
+        return $aReturn;
+    }
+
+    /**
+     * Mollie changed the returned data at some point now not having the needed data anymore for some fields
+     * This method adds the missing data to the session object
+     *
+     * @param $oSession
+     * @return mixed
+     */
+    protected function getFixedMollieSession($oSession)
+    {
+        if (empty($oSession->shippingAddress->email) && !empty($oSession->billingAddress->email)) {
+            $oSession->shippingAddress->email = $oSession->billingAddress->email;
+        }
+
+        if (empty($oSession->shippingAddress->givenName) && !empty($oSession->shippingAddress->familyName)) {
+            $aSplitName = $this->splitName($oSession->shippingAddress->familyName);
+            $oSession->shippingAddress->givenName = $aSplitName['firstname'];
+            $oSession->shippingAddress->familyName = $aSplitName['lastname'];
+        }
+        return $oSession;
+    }
+
+    /**
      * Handles the return of the customer from PayPal to the shop
      *
      * @return void
@@ -205,7 +253,11 @@ class MolliePayPalExpress extends FrontendController
 
         Registry::getSession()->setVariable('mollie_ppe_authenticationId', $oSession->authenticationId);
 
+        $oSession = $this->getFixedMollieSession($oSession);
+
         $oUser = UserHelper::getInstance()->getMollieSessionUser($oSession->shippingAddress);
+
+        $this->setSessionFlags($oUser);
 
         $oBasket = $this->getPayPalExpressBasket($oUser);
         $oBasket->calculateBasket(true);

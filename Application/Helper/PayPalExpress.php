@@ -68,6 +68,7 @@ class PayPalExpress
 
         Registry::getSession()->deleteVariable('mollie_ppe_sessionId');
         Registry::getSession()->deleteVariable('mollie_ppe_authenticationId');
+        Registry::getSession()->deleteVariable('mollie_ppe_addresshash');
     }
 
     /**
