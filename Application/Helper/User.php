@@ -281,7 +281,6 @@ class User
         // saving delivery Address for later use
         Registry::getSession()->setVariable('deladrid', $oAddress->getId());
         Registry::getSession()->setVariable('blshowshipaddress', true);
-
     }
 
     /**
@@ -419,11 +418,11 @@ class User
 
         if ($oUser === false) { // no user logged in, no user existing in shop
             $oUser = $this->getMollieSessionDummyUser($oMollieSessionAddress);
-            $this->setShippingAddressFromMollieSession($oUser, $oMollieSessionAddress);
         } else { // user logged in or existing in shop
             $this->updateUserFromMollieSessionData($oUser, $oMollieSessionAddress);
-            $this->setShippingAddressFromMollieSession($oUser, $oMollieSessionAddress);
         }
+        $this->setShippingAddressFromMollieSession($oUser, $oMollieSessionAddress);
+
         return $oUser;
     }
 

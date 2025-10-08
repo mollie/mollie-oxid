@@ -143,6 +143,12 @@ class MolliePayPalExpress extends FrontendController
         return $oBasket;
     }
 
+    /**
+     * Set session flags for PPE process
+     *
+     * @param $oUser
+     * @return void
+     */
     protected function setSessionFlags($oUser)
     {
         Registry::getSession()->setVariable('mollie_ppe_addresshash', $oUser->mollieGetEncodedDeliveryAddress());
