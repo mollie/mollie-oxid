@@ -8,7 +8,7 @@ function isApplePayAvailable() {
 }
 
 function mollieGetProductAmount(implementationPosition) {
-    if (implementationPosition != "Details") {
+    if (implementationPosition !== "Details") {
         return false;
     }
     var formAmount = $('input[name="am"]').val();
@@ -18,35 +18,76 @@ function mollieGetProductAmount(implementationPosition) {
     return 1;
 }
 
-function mollieGetProductBasketPrice(detailsProductId, implementationPosition) {
-    var ajaxCall = $.ajax({
-        url: shopBaseUrl + 'index.php',
-        type: 'POST',
-        dataType: 'json',
-        async: false,
-        data: {
-            cl: "mollieApplePay",
-            fnc: "getProductBasketPrice",
-            detailsProductId: detailsProductId,
-            detailsProductAmount: mollieGetProductAmount(implementationPosition)
-        }
-    });
-    if (ajaxCall.responseJSON) {
-        if (ajaxCall.responseJSON.productBasketPrice) {
-            return ajaxCall.responseJSON.productBasketPrice;
-        }
-        if (ajaxCall.responseJSON.errormessage && ajaxCall.responseJSON.showexception && ajaxCall.responseJSON.showexception == true) {
-            alert(ajaxCall.responseJSON.errormessage);
-        }
-        if (ajaxCall.responseJSON.errors) {
-            console.log('Apple Pay: Could not get products basket price. ' + ajaxCall.responseJSON.errors[0].message);
+function prepareMollieApplePayRequestData(object, form, namespace) {
+    var formData = form || new FormData();
+    var formKey;
+    var value;
+
+    for (var property in object) {
+        if (object.hasOwnProperty(property)) {
+            formKey = namespace ? namespace + '[' + property + ']' : property;
+            value = object[property];
+
+            if (typeof value === 'object' && !(value instanceof File)) {
+                prepareMollieApplePayRequestData(
+                    value,
+                    formData,
+                    namespace
+                        ? namespace + '[' + property + ']'
+                        : property
+                );
+                continue;
+            }
+
+            formData.append(formKey, value);
         }
     }
+
+    return formData;
+}
+
+function mollieGetProductBasketPrice(detailsProductId, implementationPosition) {
+    fetch(
+        shopBaseUrl + 'index.php',
+        {
+            method: 'POST',
+            body: prepareMollieApplePayRequestData({
+                cl: "mollieApplePay",
+                fnc: "getProductBasketPrice",
+                detailsProductId: detailsProductId,
+                detailsProductAmount: mollieGetProductAmount(implementationPosition)
+            })
+        }
+    ).then(function (response) {
+        response.json().then(function (jsonResponse) {
+            if (jsonResponse.productBasketPrice) {
+                return response.productBasketPrice;
+            }
+            if (jsonResponse.errormessage && jsonResponse.showexception && jsonResponse.showexception === true) {
+                alert(jsonResponse.errormessage);
+            }
+            if (jsonResponse.errors) {
+                console.log('Apple Pay: Could not get products basket price. ' + jsonResponse.errors[0].message);
+            }
+        });
+    });
+
     return false;
 }
 
-function mollieInitApplePay(countryCode, currencyCode, shopName, price, delivery_price, detailsProductId, totalLabel, shippingLabel, shippingId, implementationPosition) {
-    if (implementationPosition == "Details") {
+function mollieInitApplePay(
+    countryCode,
+    currencyCode,
+    shopName,
+    price,
+    deliveryPrice,
+    detailsProductId,
+    totalLabel,
+    shippingLabel,
+    shippingId,
+    implementationPosition
+) {
+    if (implementationPosition === "Details") {
         var productBasketPrice = mollieGetProductBasketPrice(detailsProductId, implementationPosition);
         if (!isNaN(productBasketPrice)) {
             price = parseFloat(productBasketPrice.toFixed(2));
@@ -56,8 +97,8 @@ function mollieInitApplePay(countryCode, currencyCode, shopName, price, delivery
         }
     }
     var initialPrice = price;
-    if (delivery_price !== false && !isNaN(delivery_price)) {
-        initialPrice = (price + delivery_price).toFixed(2);
+    if (deliveryPrice !== false && !isNaN(deliveryPrice)) {
+        initialPrice = (price + deliveryPrice).toFixed(2);
     }
     var lineItems = [
         {label: totalLabel, amount: price, type: 'final'},
@@ -75,133 +116,137 @@ function mollieInitApplePay(countryCode, currencyCode, shopName, price, delivery
 
     var session = new ApplePaySession(3, request);
     session.onvalidatemerchant = function(event) {
-        $.ajax({
-            url: shopBaseUrl + 'index.php',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                cl: "mollieApplePay",
-                fnc: "getMerchantSession",
-                validationUrl: event.validationURL,
-            },
-            success: function (response) {
-                if (response.success === true && response.merchantSession !== undefined) {
-                    session.completeMerchantValidation(JSON.parse(response.merchantSession));
+        fetch(
+            shopBaseUrl + 'index.php',
+            {
+                method: 'POST',
+                body: prepareMollieApplePayRequestData({
+                    cl: "mollieApplePay",
+                    fnc: "getMerchantSession",
+                    validationUrl: event.validationURL,
+                })
+            }
+        ).then(function (response) {
+            response.json().then(function (jsonResponse) {
+                if (jsonResponse.success === true && jsonResponse.merchantSession !== undefined) {
+                    session.completeMerchantValidation(JSON.parse(jsonResponse.merchantSession));
                 } else {
                     console.log('Apple Pay initialization failed');
                     session.abort();
                 }
-            },
-            error: function (xhr, status, errorThrown) {
-                console.log('Apple Pay: An error occured. ' + status);
-                session.abort();
-            }
+            });
+        }).catch(function (error) {
+            console.log('Apple Pay: An error occurred. ' + error.status);
+            session.abort();
         });
     };
     session.onshippingcontactselected = function(event) {
-        $.ajax({
-            url: shopBaseUrl + 'index.php',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                cl: "mollieApplePay",
-                fnc: "getDeliveryMethods",
-                countryCode: event.shippingContact.countryCode,
-                city: event.shippingContact.locality,
-                zip: event.shippingContact.postalCode,
-                detailsProductId: detailsProductId,
-                detailsProductAmount: mollieGetProductAmount(implementationPosition)
-            },
-            success: function (response) {
-                if (response.success === true && response.shippingMethods !== undefined && response.shippingMethods.length > 0) {
-                    var shippingMethod = response.shippingMethods[0];
-                    var newPrice = (price + parseFloat(shippingMethod.amount)).toFixed(2);
+        fetch(
+            shopBaseUrl + 'index.php',
+            {
+                method: 'POST',
+                body: prepareMollieApplePayRequestData({
+                    cl: "mollieApplePay",
+                    fnc: "getDeliveryMethods",
+                    countryCode: event.shippingContact.countryCode,
+                    city: event.shippingContact.locality,
+                    zip: event.shippingContact.postalCode,
+                    detailsProductId: detailsProductId,
+                    detailsProductAmount: mollieGetProductAmount(implementationPosition)
+                })
+            }
+        ).then(function (response) {
+            response.json().then(function (jsonResponse) {
+                if (jsonResponse.success === true && jsonResponse.shippingMethods !== undefined && jsonResponse.shippingMethods.length > 0) {
+                    var shippingMethod = jsonResponse.shippingMethods[0];
                     var newLineItems = JSON.parse(JSON.stringify(lineItems)); // Json-Workaround to clone the lineItems object, so that original lineItems variable stays untouched
                     newLineItems.push({label: shippingLabel + ': ' + shippingMethod.label, amount: parseFloat(shippingMethod.amount), type: 'final'});
-                    var shippingContactUpdate = {
+
+                    session.completeShippingContactSelection({
                         status: 'STATUS_SUCCESS',
-                        newShippingMethods: response.shippingMethods,
+                        newShippingMethods: jsonResponse.shippingMethods,
                         newLineItems: newLineItems,
-                        newTotal: { label: shopName, amount: newPrice },
-                    };
-                    session.completeShippingContactSelection(shippingContactUpdate);
+                        newTotal: {
+                            label: shopName,
+                            amount: (price + parseFloat(shippingMethod.amount)).toFixed(2)
+                        }
+                    });
                 } else {
-                    var shippingContactUpdate = {
+                    session.completeShippingContactSelection({
                         status: 'STATUS_FAILURE',
                         errors: [new ApplePayError("addressUnserviceable", "country", "No shipping methods available.")],
-                        newTotal: { label: shopName, amount: initialPrice },
-                    };
-                    session.completeShippingContactSelection(shippingContactUpdate);
+                        newTotal: { label: shopName, amount: initialPrice }
+                    });
                 }
-            },
-            error: function (xhr, status, errorThrown) {
-                console.log('Apple Pay: An error occured. ' + status);
-                session.abort();
-            }
+            });
+        }).catch(function (error) {
+            console.log('Apple Pay: An error occurred. ' + error.status);
+            session.abort();
         });
     };
     session.onshippingmethodselected = function(event) {
-        $.ajax({
-            url: shopBaseUrl + 'index.php',
-            type: 'POST',
-            data: {
-                cl: "mollieApplePay",
-                fnc: "updateShippingSet",
-                shipSet: event.shippingMethod.identifier,
-            },
-            success: function (response) {
-                shippingId = event.shippingMethod.identifier;
-                var newPrice = (price + parseFloat(event.shippingMethod.amount)).toFixed(2);
-                var newLineItems = JSON.parse(JSON.stringify(lineItems)); // Json-Workaround to clone the lineItems object, so that original lineItems variable stays untouched
-                newLineItems.push({label: shippingLabel + ': ' + event.shippingMethod.label, amount: parseFloat(event.shippingMethod.amount), type: 'final'});
-                var shippingMethodUpdate = {
-                    status: 'STATUS_SUCCESS',
-                    newlineItems: newLineItems,
-                    newTotal: { label: shopName, amount: newPrice },
-                };
-                session.completeShippingMethodSelection(shippingMethodUpdate);
-            },
-            error: function (xhr, status, errorThrown) {
-                console.log('Apple Pay: An error occured. ' + status);
-                session.abort();
+        fetch(
+            shopBaseUrl + 'index.php',
+            {
+                method: 'POST',
+                body: prepareMollieApplePayRequestData({
+                    cl: "mollieApplePay",
+                    fnc: "updateShippingSet",
+                    shipSet: event.shippingMethod.identifier,
+                })
             }
+        ).then(function () {
+            shippingId = event.shippingMethod.identifier;
+            var newPrice = (price + parseFloat(event.shippingMethod.amount)).toFixed(2);
+            var newLineItems = JSON.parse(JSON.stringify(lineItems)); // Json-Workaround to clone the lineItems object, so that original lineItems variable stays untouched
+            newLineItems.push({label: shippingLabel + ': ' + event.shippingMethod.label, amount: parseFloat(event.shippingMethod.amount), type: 'final'});
+            var shippingMethodUpdate = {
+                status: 'STATUS_SUCCESS',
+                newlineItems: newLineItems,
+                newTotal: { label: shopName, amount: newPrice },
+            };
+            session.completeShippingMethodSelection(shippingMethodUpdate);
+        }).catch(function (error) {
+            console.log('Apple Pay: An error occurred. ' + error.status);
+            session.abort();
         });
     };
     session.onpaymentauthorized = function(event) {
-        $.ajax({
-            url: shopBaseUrl + 'index.php',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                cl: "mollieApplePay",
-                fnc: "finalizeMollieOrder",
-                detailsProductId: detailsProductId,
-                detailsProductAmount: mollieGetProductAmount(implementationPosition),
-                token: event.payment.token,
-                billingContact: event.payment.billingContact,
-                shippingContact: event.payment.shippingContact,
-            },
-            success: function (response) {
-                if (response.success !== undefined && response.success === true) {
+        fetch(
+            shopBaseUrl + 'index.php',
+            {
+                method: 'POST',
+                body: prepareMollieApplePayRequestData({
+                    cl: "mollieApplePay",
+                    fnc: "finalizeMollieOrder",
+                    detailsProductId: detailsProductId,
+                    detailsProductAmount: mollieGetProductAmount(implementationPosition),
+                    token: event.payment.token,
+                    billingContact: event.payment.billingContact,
+                    shippingContact: event.payment.shippingContact,
+                })
+            }
+        ).then(function (response) {
+            response.json().then(function (jsonResponse) {
+                if (jsonResponse.success !== undefined && jsonResponse.success === true) {
                     session.completePayment({status: 'STATUS_SUCCESS'});
-                    window.location.replace(response.redirectUrl);
+                    window.location.replace(jsonResponse.redirectUrl);
                 } else {
-                    if (response.error !== undefined) {
-                        session.completePayment({status: 'STATUS_FAILURE', errors: [new ApplePayError(response.error.code, response.error.contactField, response.error.message)]});
+                    if (jsonResponse.error !== undefined) {
+                        session.completePayment({status: 'STATUS_FAILURE', errors: [new ApplePayError(jsonResponse.error.code, jsonResponse.error.contactField, jsonResponse.error.message)]});
                     } else {
-                        if (response.errormessage !== undefined) {
-                            alert('Apple Pay payment was not successful. An error occured: ' + response.errormessage);
+                        if (jsonResponse.errormessage !== undefined) {
+                            alert('Apple Pay payment was not successful. An error occurred: ' + jsonResponse.errormessage);
                         } else {
                             alert('Apple Pay payment was not successful.');
                         }
                         session.abort();
                     }
                 }
-            },
-            error: function (xhr, status, errorThrown) {
-                console.log('Apple Pay: An error occured. ' + status);
-                session.abort();
-            }
+            });
+        }).catch(function (error) {
+            console.log('Apple Pay: An error occurred. ' + error.status);
+            session.abort();
         });
     };
     session.begin();
