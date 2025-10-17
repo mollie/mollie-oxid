@@ -57,7 +57,7 @@ class MolliePayPalExpress extends FrontendController
 
         $aParams = [
             "amount" => [
-                "value" => (string)number_format($oBasket->getBruttoSum(), 2, ".", ""), // request throws error when amount-value is NOT sent as string
+                "value" => (string)number_format($oBasket->getPriceForPayment(), 2, ".", ""), // request throws error when amount-value is NOT sent as string
                 "currency" => $oBasket->getBasketCurrency()->name,
             ],
             "description" => $sDescription,
@@ -211,6 +211,26 @@ class MolliePayPalExpress extends FrontendController
     }
 
     /**
+     * Checks if the given delivery address has all the needed information
+     *
+     * @param  \stdClass $oMollieSessionAddress
+     * @return bool
+     */
+    protected function isAddressDataComplete($oMollieSessionAddress)
+    {
+        if (empty($oMollieSessionAddress->streetAndNumber) ||
+            empty($oMollieSessionAddress->postalCode) ||
+            empty($oMollieSessionAddress->city) ||
+            empty($oMollieSessionAddress->country) ||
+            empty($oMollieSessionAddress->givenName) ||
+            empty($oMollieSessionAddress->familyName) ||
+            empty($oMollieSessionAddress->email)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Mollie changed the returned data at some point now not having the needed data anymore for some fields
      * This method adds the missing data to the session object
      *
@@ -257,9 +277,13 @@ class MolliePayPalExpress extends FrontendController
             $this->handlePayPalExpressError(Registry::getLang()->translateString("MOLLIE_PAYPAL_DELIVERY_COUNTRY_INACTIVE")); // redirects to basket with error message, so execution ends here
         }
 
-        Registry::getSession()->setVariable('mollie_ppe_authenticationId', $oSession->authenticationId);
-
         $oSession = $this->getFixedMollieSession($oSession);
+
+        if (empty($oSession->shippingAddress) || $this->isAddressDataComplete($oSession->shippingAddress) === false) {
+            $this->handlePayPalExpressError(Registry::getLang()->translateString("MOLLIE_PAYPAL_EXPRESS_ADDRESS_DATA_INCOMPLETE")); // redirects to basket with error message, so execution ends here
+        }
+
+        Registry::getSession()->setVariable('mollie_ppe_authenticationId', $oSession->authenticationId);
 
         $oUser = UserHelper::getInstance()->getMollieSessionUser($oSession->shippingAddress);
 

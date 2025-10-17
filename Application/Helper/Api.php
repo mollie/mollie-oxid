@@ -63,4 +63,25 @@ class Api
         $oRequestLog = oxNew(RequestLog::class);
         $oRequestLog->logRequest($aRequest, $oResponse, $sOrderId, $sStoreId);
     }
+
+    /**
+     * Reformats errormessage
+     *
+     * @param  string $sErrorMessage
+     * @return string
+     */
+    public function formatErrorMessage($sErrorMessage)
+    {
+        $iBodyPos = stripos($sErrorMessage, 'Request body:');
+        if ($iBodyPos !== false) {
+            $sErrorMessage = substr($sErrorMessage, 0, $iBodyPos);
+        }
+
+        $iDocumentationPos = stripos($sErrorMessage, 'Documentation:');
+        if ($iDocumentationPos !== false) {
+            $sErrorMessage = substr($sErrorMessage, 0, $iDocumentationPos);
+        }
+
+        return trim($sErrorMessage);
+    }
 }
