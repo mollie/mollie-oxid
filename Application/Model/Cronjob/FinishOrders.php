@@ -25,6 +25,30 @@ class FinishOrders extends \Mollie\Payment\Application\Model\Cronjob\Base
     protected $iDefaultMinuteInterval = 10;
 
     /**
+     * Static property to make finish order status readable from everywhere in Oxid framework
+     *
+     * @var bool
+     */
+    protected static $blMollieFinishingOrder = false;
+
+    /**
+     * @param  bool $blMollieFinishingOrder
+     * @return void
+     */
+    protected static function mollieSetFinishingOrder($blMollieFinishingOrder)
+    {
+        self::$blMollieFinishingOrder = $blMollieFinishingOrder;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function mollieIsFinishingOrder()
+    {
+        return self::$blMollieFinishingOrder;
+    }
+
+    /**
      * Collects all expired order ids
      *
      * @return array
@@ -78,7 +102,9 @@ class FinishOrders extends \Mollie\Payment\Application\Model\Cronjob\Base
 
             self::outputExtendedInfo("Check if order can be finished", $sUnfinishedOrderId);
             if ($oOrder->load($sUnfinishedOrderId) && $oOrder->mollieIsOrderInUnfinishedState()) {
+                self::mollieSetFinishingOrder(true);
                 $oOrder->mollieFinishOrder();
+                self::mollieSetFinishingOrder(false);
                 self::outputStandardInfo("Successfully finished order", $oOrder->getId());
             } else {
                 self::outputExtendedInfo("Order is not in a finishable state", $sUnfinishedOrderId);
