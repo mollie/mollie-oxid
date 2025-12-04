@@ -29,13 +29,6 @@ class PayPalExpress extends Base
     protected $sMolliePaymentCode = 'paypal';
 
     /**
-     * Determines if the payment methods only supports the order API
-     *
-     * @var bool
-     */
-    protected $blIsOnlyOrderApiSupported = true;
-
-    /**
      * Determines if the payment method can be display in the payment list in checkout
      *
      * @var bool
