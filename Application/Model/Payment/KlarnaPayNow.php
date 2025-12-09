@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Model\Payment;
 
+// FCRM_REMOVE_ORDERS_API
 class KlarnaPayNow extends Base
 {
     /**

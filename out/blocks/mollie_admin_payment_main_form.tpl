@@ -34,16 +34,6 @@
     [{/if}]
     <tr>
         <td class="edittext" width="70">
-            [{oxmultilang ident="MOLLIE_CONFIG_METHOD"}]
-        </td>
-        <td class="edittext">
-            <span id="mollie_apihint_payment" class="mollieApiHint">
-                [{oxmultilang ident="MOLLIE_PAYMENT_API_LINK_1"}] <a href="https://docs.mollie.com/payments/overview" target=”_blank” style="text-decoration: underline;">[{oxmultilang ident="MOLLIE_PAYMENT_API_LINK_2"}]</a>
-            </span>
-        </td>
-    </tr>
-    <tr>
-        <td class="edittext" width="70">
             [{oxmultilang ident="MOLLIE_PAYMENT_DESCRIPTION"}]
         </td>
         <td class="edittext">
