@@ -100,8 +100,8 @@ class PaymentGateway extends PaymentGateway_parent
         try {
             $oResponse = $oOrder->mollieGetPaymentModel()->getApiRequestModel()->sendRequest($oOrder, $dAmount, $this->getRedirectUrl());
             $oOrder->mollieSetTransactionId($oResponse->id);
-
             $sPaymentUrl = $oResponse->getCheckoutUrl();
+
             if (!empty($sPaymentUrl)) {
                 Registry::getSession()->setVariable('mollieIsRedirected', true);
                 Registry::getSession()->setVariable('mollieRedirectUrl', $sPaymentUrl);

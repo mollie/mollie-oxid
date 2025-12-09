@@ -511,12 +511,7 @@ abstract class Base
 
         $this->addParameter('locale', PaymentHelper::getInstance()->getLocale());
 
-        $aPaymentSpecificParameters = $oPaymentModel->getPaymentSpecificParameters($oOrder);
-        if (!empty($aPaymentSpecificParameters) && $oPaymentModel->getApiMethod() == 'order') {
-            $aPaymentSpecificParameters = ['payment' => $aPaymentSpecificParameters];
-        }
-
-        $this->aParameters = array_merge($this->aParameters, $aPaymentSpecificParameters);
+        $this->aParameters = array_merge($this->aParameters, $oPaymentModel->getPaymentSpecificParameters($oOrder));
     }
 
     /**

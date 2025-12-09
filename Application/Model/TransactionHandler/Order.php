@@ -6,6 +6,7 @@ use OxidEsales\Eshop\Application\Model\Order as CoreOrder;
 use Mollie\Api\Resources\Order as ApiOrder;
 use OxidEsales\Eshop\Core\Registry;
 
+// FCRM_REMOVE_ORDERS_API
 class Order extends Base
 {
     /**
