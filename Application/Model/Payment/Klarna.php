@@ -24,6 +24,11 @@ class Klarna extends Base
     protected $blNeedsExtendedAddress = true;
 
     /**
+     * @var bool
+     */
+    protected $blIsShippedCaptureSupported = true;
+
+    /**
      * @var array|null
      */
     protected $aAvailableCaptureMethods = [

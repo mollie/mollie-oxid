@@ -150,6 +150,11 @@ abstract class Base
     protected $aAvailableCaptureMethods = null;
 
     /**
+     * @var bool
+     */
+    protected $blIsShippedCaptureSupported = false;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -716,6 +721,14 @@ abstract class Base
     public function getAvailableCaptureMethods()
     {
         return $this->aAvailableCaptureMethods;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShippedCaptureSupported()
+    {
+        return $this->blIsShippedCaptureSupported;
     }
 
     /**

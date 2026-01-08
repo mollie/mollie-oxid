@@ -55,6 +55,11 @@ class Riverty extends Base
     ];
 
     /**
+     * @var bool
+     */
+    protected $blIsShippedCaptureSupported = true;
+
+    /**
      * Returns if payment has to be captured manually
      *
      * @param Order $oOrder

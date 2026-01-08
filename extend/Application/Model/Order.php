@@ -151,7 +151,7 @@ class Order extends Order_parent
             return true;
         }
 
-        if ($this->oxorder__mollieapi->value === 'payment' && $this->mollieGetPaymentModel()->getConfiguredCaptureMode() == "shipped_capture") {
+        if ($this->oxorder__mollieapi->value === 'payment' && $this->mollieGetPaymentModel()->isShippedCaptureSupported() === true && $this->mollieIsManualCaptureMethod() === true) {
             return true;
         }
 
@@ -172,7 +172,8 @@ class Order extends Order_parent
         $oRequestLog = oxNew(RequestLog::class);
 
         try {
-            $oApiEndpoint = $this->mollieGetPaymentModel()->getApiEndpointByOrder($this);
+            $oPaymentModel = $this->mollieGetPaymentModel();
+            $oApiEndpoint = $oPaymentModel->getApiEndpointByOrder($this);
             $oMollieApiOrder = $oApiEndpoint->get($this->oxorder__oxtransid->value);
             if ($oMollieApiOrder instanceof \Mollie\Api\Resources\Order) {
                 $aOptions = [];
@@ -183,7 +184,7 @@ class Order extends Order_parent
                 $oRequestLog->logRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
 
                 DatabaseProvider::getDb()->Execute("UPDATE oxorder SET mollieshipmenthasbeenmarked = 1 WHERE oxid = ?", array($this->getId()));
-            } elseif ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment && $this->mollieGetPaymentModel()->getConfiguredCaptureMode() == "shipped_capture") {
+            } elseif ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment && $oPaymentModel->isShippedCaptureSupported() === true && $this->mollieIsManualCaptureMethod() === true) {
                 $oResponse = $this->mollieCaptureOrder();
                 $oRequestLog->logRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
             }

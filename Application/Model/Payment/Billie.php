@@ -32,6 +32,11 @@ class Billie extends Base
     protected $blIsOnlyB2BSupported = true;
 
     /**
+     * @var bool
+     */
+    protected $blIsShippedCaptureSupported = true;
+
+    /**
      * @var array|null
      */
     protected $aAvailableCaptureMethods = [
