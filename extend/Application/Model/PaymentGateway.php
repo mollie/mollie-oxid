@@ -115,6 +115,12 @@ class PaymentGateway extends PaymentGateway_parent
         return true;
     }
 
+    /**
+     * Removes technical information from Mollie error messages
+     *
+     * @param  \Exception $exc
+     * @return string
+     */
     protected function mollieGetCleanErrorMessage($exc)
     {
         $message = $exc->getPlainMessage(); // default behaviour
