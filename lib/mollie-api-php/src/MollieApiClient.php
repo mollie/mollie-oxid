@@ -465,7 +465,7 @@ class MollieApiClient
     {
         $apiKey = \trim($apiKey);
         if (!\preg_match('/^(live|test)_\\w{30,}$/', $apiKey)) {
-            throw new \Mollie\Api\Exceptions\ApiException("Invalid API key: '{$apiKey}'. An API key must start with 'test_' or 'live_' and must be at least 30 characters long.");
+            throw new \Mollie\Api\Exceptions\ApiException("Invalid API key. An API key must start with 'test_' or 'live_' and must be at least 30 characters long.");
         }
         $this->apiKey = $apiKey;
         $this->oauthAccess = \false;
