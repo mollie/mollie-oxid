@@ -109,9 +109,51 @@ class PaymentGateway extends PaymentGateway_parent
             }
         } catch(ApiException $exc) {
             $this->_iLastErrorNo = $exc->getCode();
-            $this->_sLastError = $exc->getMessage();
+            $this->_sLastError = $this->mollieGetCleanErrorMessage($exc);
             return false;
         }
         return true;
+    }
+
+    protected function mollieGetCleanErrorMessage($exc)
+    {
+        $message = $exc->getPlainMessage(); // default behaviour
+
+        $oResponse = $exc->getResponse();
+        if (!empty($oResponse) && $oResponse instanceof \stdClass) {
+            if (!empty($oResponse->status)) {
+                $message = $oResponse->status.": ";
+            }
+            if (!empty($oResponse->title)) {
+                $message .= $oResponse->title;
+            }
+            if (!empty($oResponse->detail)) {
+                if (!empty($message)) {
+                    $message .= " - ";
+                }
+                $message .= $oResponse->detail;
+            }
+        }
+
+        $message = str_ireplace("Error executing API call ", "", $message);
+
+        preg_match('/(.*?)\s*Documentation:/', $message, $matches);
+        if (!empty($matches)) {
+            $regexMessage = $matches[1];
+        } else {
+            preg_match('/(.*?)\s*Request body:/', $message, $matches);
+            if (!empty($matches)) {
+                $regexMessage = $matches[1];
+            }
+        }
+
+        if (!empty($regexMessage)) {
+            $regexMessage = trim($regexMessage);
+            $regexMessage = ltrim($regexMessage, "(");
+            $regexMessage = str_replace("):", " - ", $regexMessage);
+            $message = $regexMessage;
+        }
+
+        return $message;
     }
 }
