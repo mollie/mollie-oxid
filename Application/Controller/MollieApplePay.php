@@ -55,7 +55,7 @@ class MollieApplePay extends FrontendController
             $iAmount = 1;
         }
         if (!empty($sDetailsProductId)) { // applies when Apple Pay button on details page is pressed, since product is not in basket yet
-            $oBasketItem = $oBasket->addToBasket($sDetailsProductId, $iAmount);
+            $oBasketItem = $oBasket->addToBasket($sDetailsProductId, $iAmount, null, null, true); // Last true param sets amount override mode
             $oBasket->calculateBasket(true);
 
             $this->sDetailsProductBasketItemId = $oBasketItem->getBasketItemKey();

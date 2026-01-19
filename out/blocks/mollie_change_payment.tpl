@@ -16,8 +16,11 @@
     </div>
     [{assign var="mollieSelectPaymentFirst" value=true }][{* used in mollie_select_payment.tpl *}]
     [{capture name="mollie_hide_paymentlist"}]
-        $(function () {
-            $('#payment > .panel.panel-default:first').hide();
+        document.addEventListener("DOMContentLoaded", function () {
+            const el = document.querySelector('#payment > .panel.panel-default:first-child');
+            if (el) {
+                el.style.display = 'none';
+            }
         });
     [{/capture}]
     [{oxscript add=$smarty.capture.mollie_hide_paymentlist}]

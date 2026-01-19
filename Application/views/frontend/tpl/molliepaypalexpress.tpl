@@ -4,14 +4,6 @@
     </a><br>
     [{capture name="molliePayPalExpressAjaxSpinner"}]
         addSpinnerDiv();
-        $(document).on({
-            ajaxStart: function(){
-                $("#mollie-overlay").fadeIn(300);
-            },
-            ajaxStop: function(){
-                $("#mollie-overlay").fadeOut(300);
-            }
-        });
     [{/capture}]
     [{oxscript add=$smarty.capture.molliePayPalExpressAjaxSpinner}]
     [{oxscript add="var shopBaseUrl = '"|cat:$oViewConf->mollieGetShopUrl()|cat:"';"}]

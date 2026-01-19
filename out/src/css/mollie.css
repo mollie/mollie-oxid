@@ -178,14 +178,22 @@
 }
 
 #mollie-overlay{
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 300ms ease;
     position: fixed;
     top: 0;
     z-index: 100;
     width: 100%;
     height:100%;
-    display: none;
-    background: transparent;
+    background: rgba(0,0,0,0.6);
 }
+
+#mollie-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
 .mollie-cv-spinner {
     height: 100%;
     display: flex;
@@ -208,4 +216,3 @@
 .mollie-is-hide{
     display:none;
 }
-
