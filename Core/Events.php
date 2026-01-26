@@ -54,7 +54,8 @@ class Events
      * @var array
      */
     public static $aRenamePaymentMethods = [
-        'molliein3' => 'iDeal in3',
+        'molliein3' => 'in3',
+        'mollieideal' => 'iDEAL | Wero',
     ];
 
     /**
