@@ -53,6 +53,7 @@ class Payment
         'mollieriverty'         => array('title' => 'Riverty',             'model' => \Mollie\Payment\Application\Model\Payment\Riverty::class),
         'molliebancomatpay'     => array('title' => 'BANCOMAT PAY',        'model' => \Mollie\Payment\Application\Model\Payment\BancomatPay::class),
         'molliepaybybank'       => array('title' => 'Pay by Bank',         'model' => \Mollie\Payment\Application\Model\Payment\PayByBank::class),
+        'molliesatispay'        => array('title' => 'Satispay',            'model' => \Mollie\Payment\Application\Model\Payment\Satispay::class),
     );
 
     /**
