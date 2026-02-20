@@ -922,8 +922,16 @@ class Order extends Order_parent
      */
     public function mollieIsOrderInUnfinishedState()
     {
-        if ($this->oxorder__oxtransstatus->value == "NOT_FINISHED" && $this->oxorder__oxfolder->value == Registry::getConfig()->getShopConfVar('sMollieStatusProcessing')) {
-            return true;
+        if ($this->oxorder__oxtransstatus->value == "NOT_FINISHED") {
+            // If order is paid, the webhook already put the order in the processing status
+            if ($this->oxorder__oxfolder->value == Registry::getConfig()->getShopConfVar('sMollieStatusProcessing')) {
+                return true;
+            }
+
+            $oTransaction = $this->mollieGetTransaction();
+            if ($oTransaction->isAuthorized() === true) {
+                return true;
+            }
         }
         return false;
     }

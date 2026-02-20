@@ -72,11 +72,8 @@ class FinishOrders extends \Mollie\Payment\Application\Model\Cronjob\Base
                         oxstorno = 0 AND 
                         oxpaymenttype LIKE '%mollie%' AND 
                         oxorderdate > ? AND 
-                        oxtransstatus = 'NOT_FINISHED' AND 
-                        oxfolder = ? AND 
-                        oxpaid != '0000-00-00 00:00:00' AND
-                        oxpaid < ?";
-        $aParams = [$sTriggerDate, $sProcessingFolder, $sMinPaidDate];
+                        oxtransstatus = 'NOT_FINISHED'";
+        $aParams = [$sTriggerDate];
         if ($this->getShopId() !== false) {
             $sQuery .= " AND oxshopid = ? ";
             $aParams[] = $this->getShopId();
