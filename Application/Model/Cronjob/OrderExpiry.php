@@ -95,7 +95,7 @@ class OrderExpiry extends \Mollie\Payment\Application\Model\Cronjob\Base
         $aExpiredOrders = $this->getExpiredOrders();
         foreach ($aExpiredOrders as $sExpiredOrderId) {
             $oOrder = oxNew(Order::class);
-            if ($oOrder->load($sExpiredOrderId)) {
+            if ($oOrder->load($sExpiredOrderId) && $oOrder->mollieCanCancelOrderBecauseExpired() === true) {
                 self::outputStandardInfo("Cancelling order", $oOrder->getId());
                 $oOrder->cancelOrder();
                 self::outputStandardInfo("Order has been cancelled", $oOrder->getId());

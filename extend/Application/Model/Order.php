@@ -937,6 +937,18 @@ class Order extends Order_parent
     }
 
     /**
+     * @return bool
+     */
+    public function mollieCanCancelOrderBecauseExpired()
+    {
+        $oTransaction = $this->mollieGetTransaction();
+        if ($oTransaction->isAuthorized() === true || $oTransaction->isPaid() === true) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Recreates basket from order information
      *
      * @return object
