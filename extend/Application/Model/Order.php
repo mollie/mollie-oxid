@@ -665,9 +665,9 @@ class Order extends Order_parent
      *
      * @return object|false
      */
-    public function mollieGetTransaction()
+    public function mollieGetTransaction($blUseCache = true)
     {
-        if ($this->mollieTransaction === null) {
+        if ($this->mollieTransaction === null || $blUseCache === false) {
             $oPaymentModel = $this->mollieGetPaymentModel();
             try {
                 $this->mollieTransaction = $oPaymentModel->getApiEndpointByOrder($this)->get($this->oxorder__oxtransid->value, ["embed" => "payments"]);
@@ -922,10 +922,30 @@ class Order extends Order_parent
      */
     public function mollieIsOrderInUnfinishedState()
     {
-        if ($this->oxorder__oxtransstatus->value == "NOT_FINISHED" && $this->oxorder__oxfolder->value == Registry::getConfig()->getShopConfVar('sMollieStatusProcessing')) {
-            return true;
+        if ($this->oxorder__oxtransstatus->value == "NOT_FINISHED") {
+            // If order is paid, the webhook already put the order in the processing status
+            if ($this->oxorder__oxfolder->value == Registry::getConfig()->getShopConfVar('sMollieStatusProcessing')) {
+                return true;
+            }
+
+            $oTransaction = $this->mollieGetTransaction(false);
+            if ($oTransaction->isAuthorized() === true) {
+                return true;
+            }
         }
         return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function mollieCanCancelOrderBecauseExpired()
+    {
+        $oTransaction = $this->mollieGetTransaction(false);
+        if ($oTransaction->isAuthorized() === true || $oTransaction->isPaid() === true) {
+            return false;
+        }
+        return true;
     }
 
     /**
