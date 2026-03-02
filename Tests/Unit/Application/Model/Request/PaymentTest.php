@@ -33,7 +33,6 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getMolliePaymentCode')->willReturn('creditcard');
         $oPaymentModel->method('isRedirectUrlNeeded')->willReturn(true);
-        $oPaymentModel->method('getApiMethod')->willReturn('order');
         $oPaymentModel->method('getPaymentSpecificParameters')->willReturn(['foo' => 'bar']);
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
         $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
@@ -70,7 +69,6 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getMolliePaymentCode')->willReturn('creditcard');
         $oPaymentModel->method('isRedirectUrlNeeded')->willReturn(true);
-        $oPaymentModel->method('getApiMethod')->willReturn('order');
         $oPaymentModel->method('getPaymentSpecificParameters')->willReturn(['foo' => 'bar']);
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
         $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
@@ -111,7 +109,6 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getMolliePaymentCode')->willReturn('creditcard');
         $oPaymentModel->method('isRedirectUrlNeeded')->willReturn(true);
-        $oPaymentModel->method('getApiMethod')->willReturn('order');
         $oPaymentModel->method('getPaymentSpecificParameters')->willReturn(['foo' => 'bar']);
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
         $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);
@@ -152,7 +149,6 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
         $oPaymentModel->method('getMolliePaymentCode')->willReturn('creditcard');
         $oPaymentModel->method('isRedirectUrlNeeded')->willReturn(true);
-        $oPaymentModel->method('getApiMethod')->willReturn('order');
         $oPaymentModel->method('getPaymentSpecificParameters')->willReturn(['foo' => 'bar']);
         $oPaymentModel->method('getApiEndpoint')->willReturn($oApiEndpoint);
         $oPaymentModel->method('getApiEndpointByOrder')->willReturn($oApiEndpoint);

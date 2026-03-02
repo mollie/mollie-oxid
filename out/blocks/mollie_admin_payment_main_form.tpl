@@ -17,9 +17,6 @@
                 </script>
                 <b style="color: red;">[{oxmultilang ident="MOLLIE_PAYMENT_DISABLED_ACTIVATION"}]</b>
             [{/if}]
-            [{if $paymentModel->isOnlyOrderApiSupported() === true}]
-                <input type="hidden" name="mollie[api]" value="order">
-            [{/if}]
         </td>
     </tr>
     [{if method_exists($oView, 'mollieIsTokenConfigured') && $oView->mollieIsTokenConfigured() === false }]
@@ -35,67 +32,7 @@
             </td>
         </tr>
     [{/if}]
-    [{if $paymentModel->isOnlyOrderApiSupported() === false}]
     <tr>
-        <td class="edittext" width="70">
-            [{oxmultilang ident="MOLLIE_CONFIG_METHOD"}]
-        </td>
-        <td class="edittext">
-            <script type="text/javascript">
-                <!--
-                function mollieCustomApiChange()
-                {
-                    /* Can be redefined with custom functionality in a paymentconfig template */
-                }
-
-                function mollieHandleApiChange(oSelect)
-                {
-                    var aElements = document.getElementsByClassName("mollieApiHint");
-                    if (typeof aElements !== undefined && aElements.length > 0) {
-                        for (var i = 0; i < aElements.length; i++) {
-                            if (aElements[i].id != "mollie_apihint_" + oSelect.value) {
-                                aElements[i].style.display = "none";
-                            } else {
-                                aElements[i].style.display = "";
-                            }
-                        }
-                    }
-
-                    if (oSelect.value === 'payment') {
-                        mollieToggleDisplayByClass('mollieOnlyPaymentApi', '');
-                        mollieToggleDisplayByClass('mollieOnlyOrderApi', 'none');
-                    } else {
-                        mollieToggleDisplayByClass('mollieOnlyPaymentApi', 'none');
-                        mollieToggleDisplayByClass('mollieOnlyOrderApi', '');
-                    }
-
-                    mollieCustomApiChange(oSelect.value);
-                }
-
-                function mollieToggleDisplayByClass(className, display)
-                {
-                    var aElements = document.getElementsByClassName(className);
-                    if (typeof aElements !== undefined && aElements.length > 0) {
-                        for (var i = 0; i < aElements.length; i++) {
-                            aElements[i].style.display = display;
-                        }
-                    }
-                }
-                -->
-            </script>
-            <select name="mollie[api]" onchange="mollieHandleApiChange(this)" [{$readonly}]>
-                <option value="payment" [{if $paymentModel->getApiMethod() == 'payment'}]selected[{/if}]>Payment API</option>
-                <option value="order" [{if $paymentModel->getApiMethod() == 'order'}]selected[{/if}]>Order API</option>
-            </select>
-            <span id="mollie_apihint_payment" class="mollieApiHint" [{if $paymentModel->getApiMethod() != 'payment'}]style="display:none;"[{/if}]>
-                [{oxmultilang ident="MOLLIE_PAYMENT_API_LINK_1"}] <a href="https://docs.mollie.com/docs/accepting-payments" target=”_blank” style="text-decoration: underline;">[{oxmultilang ident="MOLLIE_PAYMENT_API_LINK_2"}]</a>
-            </span>
-            <span id="mollie_apihint_order" class="mollieApiHint" [{if $paymentModel->getApiMethod() != 'order'}]style="display:none;"[{/if}]>
-                [{oxmultilang ident="MOLLIE_ORDER_API_LINK_1"}] <a href="https://docs.mollie.com/orders/overview" target=”_blank” style="text-decoration: underline;">[{oxmultilang ident="MOLLIE_ORDER_API_LINK_2"}]</a>
-            </span>
-        </td>
-    </tr>
-    <tr class="mollieOnlyPaymentApi" [{if $paymentModel->getApiMethod() != 'payment'}]style="display:none;"[{/if}]>
         <td class="edittext" width="70">
             [{oxmultilang ident="MOLLIE_PAYMENT_DESCRIPTION"}]
         </td>
@@ -104,7 +41,6 @@
             [{oxinputhelp ident="MOLLIE_PAYMENT_DESCRIPTION_HELP"}]
         </td>
     </tr>
-    [{/if}]
     [{if $paymentModel->isOrderExpirySupported() === true}]
     <tr>
         <td class="edittext" width="70">
@@ -121,33 +57,27 @@
     </tr>
     [{/if}]
     [{if $paymentModel->getAvailableCaptureMethods()}]
-        <tr class="mollieOnlyPaymentApi" [{if $paymentModel->getApiMethod() != 'payment'}]style="display:none;"[{/if}]>
+        <tr>
             <td class="edittext" width="70">
                 [{oxmultilang ident="MOLLIE_CAPTURE_METHOD"}]
             </td>
             <td  class="edittext" width="150">
                 <script type="text/javascript">
                     <!--
-                    function mollieHandleCaptureMethodChange(oSelect, sApiMethod)
+                    function mollieHandleCaptureMethodChange(oSelect)
                     {
                         [{if 'automatic_capture'|in_array:$paymentModel->getAvailableCaptureMethods()}]
                             let oDaysRow = document.getElementById('mollieAutomaticCaptureDays');
                             let sDisplay = 'none';
-                            if (sApiMethod !== "order" && oSelect.value === 'automatic_capture') {
+                            if (oSelect.value === 'automatic_capture') {
                                 sDisplay = '';
                             }
                             oDaysRow.style.display = sDisplay;
                         [{/if}]
                     }
-
-                    function mollieCustomApiChange(sApiMethod)
-                    {
-                        let oSelect = document.getElementById('mollieSelectCaptureMethod');
-                        mollieHandleCaptureMethodChange(oSelect, sApiMethod);
-                    }
                     -->
                 </script>
-                <select id="mollieSelectCaptureMethod" name="mollie[capture_method]" style="width:177px;" onchange="mollieHandleCaptureMethodChange(this, '')" [{$readonly}]>
+                <select id="mollieSelectCaptureMethod" name="mollie[capture_method]" style="width:177px;" onchange="mollieHandleCaptureMethodChange(this)" [{$readonly}]>
                     [{foreach from=$paymentModel->getAvailableCaptureMethods() item=captureMode}]
                         <option value="[{$captureMode}]" [{if $paymentModel->getConfigParam('capture_method') == $captureMode}]selected[{/if}]>[{oxmultilang ident="MOLLIE_"|cat:$captureMode|upper}]</option>
                     [{/foreach}]
@@ -157,7 +87,7 @@
 
         </tr>
         [{if 'automatic_capture'|in_array:$paymentModel->getAvailableCaptureMethods()}]
-            <tr id="mollieAutomaticCaptureDays" class="mollieOnlyPaymentApi" [{if $paymentModel->getApiMethod() != 'payment' || $paymentModel->getConfigParam('capture_method') != 'automatic_capture' }]style="display:none;"[{/if}]>
+            <tr id="mollieAutomaticCaptureDays" [{if $paymentModel->getConfigParam('capture_method') != 'automatic_capture' }]style="display:none;"[{/if}]>
                 <td class="edittext" width="70">
                     [{oxmultilang ident="MOLLIE_CAPTURE_DAYS"}]
                 </td>

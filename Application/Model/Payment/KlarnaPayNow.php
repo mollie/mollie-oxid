@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Application\Model\Payment;
 
+// FCRM_REMOVE_ORDERS_API
 class KlarnaPayNow extends Base
 {
     /**
@@ -19,11 +20,13 @@ class KlarnaPayNow extends Base
     protected $sMolliePaymentCode = 'klarnapaynow';
 
     /**
-     * Determines if the payment methods only supports the order API
+     * Determines if payment method is deprecated.
+     * Deprecated methods are disabled, can't be used anymore and will be removed in a future release.
+     * They stay in the module to allow finishing old orders where these methods have been used
      *
      * @var bool
      */
-    protected $blIsOnlyOrderApiSupported = true;
+    protected $blMethodIsDeprecated = true;
 
     /**
      * @var bool

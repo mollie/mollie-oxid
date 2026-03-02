@@ -50,13 +50,8 @@ class Banktransfer extends Base
     public function getPaymentSpecificParameters(Order $oOrder)
     {
         $aParams = parent::getPaymentSpecificParameters($oOrder);
-
         $aParams['billingEmail'] = $oOrder->oxorder__oxbillemail->value;
         $aParams['dueDate'] = $this->getDueDate();
-
-        if ($this->getApiMethod() == 'order') {
-            unset($aParams['billingEmail']); // existance of billingEmail param in OrderAPI triggers error
-        }
         return $aParams;
     }
 }

@@ -395,7 +395,7 @@ class Order extends Order_parent
 
             if ($this->mollieIsMolliePaymentUsed()) {
                 $this->oxorder__molliemode = new Field(PaymentHelper::getInstance()->getMollieMode());
-                $this->oxorder__mollieapi = new Field($this->mollieGetPaymentModel()->getApiMethod());
+                $this->oxorder__mollieapi = new Field('payment');
             }
             return $mParentReturn;
         }

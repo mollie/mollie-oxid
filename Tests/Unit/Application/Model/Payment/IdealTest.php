@@ -79,14 +79,6 @@ class IdealTest extends UnitTestCase
         $this->assertEquals("ideal", $result);
     }
 
-    public function testIsOnlyOrderApiSupported()
-    {
-        $oPayment = new \Mollie\Payment\Application\Model\Payment\Ideal();
-        $result = $oPayment->isOnlyOrderApiSupported();
-
-        $this->assertFalse($result);
-    }
-
     public function testIsOrderExpirySupported()
     {
         $oPayment = new \Mollie\Payment\Application\Model\Payment\Ideal();
