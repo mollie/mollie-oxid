@@ -35,4 +35,5 @@ $aLang = [
     'MOLLIE_NOT_AVAILABLE_B2B'                  => 'The payment method is only available for B2B orders.',
     'MOLLIE_NOT_AVAILABLE_CURRENCY'             => 'The currency is not supported by this payment method.',
     'MOLLIE_CHANGE_CURRENCY'                    => 'Change currency',
+    'MOLLIE_SUPPORTED_CURRENCIES'               => 'Supported currencies',
 ];

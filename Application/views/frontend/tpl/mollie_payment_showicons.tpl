@@ -12,7 +12,9 @@
         </label>
 
         [{if $isDisabled}]
-            <div class="col-lg-offset-3 desc"><span>[{$paymentModel->getNotAvailableMessage()}]</span></div>
+            <div class="col-lg-offset-3 desc">
+                <span>[{$paymentModel->getNotAvailableMessage()}]</span>
+            </div>
 
             [{if $paymentModel->getSoftRestriction() == "currency"}]
                 [{block name="mollie_dd_layout_page_header_icon_menu_currencies"}]

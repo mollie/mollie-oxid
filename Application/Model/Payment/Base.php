@@ -613,6 +613,27 @@ abstract class Base
     }
 
     /**
+     * Retrieve the list of allowed currencies.
+     *
+     * @return array
+     */
+    public function getAllowedCurrencies()
+    {
+        return $this->aAllowedCurrencies;
+    }
+
+    /**
+     * Returns a string representation of allowed currencies, separated by commas.
+     *
+     * @return string
+     */
+    public function getCurrencyString()
+    {
+        return implode(', ', $this->getAllowedCurrencies());
+    }
+
+
+    /**
      * Returns if given currency is allowed for mollie payment method
      *
      * @param  string $sCurrency
@@ -620,7 +641,8 @@ abstract class Base
      */
     public function isCurrencySupported($sCurrency)
     {
-        if (!empty($this->aAllowedCurrencies) && !in_array($sCurrency, $this->aAllowedCurrencies)) {
+        $aAllowedCurrencies = $this->getAllowedCurrencies();
+        if (!empty($aAllowedCurrencies) && !in_array($sCurrency, $aAllowedCurrencies)) {
             return false;
         }
         return true;
@@ -751,13 +773,18 @@ abstract class Base
      */
     public function getNotAvailableMessage()
     {
-        if (empty($this->aSoftRestrictions)) {
+        $sRestriction = $this->getSoftRestriction();
+        if (empty($sRestriction)) {
             return "";
         }
 
-        $sMessageIdent = $this->aSoftRestrictions[0];
+        $sMessage = Registry::getLang()->translateString('MOLLIE_NOT_AVAILABLE_'.strtoupper($sRestriction));
 
-        return Registry::getLang()->translateString('MOLLIE_NOT_AVAILABLE_'.strtoupper($sMessageIdent));
+        if ($sRestriction == "currency") {
+            $sMessage .= " ".Registry::getLang()->translateString('MOLLIE_SUPPORTED_CURRENCIES').": ".$this->getCurrencyString();
+        }
+
+        return $sMessage;
     }
 
     /**
