@@ -169,6 +169,25 @@
     margin-bottom: 10px;
 }
 
+.mollieDisabled SPAN, .mollieDisabled INPUT, .mollieDisabled LABEL {
+    opacity: 0.6;
+}
+
+.mollieDisabled DIV.desc {
+    font-weight: normal;
+}
+
+.mollie-switch-currency .btn {
+    background-color: transparent;
+    font-size: 11px;
+    color: #495057;
+    border: 0;
+}
+
+.mollie-switch-currency .dropdown-toggle::after {
+    display: none;
+}
+
 .molliePayPalExpressBasketTop, .molliePayPalExpressBasketBottom {
     float: right;
     margin-right: 9px;

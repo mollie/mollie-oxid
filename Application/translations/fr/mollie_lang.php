@@ -30,6 +30,12 @@ $aLang = [
     'MOLLIE_ERROR_ORDER_FAILED'                 => 'Le paiement a échoué, veuillez essayer à nouveau',
     'MOLLIE_BILLING_APPLE_PAY_NOT_AVAILABLE'    => 'Apple Pay n\'est pas disponible pour cette adresse de facturation',
     'MOLLIE_SECOND_CHANCE_MAIL_SUBJECT'         => 'Finalisation de votre commande à',
+    'MOLLIE_NOT_AVAILABLE_BASKETSUMLIMIT'       => 'Le mode de paiement n’est pas disponible pour le montant actuel de la commande.',
+    'MOLLIE_NOT_AVAILABLE_COUNTRY'              => 'Le mode de paiement n’est pas disponible pour le pays de facturation sélectionné.',
+    'MOLLIE_NOT_AVAILABLE_B2B'                  => 'Le mode de paiement est uniquement disponible pour les commandes B2B.',
+    'MOLLIE_NOT_AVAILABLE_CURRENCY'             => 'La devise n’est pas prise en charge par ce mode de paiement.',
+    'MOLLIE_CHANGE_CURRENCY'                    => 'Changer de devise',
+    'MOLLIE_SUPPORTED_CURRENCIES'               => 'Devises prises en charge',
 
     'MOLLIE_PAYPAL_EXPRESS_DESCRIPTION'             => 'Paiement chez ',
     'MOLLIE_PAYPAL_EXPRESS'                         => 'PayPal Express',

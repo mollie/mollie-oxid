@@ -8,7 +8,7 @@
         [{$smarty.block.parent}]
     [{else}]
         [{assign var="paymentModel" value=$paymentmethod->getMolliePaymentModel()}]
-        <div class="well well-sm" id="container_[{$sPaymentID}]" [{if $paymentModel->isMollieMethodHiddenInitially()}]style="display:none"[{/if}]>
+        <div class="well well-sm[{if $paymentModel->isNotAvailableButVisible()}] mollieDisabled[{/if}]" id="container_[{$sPaymentID}]" [{if $paymentModel->isMollieMethodHiddenInitially()}]style="display:none"[{/if}]>
             [{if !method_exists($oViewConf, 'mollieShowIcons') || $oViewConf->mollieShowIcons() === false}]
                 [{include file="page/checkout/inc/payment_other.tpl"}]
             [{else}]
