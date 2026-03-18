@@ -18,7 +18,7 @@
                 [{block name="mollie_dd_layout_page_header_icon_menu_currencies"}]
                     <div class="col-lg-offset-3 desc mollie-switch-currency">
                         [{* Currency Dropdown*}]
-                        <span>Währung wechseln:</span>
+                        <span>[{oxmultilang ident="MOLLIE_CHANGE_CURRENCY"}]:</span>
                         [{oxid_include_widget cl="oxwCurrencyList" cur=$oViewConf->getActCurrency() _parent=$oView->getClassName() nocookie=1 _navurlparams=$oViewConf->getNavUrlParams() anid=$oViewConf->getActArticleId()}]
                     </div>
                 [{/block}]

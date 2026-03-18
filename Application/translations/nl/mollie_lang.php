@@ -34,4 +34,5 @@ $aLang = [
     'MOLLIE_NOT_AVAILABLE_COUNTRY'              => 'De betaalmethode is niet beschikbaar voor het geselecteerde facturatieland.',
     'MOLLIE_NOT_AVAILABLE_B2B'                  => 'De betaalmethode is alleen beschikbaar voor B2B-bestellingen.',
     'MOLLIE_NOT_AVAILABLE_CURRENCY'             => 'De valuta wordt niet ondersteund door deze betaalmethode.',
+    'MOLLIE_CHANGE_CURRENCY'                    => 'Valuta wijzigen',
 ];

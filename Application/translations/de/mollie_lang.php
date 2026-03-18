@@ -34,4 +34,5 @@ $aLang = [
     'MOLLIE_NOT_AVAILABLE_COUNTRY'              => 'Die Zahlart ist f&uuml;r das gew&auml;hlte Rechnungsland nicht verf&uuml;gbar.',
     'MOLLIE_NOT_AVAILABLE_B2B'                  => 'Die Zahlart steht nur f&uuml;r B2B Bestellungen zur Verf&uuml;gung.',
     'MOLLIE_NOT_AVAILABLE_CURRENCY'             => 'Die W&auml;hrung wird von der Zahlart nicht unterst&uuml;tzt.',
+    'MOLLIE_CHANGE_CURRENCY'                    => 'Währung wechseln',
 ];
