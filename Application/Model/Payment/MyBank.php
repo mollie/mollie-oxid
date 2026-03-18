@@ -31,7 +31,7 @@ class MyBank extends Base
      *
      * @return bool
      */
-    public function isMethodAvailable($oBasket)
+    public function isMethodAvailable($oBasket = null)
     {
         $blReturn = parent::isMethodAvailable($oBasket);
         $oUser = $oBasket->getBasketUser();

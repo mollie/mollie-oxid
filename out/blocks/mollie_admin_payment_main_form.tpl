@@ -172,6 +172,16 @@
             </tr>
         [{/if}]
     [{/if}]
+    <tr>
+        <td class="edittext" width="70">
+            [{oxmultilang ident="MOLLIE_SHOW_WHEN_NOT_AVAILABLE"}]
+        </td>
+        <td class="edittext">
+            <input type="hidden" name="mollie[show_when_not_available]" value="0">
+            <input class="edittext" type="checkbox" name="mollie[show_when_not_available]" value="1" [{if $paymentModel->getConfigParam('show_when_not_available') == 1}]checked[{/if}] [{$readonly}]>
+            [{oxinputhelp ident="MOLLIE_SHOW_WHEN_NOT_AVAILABLE_HELP"}]
+        </td>
+    </tr>
     [{if $paymentModel->getCustomConfigTemplate() !== false}]
         [{include file=$paymentModel->getCustomConfigTemplate()}]
     [{/if}]

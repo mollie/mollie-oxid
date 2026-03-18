@@ -30,4 +30,10 @@ $aLang = [
     'MOLLIE_ERROR_ORDER_FAILED'                 => 'Betaling mislukt, probeer het opnieuw',
     'MOLLIE_BILLING_APPLE_PAY_NOT_AVAILABLE'    => 'Apple Pay is niet beschikbaar voor dit factuuradres',
     'MOLLIE_SECOND_CHANCE_MAIL_SUBJECT'         => 'Completion of your order at',
+    'MOLLIE_NOT_AVAILABLE_BASKETSUMLIMIT'       => 'De betaalmethode is niet beschikbaar voor de huidige bestelwaarde.',
+    'MOLLIE_NOT_AVAILABLE_COUNTRY'              => 'De betaalmethode is niet beschikbaar voor het geselecteerde facturatieland.',
+    'MOLLIE_NOT_AVAILABLE_B2B'                  => 'De betaalmethode is alleen beschikbaar voor B2B-bestellingen.',
+    'MOLLIE_NOT_AVAILABLE_CURRENCY'             => 'De valuta wordt niet ondersteund door deze betaalmethode.',
+    'MOLLIE_CHANGE_CURRENCY'                    => 'Valuta wijzigen',
+    'MOLLIE_SUPPORTED_CURRENCIES'               => 'Ondersteunde valuta',
 ];
