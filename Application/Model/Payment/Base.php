@@ -887,6 +887,7 @@ abstract class Base
             $this->blHasHardRestrictions = false;
 
             if ($this->isMolliePaymentActiveInGeneral() === false ||
+                $this->isMethodDisplayableInPaymentList() === false ||
                 $this->isMethodDeprecated() === true
             ) {
                 $this->blHasHardRestrictions = true;
