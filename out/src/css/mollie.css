@@ -169,3 +169,11 @@
     margin-bottom: 10px;
 }
 
+.mollieDisabled {
+    opacity: 0.6;
+}
+
+.mollieDisabled DIV.desc {
+    font-weight: normal;
+}
+

@@ -147,6 +147,16 @@ abstract class Base
     protected $blIsShippedCaptureSupported = false;
 
     /**
+     * @var array|null
+     */
+    protected $aSoftRestrictions = null;
+
+    /**
+     * @var bool|null
+     */
+    protected $blHasHardRestrictions = null;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -557,18 +567,7 @@ abstract class Base
             return $sAltLogoUrl;
         }
 
-        $dAmount = false;
-        $sCurrency = false;
-        $sBillingCountryCode = false;
-
-        $oBasket = Registry::getSession()->getBasket();
-        if ($oBasket) {
-            $dAmount = $oBasket->getPrice()->getBruttoPrice();
-            $sCurrency = $oBasket->getBasketCurrency()->name;
-            $sBillingCountryCode = User::getInstance()->getBillingCountry($oBasket);
-        }
-
-        $aInfo = Payment::getInstance()->getMolliePaymentInfo($dAmount, $sCurrency, $sBillingCountryCode);
+        $aInfo = Payment::getInstance()->getMolliePaymentInfo();
         if (isset($aInfo[$this->sMolliePaymentCode])) {
             return $aInfo[$this->sMolliePaymentCode]['pic'];
         }
@@ -718,27 +717,126 @@ abstract class Base
     }
 
     /**
-     * Returns if payment method is available for the current basket situation. The limiting factors are:
-     *
-     * 1. Payment method not activated in the Mollie dashboard or for the current billing country, basket amount, currency situation
-     * 2. BasketSum is outside of the min-/max-limits of the payment method
-     * 3. Payment method has a billing country restriction and customer is not from that country
-     * 4. Payment method is only available for B2B orders and current order is not a B2B order
-     * 5. Currently selected currency is not supported by payment method
-     * 6. Payment method is deprecated
+     * Determines whether the item should be visible when it is not available.
      *
      * @return bool
      */
-    public function isMethodAvailable($oBasket)
+    public function isVisibleWhenNotAvailable()
     {
-        $sBillingCountryCode = User::getInstance()->getBillingCountry($oBasket);
-        $sCurrency = $oBasket->getBasketCurrency()->name;
-        if ($this->isMolliePaymentActive($sBillingCountryCode, $oBasket->getPrice()->getBruttoPrice(), $sCurrency) === false ||
-            $this->mollieIsBasketSumInLimits($oBasket->getPrice()->getBruttoPrice(), $sBillingCountryCode, $sCurrency) === false ||
-            $this->mollieIsMethodAvailableForCountry($sBillingCountryCode) === false ||
-            ($this->isOnlyB2BSupported() === true && $this->isB2BOrder($oBasket) === false) ||
-            $this->isCurrencySupported($sCurrency) === false ||
-            $this->isMethodDeprecated() === true
+        if ((bool)$this->getConfigParam('show_when_not_available') === true) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the item is not available but still visible, based on certain conditions.
+     *
+     * @param object $oBasket
+     * @return bool
+     */
+    public function isNotAvailableButVisible($oBasket = null)
+    {
+        if ($this->isVisibleWhenNotAvailable() === true && $this->hasSoftRestrictions($oBasket) === true) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Retrieves a message indicating that a certain functionality is not available,
+     * based on the first soft restriction in the defined list.
+     *
+     * @return string
+     */
+    public function getNotAvailableMessage()
+    {
+        if (empty($this->aSoftRestrictions)) {
+            return "";
+        }
+
+        $sMessageIdent = $this->aSoftRestrictions[0];
+
+        return Registry::getLang()->translateString('MOLLIE_NOT_AVAILABLE_'.strtoupper($sMessageIdent));
+    }
+
+    /**
+     * Returns if payment method has soft restrictions and can not be used but shown as not available. The limiting factors are:
+     *
+     * 1. BasketSum is outside of the min-/max-limits of the payment method
+     * 2. Payment method has a billing country restriction and customer is not from that country
+     * 3. Payment method is only available for B2B orders and current order is not a B2B order
+     * 4. Currently selected currency is not supported by payment method
+     *
+     * @param  object $oBasket
+     * @return bool
+     */
+    protected function hasSoftRestrictions($oBasket = null)
+    {
+        if ($this->aSoftRestrictions === null) {
+            $this->aSoftRestrictions = [];
+
+            if ($oBasket === null) {
+                $oBasket = Registry::getSession()->getBasket();
+            }
+            $sBillingCountryCode = User::getInstance()->getBillingCountry($oBasket);
+            $sCurrency = $oBasket->getBasketCurrency()->name;
+
+            if ($this->mollieIsBasketSumInLimits($oBasket->getPrice()->getBruttoPrice(), $sBillingCountryCode, $sCurrency) === false) {
+                $this->aSoftRestrictions[] = 'basketSumLimit';
+            }
+
+            if ($this->mollieIsMethodAvailableForCountry($sBillingCountryCode) === false) {
+                $this->aSoftRestrictions[] = 'country';
+            }
+
+            if ($this->isOnlyB2BSupported() === true && $this->isB2BOrder($oBasket) === false) {
+                $this->aSoftRestrictions[] = 'b2b';
+            }
+
+            if ($this->isCurrencySupported($sCurrency) === false) {
+                $this->aSoftRestrictions[] = 'currency';
+            }
+        }
+
+        if (!empty($this->aSoftRestrictions)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns if payment method has hard restrictions and can not be used or shown in any way. The limiting factors are:
+     *
+     * 1. Payment method is not activated in the Mollie dashboard
+     * 2. Payment method is deprecated
+     *
+     * @return bool
+     */
+    protected function hasHardRestrictions()
+    {
+        if ($this->blHasHardRestrictions === null) {
+            $this->blHasHardRestrictions = false;
+
+            if ($this->isMolliePaymentActiveInGeneral() === false ||
+                $this->isMethodDeprecated() === true
+            ) {
+                $this->blHasHardRestrictions = true;
+            }
+        }
+        return $this->blHasHardRestrictions;
+    }
+
+    /**
+     * Returns if payment method is available for the current basket situation
+     *
+     * @param  object $oBasket
+     * @return bool
+     */
+    public function isMethodAvailable($oBasket = null)
+    {
+        if ($this->hasHardRestrictions() === true ||
+            ($this->hasSoftRestrictions($oBasket) === true && $this->isVisibleWhenNotAvailable() === false)
         ) {
             return false;
         }
