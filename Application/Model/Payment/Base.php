@@ -761,6 +761,19 @@ abstract class Base
     }
 
     /**
+     * Retrieve the first soft restriction if available
+     *
+     * @return string|false
+     */
+    public function getSoftRestriction()
+    {
+        if (!empty($this->aSoftRestrictions[0])) {
+            return $this->aSoftRestrictions[0];
+        }
+        return false;
+    }
+
+    /**
      * Returns if payment method has soft restrictions and can not be used but shown as not available. The limiting factors are:
      *
      * 1. BasketSum is outside of the min-/max-limits of the payment method

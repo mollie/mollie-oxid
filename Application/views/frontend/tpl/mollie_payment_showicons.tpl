@@ -12,25 +12,35 @@
         </label>
 
         [{if $isDisabled}]
-            <div class="col-lg-offset-3 desc">[{$paymentModel->getNotAvailableMessage()}]</div>
-        [{/if}]
-    </dt>
-    <dd class="[{if $oView->getCheckedPaymentId() == $paymentmethod->oxpayments__oxid->value}]activePayment[{/if}]">
-        [{if $paymentmethod->getPrice() && !$isDisabled}]
-            [{assign var="oPaymentPrice" value=$paymentmethod->getPrice() }]
-            [{if $oViewConf->isFunctionalityEnabled('blShowVATForPayCharge') }]
-                [{strip}]
-                    ([{oxprice price=$oPaymentPrice->getNettoPrice() currency=$currency}]
-                    [{if $oPaymentPrice->getVatValue() > 0}]
-                        [{oxmultilang ident="PLUS_VAT"}] [{oxprice price=$oPaymentPrice->getVatValue() currency=$currency}]
-                    [{/if}])
-                [{/strip}]
-            [{else}]
-                ([{oxprice price=$oPaymentPrice->getBruttoPrice() currency=$currency}])
+            <div class="col-lg-offset-3 desc"><span>[{$paymentModel->getNotAvailableMessage()}]</span></div>
+
+            [{if $paymentModel->getSoftRestriction() == "currency"}]
+                [{block name="mollie_dd_layout_page_header_icon_menu_currencies"}]
+                    <div class="col-lg-offset-3 desc mollie-switch-currency">
+                        [{* Currency Dropdown*}]
+                        <span>Währung wechseln:</span>
+                        [{oxid_include_widget cl="oxwCurrencyList" cur=$oViewConf->getActCurrency() _parent=$oView->getClassName() nocookie=1 _navurlparams=$oViewConf->getNavUrlParams() anid=$oViewConf->getActArticleId()}]
+                    </div>
+                [{/block}]
             [{/if}]
         [{/if}]
+    </dt>
+    [{if !$isDisabled}]
+        <dd class="[{if $oView->getCheckedPaymentId() == $paymentmethod->oxpayments__oxid->value}]activePayment[{/if}]">
+            [{if $paymentmethod->getPrice()}]
+                [{assign var="oPaymentPrice" value=$paymentmethod->getPrice() }]
+                [{if $oViewConf->isFunctionalityEnabled('blShowVATForPayCharge') }]
+                    [{strip}]
+                        ([{oxprice price=$oPaymentPrice->getNettoPrice() currency=$currency}]
+                        [{if $oPaymentPrice->getVatValue() > 0}]
+                            [{oxmultilang ident="PLUS_VAT"}] [{oxprice price=$oPaymentPrice->getVatValue() currency=$currency}]
+                        [{/if}])
+                    [{/strip}]
+                [{else}]
+                    ([{oxprice price=$oPaymentPrice->getBruttoPrice() currency=$currency}])
+                [{/if}]
+            [{/if}]
 
-        [{if !$isDisabled}]
             [{foreach from=$paymentmethod->getDynValues() item=value name=PaymentDynValues}]
                 <div class="form-group">
                     <label class="control-label col-lg-3" for="[{$sPaymentID}]_[{$smarty.foreach.PaymentDynValues.iteration}]">[{$value->name}]</label>
@@ -39,16 +49,16 @@
                     </div>
                 </div>
             [{/foreach}]
-        [{/if}]
 
-        <div class="clearfix"></div>
+            <div class="clearfix"></div>
 
-        [{block name="checkout_payment_longdesc"}]
-            [{if $paymentmethod->oxpayments__oxlongdesc->value|strip_tags|trim}]
-                <div class="alert alert-info col-lg-offset-3 desc">
-                    [{$paymentmethod->oxpayments__oxlongdesc->getRawValue()}]
-                </div>
-            [{/if}]
-        [{/block}]
-    </dd>
+            [{block name="checkout_payment_longdesc"}]
+                [{if $paymentmethod->oxpayments__oxlongdesc->value|strip_tags|trim}]
+                    <div class="alert alert-info col-lg-offset-3 desc">
+                        [{$paymentmethod->oxpayments__oxlongdesc->getRawValue()}]
+                    </div>
+                [{/if}]
+            [{/block}]
+        </dd>
+    [{/if}]
 </dl>
