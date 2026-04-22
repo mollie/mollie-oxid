@@ -5,6 +5,7 @@ namespace Mollie\Payment\extend\Application\Controller;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Payment\Application\Helper\Order as OrderHelper;
+use Mollie\Payment\extend\Application\Model\Order as MollieOrder;
 
 class OrderController extends OrderController_parent
 {
@@ -94,11 +95,9 @@ class OrderController extends OrderController_parent
         }
         $sReturn = parent::execute();
 
-        if (Registry::getSession()->getVariable('mollieReinitializePaymentMode')) {
+        if (Registry::getRequest()->getRequestEscapedParameter(MollieOrder::MOLLIE_PAYMENT_REINIT_PARAM)) {
             Registry::getSession()->deleteVariable('usr'); // logout user since the payment link should not be seen as a successful login
         }
-
-        Registry::getSession()->deleteVariable('mollieReinitializePaymentMode');
 
         return $sReturn;
     }

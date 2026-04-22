@@ -77,11 +77,16 @@ class PaymentGateway extends PaymentGateway_parent
     /**
      * Generate a return url with all necessary return flags
      *
+     * @param  CoreOrder $oOrder
      * @return string
      */
-    protected function getRedirectUrl()
+    protected function getRedirectUrl(CoreOrder $oOrder = null)
     {
         $sBaseUrl = Registry::getConfig()->getCurrentShopUrl().'index.php?cl=order&fnc=handleMollieReturn';
+
+        if ($oOrder !== null && $oOrder->getMollieReinitializePaymentMode() === true) { // transmit reinit state as parameter
+            $sBaseUrl .= '&'.Order::MOLLIE_PAYMENT_REINIT_PARAM.'=1';
+        }
 
         return $sBaseUrl.$this->mollieGetAdditionalParameters();
     }
@@ -98,7 +103,7 @@ class PaymentGateway extends PaymentGateway_parent
         $oOrder->mollieSetOrderNumber();
 
         try {
-            $oResponse = $oOrder->mollieGetPaymentModel()->getApiRequestModel()->sendRequest($oOrder, $dAmount, $this->getRedirectUrl());
+            $oResponse = $oOrder->mollieGetPaymentModel()->getApiRequestModel()->sendRequest($oOrder, $dAmount, $this->getRedirectUrl($oOrder));
             $oOrder->mollieSetTransactionId($oResponse->id);
 
             $sPaymentUrl = $oResponse->getCheckoutUrl();
