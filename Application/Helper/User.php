@@ -113,9 +113,9 @@ class User
 
         $this->setInitialDeliveryData($oUser);
 
-        $aShippingContact = Registry::getRequest()->getRequestEscapedParameter('shippingContact');
-        if (!empty($aShippingContact)) {
-            $oUser->oxuser__oxusername = new Field($aShippingContact['emailAddress']);
+        $sApplePayEmail = $this->getApplePayEmailAddress();
+        if (!empty($sApplePayEmail)) {
+            $oUser->oxuser__oxusername = new Field($sApplePayEmail);
             $this->updateUserFromApplePayData($oUser);
             $oUser->save();
         }
