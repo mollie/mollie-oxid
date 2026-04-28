@@ -193,7 +193,7 @@ class MollieApplePay extends FrontendController
             $oBasket = Registry::getSession()->getBasket();
             $oBasket->setShipping($sShipSet);
         }
-        Registry::getUtils()->showMessageAndExit("");
+        Registry::getUtils()->showMessageAndExit(json_encode([]));
     }
 
     /**

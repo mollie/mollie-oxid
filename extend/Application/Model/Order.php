@@ -741,23 +741,43 @@ class Order extends Order_parent
         $this->oxorder__oxbillfon = new Field("");
         $this->oxorder__oxbillfax = new Field("");
 
-        // set delivery address
-        $this->oxorder__oxdelfname = new Field($aShippingContact['givenName']);
-        $this->oxorder__oxdellname = new Field($aShippingContact['familyName']);
+        $oDelAdress = $this->getDelAddressInfo();
 
-        $aShippingStreetSplitInfo = UserHelper::getInstance()->splitStreet($aShippingContact['addressLines']);
-        $this->oxorder__oxdelstreet = new Field($aShippingStreetSplitInfo['street']);
-        $this->oxorder__oxdelstreetnr = new Field($aShippingStreetSplitInfo['number']);
-        $this->oxorder__oxdeladdinfo = new Field($aShippingStreetSplitInfo['addinfo']);
-        $this->oxorder__oxdelcity = new Field($aShippingContact['locality']);
-        $this->oxorder__oxdelcountryid = new Field($oCountry->getIdByCode($aShippingContact['countryCode']));
-        $this->oxorder__oxdelstateid = new Field(UserHelper::getInstance()->getStateFromAdministrativeArea($aShippingContact['administrativeArea']));
-        $this->oxorder__oxdelzip = new Field($aShippingContact['postalCode']);
-        $this->oxorder__oxdelsal = new Field(UserHelper::getInstance()->getSalByFirstname($aShippingContact['givenName']));
+        $oPaymentModel = PaymentHelper::getInstance()->getMolliePaymentModel('mollieapplepay');
+        if ((bool)$oPaymentModel->getConfigParam('ignore_apple_pay_delivery_address') === true && !empty($oDelAdress)) {
+            // set delivery address (OXID Standard)
+            $this->oxorder__oxdelcompany = clone $oDelAdress->oxaddress__oxcompany;
+            $this->oxorder__oxdelfname = clone $oDelAdress->oxaddress__oxfname;
+            $this->oxorder__oxdellname = clone $oDelAdress->oxaddress__oxlname;
+            $this->oxorder__oxdelstreet = clone $oDelAdress->oxaddress__oxstreet;
+            $this->oxorder__oxdelstreetnr = clone $oDelAdress->oxaddress__oxstreetnr;
+            $this->oxorder__oxdeladdinfo = clone $oDelAdress->oxaddress__oxaddinfo;
+            $this->oxorder__oxdelcity = clone $oDelAdress->oxaddress__oxcity;
+            $this->oxorder__oxdelcountryid = clone $oDelAdress->oxaddress__oxcountryid;
+            $this->oxorder__oxdelstateid = clone $oDelAdress->oxaddress__oxstateid;
+            $this->oxorder__oxdelzip = clone $oDelAdress->oxaddress__oxzip;
+            $this->oxorder__oxdelfon = clone $oDelAdress->oxaddress__oxfon;
+            $this->oxorder__oxdelfax = clone $oDelAdress->oxaddress__oxfax;
+            $this->oxorder__oxdelsal = clone $oDelAdress->oxaddress__oxsal;
+        } else {
+            // set delivery address (shippingContact from Apple Pay)
+            $this->oxorder__oxdelfname = new Field($aShippingContact['givenName']);
+            $this->oxorder__oxdellname = new Field($aShippingContact['familyName']);
 
-        $this->oxorder__oxdelcompany = new Field("");
-        $this->oxorder__oxdelfon = new Field("");
-        $this->oxorder__oxdelfax = new Field("");
+            $aShippingStreetSplitInfo = UserHelper::getInstance()->splitStreet($aShippingContact['addressLines']);
+            $this->oxorder__oxdelstreet = new Field($aShippingStreetSplitInfo['street']);
+            $this->oxorder__oxdelstreetnr = new Field($aShippingStreetSplitInfo['number']);
+            $this->oxorder__oxdeladdinfo = new Field($aShippingStreetSplitInfo['addinfo']);
+            $this->oxorder__oxdelcity = new Field($aShippingContact['locality']);
+            $this->oxorder__oxdelcountryid = new Field($oCountry->getIdByCode($aShippingContact['countryCode']));
+            $this->oxorder__oxdelstateid = new Field(UserHelper::getInstance()->getStateFromAdministrativeArea($aShippingContact['administrativeArea']));
+            $this->oxorder__oxdelzip = new Field($aShippingContact['postalCode']);
+            $this->oxorder__oxdelsal = new Field(UserHelper::getInstance()->getSalByFirstname($aShippingContact['givenName']));
+
+            $this->oxorder__oxdelcompany = new Field("");
+            $this->oxorder__oxdelfon = new Field("");
+            $this->oxorder__oxdelfax = new Field("");
+        }
     }
 
     /**
