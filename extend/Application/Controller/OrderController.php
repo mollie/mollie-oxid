@@ -43,6 +43,23 @@ class OrderController extends OrderController_parent
     }
 
     /**
+     * Mollie sometimes sends multiple calls to the shop when payment was done with Apple Pay in credit card form.
+     * This function recognizes these situations to prevent double processing
+     *
+     * @param  Order $oOrder
+     * @return bool
+     */
+    protected function mollieIsCreditCardApplePayDoubleCall(Order $oOrder)
+    {
+        if ($oOrder->getFieldData("oxorder__oxpaymenttype") == "molliecreditcard" &&
+            $oOrder->getFieldData("oxorder__oxtransstatus") == "OK"
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Writes error-status to session and redirects to payment page
      *
      * @param string $sErrorLangIdent
@@ -89,6 +106,11 @@ class OrderController extends OrderController_parent
                     $sErrorIdent = 'MOLLIE_ERROR_ORDER_FAILED';
                 }
                 return $this->redirectWithError($sErrorIdent);
+            }
+
+            if ($this->mollieIsCreditCardApplePayDoubleCall($oOrder) === true) {
+                // Order already finalized, return OK to prevent double processing
+                return $this->_getNextStep(Order::ORDER_STATE_OK);
             }
 
             // else - continue to parent::execute since success must be true
