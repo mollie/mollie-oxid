@@ -563,11 +563,14 @@ abstract class Base
         $aParams = [];
 
         $sCaptureMethod = $this->getCaptureMethod();
-        if ($sCaptureMethod !== false) { // Merchant capture only available for Payment API
+
+        if ($sCaptureMethod !== false) {
             $oOrder->mollieSetCaptureMode($sCaptureMethod);
-            $aParams['captureMode'] = $sCaptureMethod;
-            if ($sCaptureMethod === 'automatic') {
-                $aParams['captureDelay'] = $this->getCaptureDays().' days';
+            if ($this->getApiMethod($oOrder) == 'payment') { // Merchant capture only available for Payment API
+                $aParams['captureMode'] = $sCaptureMethod;
+                if ($sCaptureMethod === 'automatic') {
+                    $aParams['captureDelay'] = $this->getCaptureDays() . ' days';
+                }
             }
         }
 
