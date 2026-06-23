@@ -5,6 +5,7 @@ namespace Mollie\Payment\extend\Application\Controller;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Payment\Application\Helper\Order as OrderHelper;
+use Mollie\Payment\extend\Application\Model\Order as MollieOrder;
 
 class OrderController extends OrderController_parent
 {
@@ -37,6 +38,23 @@ class OrderController extends OrderController_parent
             if ($oOrder->isLoaded() === true) {
                 return $oOrder;
             }
+        }
+        return false;
+    }
+
+    /**
+     * Mollie sometimes sends multiple calls to the shop when payment was done with Apple Pay in credit card form.
+     * This function recognizes these situations to prevent double processing
+     *
+     * @param  Order $oOrder
+     * @return bool
+     */
+    protected function mollieIsCreditCardApplePayDoubleCall(Order $oOrder)
+    {
+        if ($oOrder->getFieldData("oxorder__oxpaymenttype") == "molliecreditcard" &&
+            $oOrder->getFieldData("oxorder__oxtransstatus") == "OK"
+        ) {
+            return true;
         }
         return false;
     }
@@ -90,15 +108,18 @@ class OrderController extends OrderController_parent
                 return $this->redirectWithError($sErrorIdent);
             }
 
+            if ($this->mollieIsCreditCardApplePayDoubleCall($oOrder) === true) {
+                // Order already finalized, return OK to prevent double processing
+                return $this->_getNextStep(Order::ORDER_STATE_OK);
+            }
+
             // else - continue to parent::execute since success must be true
         }
         $sReturn = parent::execute();
 
-        if (Registry::getSession()->getVariable('mollieReinitializePaymentMode')) {
+        if (Registry::getRequest()->getRequestEscapedParameter(MollieOrder::MOLLIE_PAYMENT_REINIT_PARAM) == '1') {
             Registry::getSession()->deleteVariable('usr'); // logout user since the payment link should not be seen as a successful login
         }
-
-        Registry::getSession()->deleteVariable('mollieReinitializePaymentMode');
 
         return $sReturn;
     }

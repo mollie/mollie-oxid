@@ -1,5 +1,7 @@
 [{if method_exists($paymentmethod, 'isMolliePaymentMethod') && $paymentmethod->isMolliePaymentMethod() === true}]
-    [{assign var="paymentModel" value=$paymentmethod->getMolliePaymentModel()}]
+    [{if !$paymentModel}]
+        [{assign var="paymentModel" value=$paymentmethod->getMolliePaymentModel()}]
+    [{/if}]
     [{if $paymentModel && $paymentModel->getCustomFrontendTemplate() !== false}]
         [{include file=$paymentModel->getCustomFrontendTemplate()}]
     [{/if}]

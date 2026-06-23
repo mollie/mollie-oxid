@@ -168,7 +168,7 @@ final class CurlMollieHttpAdapter implements \Mollie\Api\HttpAdapter\MollieHttpA
             if ($httpBody) {
                 $message .= ". Request body: {$httpBody}";
             }
-            throw new \Mollie\Api\Exceptions\ApiException($message, $statusCode, $field);
+            throw new \Mollie\Api\Exceptions\ApiException($message, $statusCode, $field, null, $body);
         }
         return $body;
     }

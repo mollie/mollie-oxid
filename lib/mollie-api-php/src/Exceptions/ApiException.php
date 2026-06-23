@@ -52,10 +52,12 @@ class ApiException extends \Exception
         }
         if (!empty($response)) {
             $this->response = $response;
-            $object = static::parseResponseBody($this->response);
-            if (isset($object->_links)) {
-                foreach ($object->_links as $key => $value) {
-                    $this->links[$key] = $value;
+            if (is_object($response) && !$response instanceof \stdClass) {
+                $object = static::parseResponseBody($this->response);
+                if (isset($object->_links)) {
+                    foreach ($object->_links as $key => $value) {
+                        $this->links[$key] = $value;
+                    }
                 }
             }
         }

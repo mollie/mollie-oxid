@@ -54,7 +54,19 @@ class Events
      * @var array
      */
     public static $aRenamePaymentMethods = [
-        'molliein3' => 'iDeal in3',
+        'molliein3' => 'in3',
+        'mollieideal' => 'iDEAL | Wero',
+    ];
+
+    /**
+     * Whitelist of tables to be updated
+     *
+     * @var string[]
+     */
+    public static $aTableWhitelist = [
+        'oxpayments',
+        'oxcontents',
+        'oxobject2payment',
     ];
 
     /**
@@ -165,7 +177,7 @@ class Events
      */
     protected static function addPaymentMethod($sPaymentId, $sPaymentTitle)
     {
-        $blNewlyAdded = self::insertRowIfNotExists('oxpayments', ['OXID' => $sPaymentId], "INSERT INTO oxpayments(OXID,OXACTIVE,OXDESC,OXADDSUM,OXADDSUMTYPE,OXFROMBONI,OXFROMAMOUNT,OXTOAMOUNT,OXVALDESC,OXCHECKED,OXDESC_1,OXVALDESC_1,OXDESC_2,OXVALDESC_2,OXDESC_3,OXVALDESC_3,OXLONGDESC,OXLONGDESC_1,OXLONGDESC_2,OXLONGDESC_3,OXSORT) VALUES ('{$sPaymentId}', 0, '{$sPaymentTitle}', 0, 'abs', 0, 0, 1000000, '', 0, '{$sPaymentTitle}', '', '', '', '', '', '', '', '', '', 0);");
+        $blNewlyAdded = self::insertRowIfNotExists('oxpayments', ['OXID' => $sPaymentId], "INSERT INTO oxpayments(OXID,OXACTIVE,OXDESC,OXADDSUM,OXADDSUMTYPE,OXFROMBONI,OXFROMAMOUNT,OXTOAMOUNT,OXVALDESC,OXCHECKED,OXDESC_1,OXVALDESC_1,OXDESC_2,OXVALDESC_2,OXDESC_3,OXVALDESC_3,OXLONGDESC,OXLONGDESC_1,OXLONGDESC_2,OXLONGDESC_3,OXSORT) VALUES (:paymentid, 0, :paymenttitle, 0, 'abs', 0, 0, 1000000, '', 0, :paymenttitle, '', '', '', '', '', '', '', '', '', 0);", [':paymentid' => $sPaymentId, ':paymenttitle' => $sPaymentTitle]);
 
         if ($blNewlyAdded === true) {
             //Insert basic payment method configuration
@@ -241,6 +253,10 @@ class Events
      */
     protected static function insertRowIfNotExists($sTableName, $aKeyValue, $sQuery, $aParams = [])
     {
+        if (!in_array($sTableName, self::$aTableWhitelist)) {
+            return false;
+        }
+
         $sCheckQuery = "SELECT * FROM {$sTableName} WHERE 1";
         foreach ($aKeyValue as $key => $value) {
             $sCheckQuery .= " AND $key = '$value'";

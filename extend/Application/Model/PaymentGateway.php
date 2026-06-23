@@ -77,11 +77,16 @@ class PaymentGateway extends PaymentGateway_parent
     /**
      * Generate a return url with all necessary return flags
      *
+     * @param  CoreOrder $oOrder
      * @return string
      */
-    protected function getRedirectUrl()
+    protected function getRedirectUrl(CoreOrder $oOrder = null)
     {
         $sBaseUrl = Registry::getConfig()->getCurrentShopUrl().'index.php?cl=order&fnc=handleMollieReturn';
+
+        if ($oOrder !== null && $oOrder->getMollieReinitializePaymentMode() === true) { // transmit reinit state as parameter
+            $sBaseUrl .= '&'.Order::MOLLIE_PAYMENT_REINIT_PARAM.'=1';
+        }
 
         return $sBaseUrl.$this->mollieGetAdditionalParameters();
     }
@@ -98,7 +103,7 @@ class PaymentGateway extends PaymentGateway_parent
         $oOrder->mollieSetOrderNumber();
 
         try {
-            $oResponse = $oOrder->mollieGetPaymentModel()->getApiRequestModel()->sendRequest($oOrder, $dAmount, $this->getRedirectUrl());
+            $oResponse = $oOrder->mollieGetPaymentModel()->getApiRequestModel()->sendRequest($oOrder, $dAmount, $this->getRedirectUrl($oOrder));
             $oOrder->mollieSetTransactionId($oResponse->id);
             $sPaymentUrl = $oResponse->getCheckoutUrl();
 
@@ -109,9 +114,57 @@ class PaymentGateway extends PaymentGateway_parent
             }
         } catch(ApiException $exc) {
             $this->_iLastErrorNo = $exc->getCode();
-            $this->_sLastError = $exc->getMessage();
+            $this->_sLastError = $this->mollieGetCleanErrorMessage($exc);
             return false;
         }
         return true;
+    }
+
+    /**
+     * Removes technical information from Mollie error messages
+     *
+     * @param  \Exception $exc
+     * @return string
+     */
+    protected function mollieGetCleanErrorMessage($exc)
+    {
+        $message = $exc->getPlainMessage(); // default behaviour
+
+        $oResponse = $exc->getResponse();
+        if (!empty($oResponse) && $oResponse instanceof \stdClass) {
+            if (!empty($oResponse->status)) {
+                $message = $oResponse->status.": ";
+            }
+            if (!empty($oResponse->title)) {
+                $message .= $oResponse->title;
+            }
+            if (!empty($oResponse->detail)) {
+                if (!empty($message)) {
+                    $message .= " - ";
+                }
+                $message .= $oResponse->detail;
+            }
+        }
+
+        $message = str_ireplace("Error executing API call ", "", $message);
+
+        preg_match('/(.*?)\s*Documentation:/', $message, $matches);
+        if (!empty($matches)) {
+            $regexMessage = $matches[1];
+        } else {
+            preg_match('/(.*?)\s*Request body:/', $message, $matches);
+            if (!empty($matches)) {
+                $regexMessage = $matches[1];
+            }
+        }
+
+        if (!empty($regexMessage)) {
+            $regexMessage = trim($regexMessage);
+            $regexMessage = ltrim($regexMessage, "(");
+            $regexMessage = str_replace("):", " - ", $regexMessage);
+            $message = $regexMessage;
+        }
+
+        return $message;
     }
 }
