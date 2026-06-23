@@ -85,7 +85,7 @@ class PaymentGateway extends PaymentGateway_parent
         $sBaseUrl = Registry::getConfig()->getCurrentShopUrl().'index.php?cl=order&fnc=handleMollieReturn';
 
         if ($oOrder !== null && $oOrder->getMollieReinitializePaymentMode() === true) { // transmit reinit state as parameter
-            $sBaseUrl .= '&'.Order::MOLLIE_PAYMENT_REINIT_PARAM.'=1';
+            $sBaseUrl .= '&'.$oOrder::MOLLIE_PAYMENT_REINIT_PARAM.'=1';
         }
 
         return $sBaseUrl.$this->mollieGetAdditionalParameters();
