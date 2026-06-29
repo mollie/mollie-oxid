@@ -57,6 +57,7 @@ class FinishOrders extends \Mollie\Payment\Application\Model\Cronjob\Base
     {
         $aOrders = [];
 
+        $sProcessingFolder = Registry::getConfig()->getShopConfVar('sMollieStatusProcessing');
         $iMollieCronFinishOrdersDays = (int)Registry::getConfig()->getShopConfVar('iMollieCronFinishOrdersDays');
         if (empty($iMollieCronFinishOrdersDays)) {
             $iMollieCronFinishOrdersDays = 14;
@@ -72,8 +73,9 @@ class FinishOrders extends \Mollie\Payment\Application\Model\Cronjob\Base
                         oxpaymenttype LIKE '%mollie%' AND 
                         oxorderdate > ? AND 
                         oxorderdate < ? AND 
-                        oxtransstatus = 'NOT_FINISHED'";
-        $aParams = [$sTriggerDate, $sMinTriggerDate];
+                        oxtransstatus = 'NOT_FINISHED' AND
+                        ((oxpaid != '0000-00-00 00:00:00' AND oxfolder = ?) OR molliecapturemethod IN ('manual', 'automatic'))";
+        $aParams = [$sTriggerDate, $sMinTriggerDate, $sProcessingFolder];
         if ($this->getShopId() !== false) {
             $sQuery .= " AND oxshopid = ? ";
             $aParams[] = $this->getShopId();

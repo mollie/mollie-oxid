@@ -132,7 +132,7 @@ class OrderController extends OrderController_parent
         }
         $sReturn = parent::execute();
 
-        if (Registry::getRequest()->getRequestEscapedParameter(MollieOrder::MOLLIE_PAYMENT_REINIT_PARAM) == '1') {
+        if (Registry::getRequest()->getRequestEscapedParameter(oxNew(Order::class)::MOLLIE_PAYMENT_REINIT_PARAM) == '1') {
             Registry::getSession()->deleteVariable('usr'); // logout user since the payment link should not be seen as a successful login
         }
 

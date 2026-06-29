@@ -961,9 +961,11 @@ class Order extends Order_parent
                 return true;
             }
 
-            $oTransaction = $this->mollieGetTransaction(false);
-            if ($oTransaction->isAuthorized() === true) {
-                return true;
+            if (in_array($this->oxorder__molliecapturemethod->value, ['manual', 'automatic'])) { // Manual capture is possible for Klarna, Billie, Riverty and Creditcard - Automatic is possible for Creditcard
+                $oTransaction = $this->mollieGetTransaction(false);
+                if ($oTransaction && $oTransaction->isAuthorized() === true) {
+                    return true;
+                }
             }
         }
         return false;
