@@ -4,6 +4,7 @@ namespace Mollie\Payment\Application\Model\Request;
 
 use OxidEsales\Eshop\Application\Model\Order as CoreOrder;
 
+// FCRM_REMOVE_ORDERS_API
 class Order extends Base
 {
     /**

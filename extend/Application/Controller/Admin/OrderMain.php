@@ -26,18 +26,23 @@ class OrderMain extends OrderMain_parent
      */
     public function save()
     {
-        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestParameter('editval');
+        $aParams = Registry::getRequest()->getRequestParameter('editval');
 
         $blUpdateTrackingCode = false;
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+        $oOrder->load($this->getEditObjectId());
         if (!empty($aParams['oxorder__oxtrackcode']) &&
-            $oOrder->load($this->getEditObjectId()) &&
+            $oOrder->isLoaded() &&
             $oOrder->mollieIsMolliePaymentUsed() &&
             $aParams['oxorder__oxtrackcode'] != $oOrder->oxorder__oxtrackcode->value &&
             $oOrder->oxorder__oxsenddate->value != '-' &&
             $oOrder->oxorder__oxsenddate->value != '0000-00-00 00:00:00'
         ) {
             $blUpdateTrackingCode = true;
+        }
+
+        if (Registry::getConfig()->getRequestParameter("setPayment") === 'oxempty' && $oOrder->mollieIsMolliePaymentUsed()) {
+            $_POST['setPayment'] = $oOrder->oxorder__oxpaymenttype->value; // Prevent payment type being set to oxempty
         }
 
         parent::save();

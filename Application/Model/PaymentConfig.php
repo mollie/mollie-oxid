@@ -32,14 +32,7 @@ class PaymentConfig
      */
     public function savePaymentConfig($sPaymentId, $aConfig)
     {
-        if (!isset($aConfig['api'])) {
-            return false; // Faulty values - cancel execution
-        }
-
-        $sMollieApi = $aConfig['api'];
-        unset($aConfig['api']);
-
-        return $this->handleData($sPaymentId, $sMollieApi, $aConfig);
+        return $this->handleData($sPaymentId, 'payment', $aConfig);
     }
 
     /**

@@ -32,13 +32,6 @@ abstract class Base
     protected $aPaymentConfig = null;
 
     /**
-     * Determines if the payment methods only supports the order API
-     *
-     * @var bool
-     */
-    protected $blIsOnlyOrderApiSupported = false;
-
-    /**
      * Determines if the payment methods supports the order expiry mechanism
      *
      * @var bool
@@ -177,16 +170,6 @@ abstract class Base
     }
 
     /**
-     * Returns if the payment methods only supports the order API
-     *
-     * @return bool
-     */
-    public function isOnlyOrderApiSupported()
-    {
-        return $this->blIsOnlyOrderApiSupported;
-    }
-
-    /**
      * Returns array of billing country restrictions
      *
      * @return bool
@@ -284,7 +267,7 @@ abstract class Base
         if ($sApiMethod === false) {
             $sApiMethod = $this->getApiMethod();
         }
-        if ($sApiMethod == 'order') {
+        if ($sApiMethod == 'order') { // FCRM_REMOVE_ORDERS_API
             return Payment::getInstance()->loadMollieApi($sMode)->orders;
         }
         return Payment::getInstance()->loadMollieApi($sMode)->payments;
@@ -317,6 +300,7 @@ abstract class Base
      */
     public function getApiRequestModel($oOrder = false)
     {
+        // FCRM_REMOVE_ORDERS_API
         if ($this->getApiMethod($oOrder) == 'order') {
             return oxNew(\Mollie\Payment\Application\Model\Request\Order::class);
         }
@@ -331,6 +315,7 @@ abstract class Base
      */
     public function getTransactionHandler($oOrder = false)
     {
+        // FCRM_REMOVE_ORDERS_API
         if ($this->getApiMethod($oOrder) == 'order') {
             return oxNew(\Mollie\Payment\Application\Model\TransactionHandler\Order::class);
         }
@@ -349,14 +334,7 @@ abstract class Base
             return $oOrder->oxorder__mollieapi->value;
         }
 
-        $sApiMethod = $this->getConfigParam('api');
-        if (empty($sApiMethod)) {
-            $sApiMethod = $this->sDefaultApi;
-            if ($this->blIsOnlyOrderApiSupported === true) {
-                $sApiMethod = 'order';
-            }
-        }
-        return $sApiMethod;
+        return 'payment'; // order API was removed in 2025-12
     }
 
     /**
@@ -585,6 +563,7 @@ abstract class Base
         $aParams = [];
 
         $sCaptureMethod = $this->getCaptureMethod();
+
         if ($sCaptureMethod !== false) {
             $oOrder->mollieSetCaptureMode($sCaptureMethod);
             if ($this->getApiMethod($oOrder) == 'payment') { // Merchant capture only available for Payment API

@@ -67,7 +67,7 @@ class Riverty extends Base
      */
     public function isManualCaptureNeeded(Order $oOrder)
     {
-        if ($oOrder->mollieIsManualCaptureMethod() === true) {
+        if ($oOrder->mollieIsManualCaptureMethod() === true && $oOrder->oxorder__mollieapi->value === 'payment') {
             return true;
         }
         return parent::isManualCaptureNeeded($oOrder);
