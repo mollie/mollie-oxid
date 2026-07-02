@@ -196,6 +196,8 @@ class Order extends Order_parent
             } elseif ($oMollieApiOrder instanceof \Mollie\Api\Resources\Payment && $oPaymentModel->isShippedCaptureSupported() === true && $this->mollieIsManualCaptureMethod() === true) {
                 $oResponse = $this->mollieCaptureOrder();
                 $oRequestLog->logRequest([], $oResponse, $this->getId(), $this->getConfig()->getShopId());
+
+                DatabaseProvider::getDb()->Execute("UPDATE oxorder SET mollieshipmenthasbeenmarked = 1 WHERE oxid = ?", array($this->getId()));
             }
         } catch (Exception $exc) {
             $oRequestLog->logExceptionResponse([], $exc->getCode(), $exc->getMessage(), 'shipAll', $this->getId(), $this->getConfig()->getShopId());
