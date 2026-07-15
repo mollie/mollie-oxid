@@ -9,6 +9,12 @@ use OxidEsales\Eshop\Core\Registry;
 class Payment extends Base
 {
     /**
+     * Determines if the extended address is needed in the params
+     *
+     * @var bool
+     */
+    protected $blNeedsExtendedAddress = true;
+    /**
      * Default text for payment description
      *
      * @var string
