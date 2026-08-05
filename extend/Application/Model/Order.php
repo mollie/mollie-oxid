@@ -841,7 +841,7 @@ class Order extends Order_parent
             return false;
         }
 
-        if ($oMollieApiOrder->isPaid() && $oMollieApiOrder->getSettlementAmount() > 0 && $oMollieApiOrder->getAmountRemaining() > 0) { // amount remaining is amount remaining to be refunded
+        if ($oMollieApiOrder->isPaid() && $oMollieApiOrder->getAmountRemaining() > 0) { // amount remaining is amount remaining to be refunded
             return true;
         }
 
