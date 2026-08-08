@@ -3,11 +3,6 @@
 namespace Mollie\Payment\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Types;
-use Mollie\Payment\Application\Model\Payment\Creditcard;
-use Mollie\Payment\Application\Model\PaymentConfig;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 use Mollie\Payment\Application\Model\BaseMigration;
 
 class Version20250527120000 extends BaseMigration
@@ -54,25 +49,30 @@ class Version20250527120000 extends BaseMigration
 
     protected function hasMolliePaymentConfig($sPaymentId)
     {
-        $sQuery = "SELECT 1 FROM molliepaymentconfig WHERE oxid = ?";
-        $dbValue =  \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQuery, array($sPaymentId));
-        if ($dbValue == '1') {
-            return true;
-        }
-        return false;
+        $sQuery = "SELECT COUNT(*) FROM molliepaymentconfig WHERE oxid = ?";
+        $result = $this->connection->fetchOne($sQuery, [$sPaymentId]);
+        return (int)$result > 0;
     }
 
     protected function renameCaptureMethodConfig()
     {
-        $oPaymentConfig = oxNew(PaymentConfig::class);
-        $aCreditcardConfig = $oPaymentConfig->getPaymentConfig('molliecreditcard');
-        if (!empty($aCreditcardConfig['creditcard_capture_method'])) {
-            $aCreditcardConfig['capture_method'] = $aCreditcardConfig['creditcard_capture_method'];
-            unset($aCreditcardConfig['creditcard_capture_method']);
-
-            $aCreditcardConfig['capture_method'] = str_replace("creditcard_", "", $aCreditcardConfig['capture_method']);
-
-            $oPaymentConfig->savePaymentConfig('molliecreditcard', $aCreditcardConfig);
+        $sQuery = "SELECT CONFIG FROM molliepaymentconfig WHERE OXID = 'molliecreditcard'";
+        $configJson = $this->connection->fetchOne($sQuery);
+        if ($configJson === false) {
+            return;
         }
+
+        $config = json_decode($configJson, true);
+        if (!is_array($config) || empty($config['creditcard_capture_method'])) {
+            return;
+        }
+
+        $config['capture_method'] = str_replace("creditcard_", "", $config['creditcard_capture_method']);
+        unset($config['creditcard_capture_method']);
+
+        $this->addSql(
+            "UPDATE molliepaymentconfig SET CONFIG = ? WHERE OXID = 'molliecreditcard'",
+            [json_encode($config)]
+        );
     }
 }
