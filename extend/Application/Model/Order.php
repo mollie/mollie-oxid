@@ -405,7 +405,7 @@ class Order extends Order_parent
         if ($this->blMollieFinalizeReturnMode === false) {
             $mParentReturn = parent::_setPayment($sPaymentid);
 
-            if ($this->mollieIsMolliePaymentUsed()) {
+            if ($this->mollieIsMolliePaymentUsed() && $this->mollieRecalculateOrder === false) {
                 $this->oxorder__molliemode = new Field(PaymentHelper::getInstance()->getMollieMode());
                 $this->oxorder__mollieapi = new Field('payment');
             }
