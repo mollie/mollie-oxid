@@ -35,7 +35,7 @@ class FinishOrders extends \Mollie\Payment\Application\Model\Cronjob\Base
      * @param  bool $blMollieFinishingOrder
      * @return void
      */
-    protected static function mollieSetFinishingOrder($blMollieFinishingOrder)
+    public static function mollieSetFinishingOrder($blMollieFinishingOrder)
     {
         self::$blMollieFinishingOrder = $blMollieFinishingOrder;
     }

@@ -150,6 +150,11 @@ abstract class Base
     protected $blHasHardRestrictions = null;
 
     /**
+     * @var bool
+     */
+    protected $blIsOrderEmailOnWebhookNeeded = false;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -238,6 +243,17 @@ abstract class Base
     public function isMollieMethodHiddenInitially()
     {
         return $this->blIsMethodHiddenInitially;
+    }
+
+    /**
+     * Returns if order email has to be sent on webhook and not direclty in finalizeOrder
+     * Some payment methods might have unusual behaviour and require this
+     *
+     * @return bool
+     */
+    public function isOrderEmailOnWebhookNeeded()
+    {
+        return $this->blIsOrderEmailOnWebhookNeeded;
     }
 
     /**

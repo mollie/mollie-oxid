@@ -37,4 +37,9 @@ class PayByBank extends Base
     protected $aBillingCountryRestrictedTo = [
         'AT', 'BE', 'CY', 'EE', 'FI', 'FR', 'DE', 'GR', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PT', 'SK', 'SI', 'ES', 'UK'
     ];
+
+    /**
+     * @var bool
+     */
+    protected $blIsOrderEmailOnWebhookNeeded = true;
 }
