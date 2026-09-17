@@ -65,7 +65,7 @@ abstract class Base
      * @param string $sType
      * @return array
      */
-    public function processTransaction(Order $oOrder, $sType = 'webhook')
+    public function processTransaction(Order $oOrder, $sType)
     {
         try {
             $oTransaction = $oOrder->mollieGetTransaction();
@@ -74,6 +74,13 @@ abstract class Base
             }
 
             $aResult = $this->handleTransactionStatus($oTransaction, $oOrder, $sType);
+            if ($aResult['success'] === true && $aResult['status'] === 'paid') {
+                $oPaymentModel = $oOrder->mollieGetPaymentModel();
+                if ($oPaymentModel->isOrderEmailOnWebhookNeeded() === true && $sType == 'webhook' && $oOrder->oxorder__mollieordermailsent->value == "0000-00-00 00:00:00") {
+                    // Email will be sent when paid webhook for this order arrives
+                    $oOrder->mollieSendOrderByEmail();
+                }
+            }
         } catch(\Exception $exc) {
             $aResult = ['success' => false, 'status' => 'exception', 'error' => $exc->getMessage()];
         }
