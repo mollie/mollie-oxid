@@ -36,4 +36,9 @@ class Wero extends Base
     protected $aBillingCountryRestrictedTo = [
         'DE', 'BE', 'FR', 'LU',
     ];
+
+    /**
+     * @var bool
+     */
+    protected $blIsOrderEmailOnWebhookNeeded = true;
 }

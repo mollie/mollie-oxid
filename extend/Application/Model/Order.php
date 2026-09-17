@@ -8,6 +8,7 @@ use Mollie\Api\Resources\Capture;
 use Mollie\Payment\Application\Helper\Api;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
+use Mollie\Payment\Application\Model\Cronjob\FinishOrders;
 use Mollie\Payment\Application\Model\Payment\Base;
 use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Application\Model\Basket;
@@ -607,9 +608,53 @@ class Order extends Order_parent
      */
     protected function _sendOrderByEmail($oUser = null, $oBasket = null, $oPayment = null)
     {
-        $blParentReturn = parent::_sendOrderByEmail($oUser, $oBasket, $oPayment);
+        $oPaymentModel = $this->mollieGetPaymentModel();
+        if ($oPaymentModel->isOrderEmailOnWebhookNeeded() === true) { // Email will be sent when webhook for this order arrives
+            $blParentReturn = self::ORDER_STATE_OK;
+        } else {
+            $blParentReturn = parent::_sendOrderByEmail($oUser, $oBasket, $oPayment);
+            $this->mollieSetOrderEmailSendDate();
+        }
         $this->mollieHandleOrderFinished();
         return $blParentReturn;
+    }
+
+    /**
+     * @return void
+     */
+    public function mollieSendOrderByEmail()
+    {
+        FinishOrders::mollieSetFinishingOrder(true);
+        $oBasket = $this->mollieRecreateBasket();
+        foreach ($oBasket->getContents() as $item) {
+            $item->mollieUnsetArticle();
+        }
+        FinishOrders::mollieSetFinishingOrder(false);
+
+        $oUser = $this->getUser();
+        if (!$oUser) {
+            $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+            $oUser->load($this->oxorder__oxuserid->value);
+            $this->setUser($oUser);
+            Registry::getSession()->setVariable('usr', $this->oxorder__oxuserid->value);
+        }
+        $oPayment = $this->getPaymentType();
+
+        parent::_sendOrderByEmail($oUser, $oBasket, $oPayment);
+        $this->mollieSetOrderEmailSendDate();
+    }
+
+    /**
+     * @return void
+     */
+    protected function mollieSetOrderEmailSendDate()
+    {
+        $sDate = date('Y-m-d H:i:s');
+
+        $sQuery = "UPDATE oxorder SET mollieordermailsent = ? WHERE oxid = ?";
+        DatabaseProvider::getDb()->Execute($sQuery, array($sDate, $this->getId()));
+
+        $this->oxorder__mollieordermailsent = new Field($sDate);
     }
 
     /**
