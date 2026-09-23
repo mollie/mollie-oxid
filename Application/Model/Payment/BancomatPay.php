@@ -24,6 +24,16 @@ class BancomatPay extends Base
      * @var array
      */
     protected $aAllowedCurrencies = [
-        'EUR'
+        'EUR',
+    ];
+
+    /**
+     * Array with country-codes the payment method is restricted to
+     * If property is set to false it is available to all countries
+     *
+     * @var array|false
+     */
+    protected $aBillingCountryRestrictedTo = [
+        'IT'
     ];
 }
