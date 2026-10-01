@@ -36,4 +36,7 @@ $aLang = [
     'MOLLIE_NOT_AVAILABLE_CURRENCY'             => 'La devise n’est pas prise en charge par ce mode de paiement.',
     'MOLLIE_CHANGE_CURRENCY'                    => 'Changer de devise',
     'MOLLIE_SUPPORTED_CURRENCIES'               => 'Devises prises en charge',
+    'MOLLIE_PP_VAULT_ACCEPTED'                  => 'Enregistrer mon mode de paiement PayPal pour de prochaines commandes (facultatif).',
+    'MOLLIE_PP_VAULT_ACCEPTED_HAS_CUSTOMER_ID'  => 'Utiliser mon mode de paiement PayPal enregistré (facultatif).',
+    'MOLLIE_PP_VAULT_INFO'                      => 'Par la présente, vous confirmez le stockage sécurisé de votre mode de paiement PayPal chez le prestataire de paiement ainsi que son utilisation pour de futures commandes.',
 ];

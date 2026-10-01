@@ -39,7 +39,10 @@ $aLang = array(
     'SHOP_MODULE_GROUP_MOLLIE_APPLEPAY'                 => 'Apple Pay',
     'SHOP_MODULE_blMollieApplePayButtonOnBasket'        => 'Show Apple Pay button on basket page',
     'SHOP_MODULE_blMollieApplePayButtonOnDetails'       => 'Show Apple Pay button on product details page',
+    'SHOP_MODULE_GROUP_MOLLIE_PAYPAL'                   => 'PayPal',
+    'SHOP_MODULE_blMolliePaypalVaultIsActive'           => 'PayPal Vault feature active',
 
+    'HELP_SHOP_MODULE_blMolliePaypalVaultIsActive'      => 'The PayPal Vault feature is only available in Mollie\'s live mode (not in test mode). For technical reasons, the feature only works for logged-in, registered customers (no guest checkout).',
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Show Payment Icons on Checkout',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Log file to be found here: SHOPROOT/log/MollieTransactions.log',
     'HELP_SHOP_MODULE_sMollieAutomaticRefundOnCancel'   => 'If an order is cancelled, an automatic refund will be issued for an already captured order, or the existing authorization will be voided. This function is only available via the Payments API.',
