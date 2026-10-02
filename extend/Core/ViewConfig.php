@@ -93,6 +93,16 @@ class ViewConfig extends ViewConfig_parent
     }
 
     /**
+     * Returns if PayPal Vault button should be active
+     *
+     * @return bool
+     */
+    public function molliePaypalVaultIsActive()
+    {
+        return (bool)Registry::getConfig()->getShopConfVar('blMolliePaypalVaultIsActive');
+    }
+
+    /**
      * Functionality from Basket->getPriceForPayment() but without the delivery costs since they are added later
      *
      * @return double

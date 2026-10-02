@@ -38,7 +38,10 @@ $aLang = array(
     'SHOP_MODULE_GROUP_MOLLIE_APPLEPAY'                 => 'Apple Pay',
     'SHOP_MODULE_blMollieApplePayButtonOnBasket'        => 'Toon Apple Pay button op pagina winkelmandje',
     'SHOP_MODULE_blMollieApplePayButtonOnDetails'       => 'Toon Apple Pay button op pagina productdetails',
+    'SHOP_MODULE_GROUP_MOLLIE_PAYPAL'                   => 'PayPal',
+    'SHOP_MODULE_blMolliePaypalVaultIsActive'           => 'PayPal Vault-functie actief',
 
+    'HELP_SHOP_MODULE_blMolliePaypalVaultIsActive'      => 'De PayPal Vault-functie is alleen beschikbaar in de live-modus van Mollie (niet in testmodus). Om technische redenen werkt de functie alleen voor aangemelde, geregistreerde klanten (geen gastbestellingen).',
     'HELP_SHOP_MODULE_blMollieShowIcons'                => 'Toon betaaliconen tijdens checkout',
     'HELP_SHOP_MODULE_blMollieLogTransactionInfo'       => 'Log file hier te vinden: SHOPROOT/log/MollieTransactions.log',
     'HELP_SHOP_MODULE_sMollieAutomaticRefundOnCancel'   => 'Als een bestelling wordt geannuleerd, wordt automatisch een terugbetaling uitgevoerd voor een reeds vastgelegde bestelling of wordt de bestaande autorisatie geannuleerd. Deze functie is alleen beschikbaar via de Payments API.',
