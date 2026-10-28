@@ -21,18 +21,6 @@ class Riverty extends Base
     protected $sMolliePaymentCode = 'riverty';
 
     /**
-     * @var bool
-     */
-    protected $blNeedsExtendedAddress = true;
-
-    /**
-     * Riverty only supports manual capture mode with Payments API
-     *
-     * @var string|false
-     */
-    protected $sCaptureMethod = 'manual';
-
-    /**
      * If filled, the payment method will only be shown if one of the allowed currencies is active in checkout
      *
      * @var array
@@ -53,6 +41,18 @@ class Riverty extends Base
         'DE',
         'AT',
     ];
+
+    /**
+     * @var bool
+     */
+    protected $blNeedsExtendedAddress = true;
+
+    /**
+     * Riverty only supports manual capture mode with Payments API
+     *
+     * @var string|false
+     */
+    protected $sCaptureMethod = 'manual';
 
     /**
      * @var bool

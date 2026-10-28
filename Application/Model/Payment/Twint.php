@@ -30,6 +30,16 @@ class Twint extends Base
     ];
 
     /**
+     * Array with country-codes the payment method is restricted to
+     * If property is set to false it is available to all countries
+     *
+     * @var array|false
+     */
+    protected $aBillingCountryRestrictedTo = [
+        'CH'
+    ];
+
+    /**
      * Is used to show in backend if payment method can be used in general
      * This method has the purpose to be overloaded by child-classes with specific parameters
      *
