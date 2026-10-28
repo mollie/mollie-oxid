@@ -56,6 +56,8 @@ class Payment
         'molliesatispay'        => array('title' => 'Satispay',            'model' => \Mollie\Payment\Application\Model\Payment\Satispay::class),
         'mollieswish'           => array('title' => 'Swish',               'model' => \Mollie\Payment\Application\Model\Payment\Swish::class),
         'molliewero'            => array('title' => 'Wero',                'model' => \Mollie\Payment\Application\Model\Payment\Wero::class),
+        'molliemobilepay'       => array('title' => 'MobilePay',           'model' => \Mollie\Payment\Application\Model\Payment\MobilePay::class),
+        'mollievipps'           => array('title' => 'Vipps',               'model' => \Mollie\Payment\Application\Model\Payment\Vipps::class),
     );
 
     /**
