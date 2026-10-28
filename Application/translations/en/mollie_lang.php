@@ -36,4 +36,7 @@ $aLang = [
     'MOLLIE_NOT_AVAILABLE_CURRENCY'             => 'The currency is not supported by this payment method.',
     'MOLLIE_CHANGE_CURRENCY'                    => 'Change currency',
     'MOLLIE_SUPPORTED_CURRENCIES'               => 'Supported currencies',
+    'MOLLIE_PP_VAULT_ACCEPTED'                  => 'Save my PayPal payment method for future orders (optional).',
+    'MOLLIE_PP_VAULT_ACCEPTED_HAS_CUSTOMER_ID'  => 'Use my saved PayPal payment method (optional).',
+    'MOLLIE_PP_VAULT_INFO'                      => 'By doing so, you confirm the secure storage of your PayPal payment method with the payment provider as well as its use for future orders.',
 ];

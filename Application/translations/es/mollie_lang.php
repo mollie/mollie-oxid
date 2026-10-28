@@ -36,4 +36,7 @@ $aLang = [
     'MOLLIE_NOT_AVAILABLE_CURRENCY'             => 'La moneda no es compatible con este método de pago.',
     'MOLLIE_CHANGE_CURRENCY'                    => 'Cambiar moneda',
     'MOLLIE_SUPPORTED_CURRENCIES'               => 'Monedas compatibles',
+    'MOLLIE_PP_VAULT_ACCEPTED'                  => 'Guardar mi método de pago de PayPal para pedidos futuros (opcional).',
+    'MOLLIE_PP_VAULT_ACCEPTED_HAS_CUSTOMER_ID'  => 'Usar mi método de pago de PayPal guardado (opcional).',
+    'MOLLIE_PP_VAULT_INFO'                      => 'Con ello confirma el almacenamiento seguro de su método de pago de PayPal por parte del proveedor de pagos, así como su uso para pedidos futuros.',
 ];
