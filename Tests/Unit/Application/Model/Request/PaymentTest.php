@@ -41,7 +41,8 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oOrder->method('getId')->willReturn('testOrder');
         $oOrder->method('getShopId')->willReturn(1);
         $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
-        $oOrder->method('__get')->willReturn(new Field('test'));
+        $oOrder->method('__get')->willReturnCallback([$this, 'getOrderFieldValue']);
+        $oOrder->method('getOrderArticles')->willReturn($this->getEmptyOrderArticleList());
 
         $oRequest = new Payment();
         $result = $oRequest->sendRequest($oOrder, 50, "http://someurl.com");
@@ -77,7 +78,8 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oOrder->method('getId')->willReturn('testOrder');
         $oOrder->method('getShopId')->willReturn(1);
         $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
-        $oOrder->method('__get')->willReturn(new Field('test'));
+        $oOrder->method('__get')->willReturnCallback([$this, 'getOrderFieldValue']);
+        $oOrder->method('getOrderArticles')->willReturn($this->getEmptyOrderArticleList());
 
         $oRequest = new Payment();
 
@@ -117,7 +119,8 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oOrder->method('getId')->willReturn('testOrder');
         $oOrder->method('getShopId')->willReturn(1);
         $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
-        $oOrder->method('__get')->willReturn(new Field('test'));
+        $oOrder->method('__get')->willReturnCallback([$this, 'getOrderFieldValue']);
+        $oOrder->method('getOrderArticles')->willReturn($this->getEmptyOrderArticleList());
 
         $oRequest = new Payment();
 
@@ -157,11 +160,36 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oOrder->method('getId')->willReturn('testOrder');
         $oOrder->method('getShopId')->willReturn(1);
         $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
-        $oOrder->method('__get')->willReturn(new Field('test'));
+        $oOrder->method('__get')->willReturnCallback([$this, 'getOrderFieldValue']);
+        $oOrder->method('getOrderArticles')->willReturn($this->getEmptyOrderArticleList());
 
         $oRequest = new Payment();
 
         $this->expectException(\Mollie\Api\Exceptions\ApiException::class);
         $result = $oRequest->sendRequest($oOrder, 50, "http://someurl.com");
+    }
+
+    /**
+     * Returns numeric values for price fields and text for all other order fields
+     *
+     * @param  string $sName
+     * @return Field
+     */
+    public function getOrderFieldValue($sName)
+    {
+        if (preg_match('/(cost|sum|discount|vat|price)$/', $sName)) {
+            return new Field('0');
+        }
+        return new Field('test');
+    }
+
+    /**
+     * @return \OxidEsales\Eshop\Core\Model\ListModel
+     */
+    protected function getEmptyOrderArticleList()
+    {
+        $oOrderArticles = $this->getMockBuilder(\OxidEsales\Eshop\Core\Model\ListModel::class)->disableOriginalConstructor()->getMock();
+        $oOrderArticles->method('getArray')->willReturn([]);
+        return $oOrderArticles;
     }
 }

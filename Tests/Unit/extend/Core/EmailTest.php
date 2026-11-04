@@ -34,4 +34,30 @@ class EmailTest extends UnitTestCase
 
         $this->assertTrue($result);
     }
+
+    public function testMollieSendSupportEmail()
+    {
+        $oShop = $this->getMockBuilder(Shop::class)->disableOriginalConstructor()->getMock();
+        $oShop->method('__get')->willReturnMap([
+            ['oxshops__oxorderemail', new \OxidEsales\Eshop\Core\Field("shop@testdomain.net")],
+            ['oxshops__oxname', new \OxidEsales\Eshop\Core\Field("Shopname")],
+            ['oxshops__oxsmtp', new \OxidEsales\Eshop\Core\Field(false)],
+            ['oxshops__oxsmtpuser', new \OxidEsales\Eshop\Core\Field(false)],
+        ]);
+
+        $sAttachmentPath = tempnam(sys_get_temp_dir(), 'mollie_test_');
+        file_put_contents($sAttachmentPath, 'Test');
+
+        // template rendering is not part of this test
+        $oEmail = $this->getMockBuilder(\Mollie\Payment\extend\Core\Email::class)->setMethods(['mollieRenderTemplate'])->getMock();
+        $oEmail->method('mollieRenderTemplate')->willReturn('Body');
+        $oEmail->setShop($oShop);
+
+        $result = $oEmail->mollieSendSupportEmail("Name", "testing@testdomain.net", "Subject", "Enquiry", "1.0.0", $sAttachmentPath);
+        unlink($sAttachmentPath);
+
+        $this->assertTrue($result);
+        $this->assertStringContainsString("Subject", $oEmail->getSubject());
+        $this->assertCount(1, $oEmail->getAttachments());
+    }
 }

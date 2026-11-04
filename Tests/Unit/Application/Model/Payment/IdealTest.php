@@ -16,11 +16,10 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class IdealTest extends UnitTestCase
 {
-    public function testGetPaymentSpecificParameters()
+    public function testGetPaymentSpecificParametersWithoutIssuer()
     {
-        $expected = 'issuer';
-
-        $aDynValue = ['mollie_ideal_issuer' => $expected];
+        // The issuer selection was removed for iDEAL, a transmitted issuer must not be used anymore
+        $aDynValue = ['mollie_ideal_issuer' => 'issuer'];
 
         $oRequest = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $oRequest->method('getRequestParameter')->willReturn($aDynValue);
@@ -32,7 +31,7 @@ class IdealTest extends UnitTestCase
         $oPayment = new \Mollie\Payment\Application\Model\Payment\Ideal();
         $result = $oPayment->getPaymentSpecificParameters($oOrder);
 
-        $this->assertEquals($expected, $result['issuer']);
+        $this->assertArrayNotHasKey('issuer', $result);
     }
 
     public function testGetPaymentSpecificParametersParent()
@@ -43,32 +42,6 @@ class IdealTest extends UnitTestCase
         $result = $oPayment->getPaymentSpecificParameters($oOrder);
 
         $this->assertCount(0, $result);
-    }
-
-    public function testGetIssuers()
-    {
-        $oIssuer = new \stdClass();
-        $oIssuer->name = 'test';
-        $oIssuer->image = new \stdClass();
-        $oIssuer->image->size2x = 'testpic.png';
-
-        $oMethods = $this->getMockBuilder(MethodEndpoint::class)->disableOriginalConstructor()->getMock();
-        $oMethods->method('get')->willReturn([$oIssuer]);
-
-        $oMollieApi = $this->getMockBuilder(\Mollie\Api\MollieApiClient::class)->disableOriginalConstructor()->getMock();
-        $oMollieApi->methods = $oMethods;
-
-        UtilsObject::setClassInstance(\Mollie\Api\MollieApiClient::class, $oMollieApi);
-
-        $oPaymentConfig = $this->getMockBuilder(PaymentConfig::class)->disableOriginalConstructor()->getMock();
-        $oPaymentConfig->method('getPaymentConfig')->willReturn(['add_qr' => true, 'issuer_list_type' => 'dropdown']);
-
-        UtilsObject::setClassInstance(PaymentConfig::class, $oPaymentConfig);
-
-        $oPayment = new \Mollie\Payment\Application\Model\Payment\Ideal();
-        $result = $oPayment->getIssuers([], '');
-
-        $this->assertArrayHasKey('qr', $result);
     }
 
     public function testGetMolliePaymentCode()
@@ -95,19 +68,19 @@ class IdealTest extends UnitTestCase
         $this->assertFalse($result);
     }
 
-    public function testGetCustomConfigTemplate()
+    public function testGetCustomConfigTemplateNotExisting()
     {
         $oPayment = new \Mollie\Payment\Application\Model\Payment\Ideal();
         $result = $oPayment->getCustomConfigTemplate();
 
-        $this->assertEquals("mollie_config_ideal.tpl", $result);
+        $this->assertFalse($result);
     }
 
-    public function testGetCustomFrontendTemplate()
+    public function testGetCustomFrontendTemplateNotExisting()
     {
         $oPayment = new \Mollie\Payment\Application\Model\Payment\Ideal();
         $result = $oPayment->getCustomFrontendTemplate();
 
-        $this->assertEquals("mollieideal.tpl", $result);
+        $this->assertFalse($result);
     }
 }

@@ -102,15 +102,22 @@ class MollieApplePayTest extends UnitTestCase
 
     public function testGetDeliveryMethods()
     {
-        $expected = ['DeliveryList'];
+        $expected = [
+            ['label' => 'Standard', 'detail' => '', 'amount' => '3.90', 'identifier' => 'oxidstandard'],
+            ['label' => 'Express', 'detail' => '', 'amount' => '9.90', 'identifier' => 'oxidexpress'],
+        ];
 
         $oRequest = $this->getMockBuilder(\OxidEsales\Eshop\Core\Request::class)->disableOriginalConstructor()->getMock();
         $oRequest->method('getRequestEscapedParameter')->willReturn(true);
 
         Registry::set(\OxidEsales\Eshop\Core\Request::class, $oRequest);
 
+        $sOutput = null;
         $oUtils = $this->getMockBuilder(\OxidEsales\Eshop\Core\Utils::class)->disableOriginalConstructor()->getMock();
-        $oUtils->method('showMessageAndExit')->willReturn(null);
+        $oUtils->method('showMessageAndExit')->willReturnCallback(function ($sMessage) use (&$sOutput) {
+            $sOutput = $sMessage;
+            return null;
+        });
 
         Registry::set(\OxidEsales\Eshop\Core\Utils::class, $oUtils);
 
@@ -119,6 +126,7 @@ class MollieApplePayTest extends UnitTestCase
 
         $oBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
         $oBasket->method('addToBasket')->willReturn($oBasketItem);
+        $oBasket->expects($this->once())->method('setShipping')->with('oxidstandard'); // first method is preselected
 
         $oSession = $this->getMockBuilder(\OxidEsales\Eshop\Core\Session::class)->disableOriginalConstructor()->getMock();
         $oSession->method('getBasket')->willReturn($oBasket);
@@ -134,6 +142,9 @@ class MollieApplePayTest extends UnitTestCase
         $result = $oController->getDeliveryMethods();
 
         $this->assertNull($result);
+        $aOutput = json_decode($sOutput, true);
+        $this->assertTrue($aOutput['success']);
+        $this->assertEquals($expected, $aOutput['shippingMethods']);
 
         UtilsObject::resetClassInstances();
         DeliverySet::destroyInstance();
@@ -190,6 +201,40 @@ class MollieApplePayTest extends UnitTestCase
 
         $oUtils = $this->getMockBuilder(\OxidEsales\Eshop\Core\Utils::class)->disableOriginalConstructor()->getMock();
         $oUtils->method('showMessageAndExit')->willReturn(null);
+
+        Registry::set(\OxidEsales\Eshop\Core\Utils::class, $oUtils);
+
+        $oController = new \Mollie\Payment\Application\Controller\MollieApplePay();
+        $result = $oController->finalizeMollieOrder();
+
+        $this->assertNull($result);
+
+        UtilsObject::resetClassInstances();
+        \Mollie\Payment\Application\Helper\User::destroyInstance();
+    }
+
+    public function testFinalizeMollieOrderLoginNeeded()
+    {
+        \Mollie\Payment\Application\Helper\User::destroyInstance();
+
+        $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
+        $oOrder->expects($this->never())->method('finalizeOrder');
+
+        UtilsObject::setClassInstance(Order::class, $oOrder);
+
+        $oUserHelper = $this->getMockBuilder(\Mollie\Payment\Application\Helper\User::class)->disableOriginalConstructor()->getMock();
+        $oUserHelper->method('isLoginNeededForApplePayEmail')->willReturn(true);
+        $oUserHelper->expects($this->never())->method('getApplePayUser');
+
+        UtilsObject::setClassInstance(\Mollie\Payment\Application\Helper\User::class, $oUserHelper);
+
+        $oUtils = $this->getMockBuilder(\OxidEsales\Eshop\Core\Utils::class)->disableOriginalConstructor()->getMock();
+        $oUtils->expects($this->once())->method('showMessageAndExit')->with($this->callback(function ($sJson) {
+            $aResponse = json_decode($sJson, true);
+            return $aResponse['success'] === false
+                && $aResponse['error']['code'] === 'shippingContactInvalid'
+                && $aResponse['error']['contactField'] === 'emailAddress';
+        }));
 
         Registry::set(\OxidEsales\Eshop\Core\Utils::class, $oUtils);
 
@@ -283,8 +328,12 @@ class MollieApplePayTest extends UnitTestCase
 
         UtilsObject::setClassInstance(\Mollie\Payment\Application\Helper\User::class, $oUserHelper);
 
+        $sOutput = null;
         $oUtils = $this->getMockBuilder(\OxidEsales\Eshop\Core\Utils::class)->disableOriginalConstructor()->getMock();
-        $oUtils->method('showMessageAndExit')->willReturn(null);
+        $oUtils->method('showMessageAndExit')->willReturnCallback(function ($sMessage) use (&$sOutput) {
+            $sOutput = $sMessage;
+            return null;
+        });
 
         Registry::set(\OxidEsales\Eshop\Core\Utils::class, $oUtils);
 
@@ -292,6 +341,10 @@ class MollieApplePayTest extends UnitTestCase
         $result = $oController->finalizeMollieOrder();
 
         $this->assertNull($result);
+        $aOutput = json_decode($sOutput, true);
+        $this->assertFalse($aOutput['success']);
+        $this->assertEquals(Registry::getLang()->translateString('MOLLIE_ERROR_SOMETHING_WENT_WRONG'), $aOutput['errormessage']);
+        $this->assertStringNotContainsString('Test-Error', $sOutput);
 
         UtilsObject::resetClassInstances();
         \Mollie\Payment\Application\Helper\User::destroyInstance();
@@ -360,7 +413,7 @@ class MollieApplePayTest extends UnitTestCase
     public function testGetProductBasketPriceException()
     {
         $oBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
-        $oBasket->method('addToBasket')->willThrowException(new \Exception());
+        $oBasket->method('addToBasket')->willThrowException(new \Exception('Test-Error'));
 
         $oSession = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $oSession->method('getBasket')->willReturn($oBasket);
@@ -375,8 +428,12 @@ class MollieApplePayTest extends UnitTestCase
 
         Registry::set(\OxidEsales\Eshop\Core\Request::class, $oRequest);
 
+        $sOutput = null;
         $oUtils = $this->getMockBuilder(\OxidEsales\Eshop\Core\Utils::class)->disableOriginalConstructor()->getMock();
-        $oUtils->method('showMessageAndExit')->willReturn(null);
+        $oUtils->method('showMessageAndExit')->willReturnCallback(function ($sMessage) use (&$sOutput) {
+            $sOutput = $sMessage;
+            return null;
+        });
 
         Registry::set(\OxidEsales\Eshop\Core\Utils::class, $oUtils);
 
@@ -384,5 +441,9 @@ class MollieApplePayTest extends UnitTestCase
         $result = $oController->getProductBasketPrice();
 
         $this->assertNull($result);
+        $aOutput = json_decode($sOutput, true);
+        $this->assertFalse($aOutput['success']);
+        $this->assertEquals(Registry::getLang()->translateString('MOLLIE_ERROR_SOMETHING_WENT_WRONG'), $aOutput['errormessage']);
+        $this->assertStringNotContainsString('Test-Error', $sOutput);
     }
 }

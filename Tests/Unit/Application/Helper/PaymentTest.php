@@ -7,11 +7,19 @@ use Mollie\Payment\Application\Helper\Payment;
 use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsObject;
-use OxidEsales\EshopCommunity\Core\Module\Module;
+use OxidEsales\Eshop\Core\Module\Module;
 use OxidEsales\TestingLibrary\UnitTestCase;
 
 class PaymentTest extends UnitTestCase
 {
+    protected function tearDown(): void
+    {
+        Payment::destroyInstance(); // the helper caches payment infos
+        UtilsObject::resetClassInstances();
+
+        parent::tearDown();
+    }
+
     public function testGetMolliePaymentModel()
     {
         $oPayment = Payment::getInstance();
@@ -41,10 +49,10 @@ class PaymentTest extends UnitTestCase
         $oMethods = $this->getMockBuilder(MethodEndpoint::class)->disableOriginalConstructor()->getMock();
         $oMethods->method('all')->willReturn([$oItem]);
 
-        $oModule = $this->getMockBuilder(\OxidEsales\EshopCommunity\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
+        $oModule = $this->getMockBuilder(\OxidEsales\Eshop\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
         $oModule->method('getInfo')->willReturn('1.2.3');
 
-        UtilsObject::setClassInstance(\OxidEsales\EshopCommunity\Core\Module\Module::class, $oModule);
+        UtilsObject::setClassInstance(\OxidEsales\Eshop\Core\Module\Module::class, $oModule);
 
         $oMollieApi = $this->getMockBuilder(\Mollie\Api\MollieApiClient::class)->disableOriginalConstructor()->getMock();
         $oMollieApi->methods = $oMethods;
@@ -108,20 +116,15 @@ class PaymentTest extends UnitTestCase
 
     public function testGetShopVersion()
     {
-        $expected = "X.X";
-
-        $oShop = $this->getMockBuilder(Shop::class)->disableOriginalConstructor()->getMock();
-        $oShop->method('__get')->willReturn(new \OxidEsales\Eshop\Core\Field($expected));
-
         $oConfig = $this->getMockBuilder(\OxidEsales\Eshop\Core\Config::class)->disableOriginalConstructor()->getMock();
-        $oConfig->method('getActiveShop')->willReturn($oShop);
+        $oConfig->method('getEdition')->willReturn('XE');
 
         Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
 
         $oPayment = oxNew($this->getProxyClassName(Payment::class));
         $result = $oPayment->getShopVersion();
 
-        $this->assertEquals($expected."_".$expected, $result);
+        $this->assertEquals("XE_".\OxidEsales\Eshop\Core\ShopVersion::getVersion(), $result);
     }
 
     public function testGetProfileId()
@@ -133,10 +136,10 @@ class PaymentTest extends UnitTestCase
 
         Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
 
-        $oModule = $this->getMockBuilder(\OxidEsales\EshopCommunity\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
+        $oModule = $this->getMockBuilder(\OxidEsales\Eshop\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
         $oModule->method('getInfo')->willReturn('1.2.3');
 
-        UtilsObject::setClassInstance(\OxidEsales\EshopCommunity\Core\Module\Module::class, $oModule);
+        UtilsObject::setClassInstance(\OxidEsales\Eshop\Core\Module\Module::class, $oModule);
 
         $oProfile = $this->getMockBuilder(\Mollie\Api\Resources\CurrentProfile::class)->disableOriginalConstructor()->getMock();
         $oProfile->id = $expected;
@@ -178,5 +181,38 @@ class PaymentTest extends UnitTestCase
         $result = $oPayment->getLocale();
 
         $this->assertEquals($expected, $result);
+    }
+
+    public function testIsAlternativeLogoConfVar()
+    {
+        $oPayment = Payment::getInstance();
+
+        $this->assertTrue($oPayment->isAlternativeLogoConfVar('sMolliemolliecreditcardAltLogo'));
+        $this->assertTrue($oPayment->isAlternativeLogoConfVar('sMolliemolliepaypalAltLogo'));
+        $this->assertFalse($oPayment->isAlternativeLogoConfVar('sMollieTestToken'));
+        $this->assertFalse($oPayment->isAlternativeLogoConfVar('sMollieunknownAltLogo'));
+        $this->assertFalse($oPayment->isAlternativeLogoConfVar('sMolliemolliecreditcardAltLogo2'));
+        $this->assertFalse($oPayment->isAlternativeLogoConfVar(''));
+        $this->assertFalse($oPayment->isAlternativeLogoConfVar(null));
+        $this->assertFalse($oPayment->isAlternativeLogoConfVar(['sMolliemolliecreditcardAltLogo']));
+    }
+
+    public function testDeleteMollieAltLogo()
+    {
+        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $sShopId = Registry::getConfig()->getShopId();
+        $sQuery = "INSERT INTO oxconfig (OXID, OXSHOPID, OXMODULE, OXVARNAME, OXVARTYPE, OXVARVALUE) VALUES (?, ?, 'module:molliepayment', ?, 'str', '')";
+        $oDb->execute($sQuery, ['mollieTestAltLogo1', $sShopId, 'sMolliemolliecreditcardAltLogo']);
+        $oDb->execute($sQuery, ['mollieTestAltLogo2', $sShopId, 'sMollieTestDeleteVar']);
+
+        \Mollie\Payment\Application\Helper\Database::getInstance()->deleteMollieAltLogo('sMolliemolliecreditcardAltLogo');
+        \Mollie\Payment\Application\Helper\Database::getInstance()->deleteMollieAltLogo('sMollieTestDeleteVar');
+
+        $iRemaining1 = $oDb->getOne("SELECT COUNT(*) FROM oxconfig WHERE oxid = 'mollieTestAltLogo1'");
+        $iRemaining2 = $oDb->getOne("SELECT COUNT(*) FROM oxconfig WHERE oxid = 'mollieTestAltLogo2'");
+        $oDb->execute("DELETE FROM oxconfig WHERE oxid IN ('mollieTestAltLogo1', 'mollieTestAltLogo2')");
+
+        $this->assertEquals(0, $iRemaining1);
+        $this->assertEquals(1, $iRemaining2);
     }
 }

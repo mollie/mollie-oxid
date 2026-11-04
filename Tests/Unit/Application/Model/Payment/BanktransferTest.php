@@ -24,10 +24,10 @@ class BanktransferTest extends UnitTestCase
 
         Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
 
-        $oModule = $this->getMockBuilder(\OxidEsales\EshopCommunity\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
+        $oModule = $this->getMockBuilder(\OxidEsales\Eshop\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
         $oModule->method('getInfo')->willReturn('1.2.3');
 
-        UtilsObject::setClassInstance(\OxidEsales\EshopCommunity\Core\Module\Module::class, $oModule);
+        UtilsObject::setClassInstance(\OxidEsales\Eshop\Core\Module\Module::class, $oModule);
 
         parent::setUp();
     }
@@ -50,12 +50,12 @@ class BanktransferTest extends UnitTestCase
         $this->assertEquals($expected, $result['billingEmail']);
     }
 
-    public function testGetPaymentSpecificParametersOrderApi()
+    public function testGetPaymentSpecificParametersWithoutDueDays()
     {
         $expected = 'TestMail';
 
         $oPaymentConfig = $this->getMockBuilder(PaymentConfig::class)->disableOriginalConstructor()->getMock();
-        $oPaymentConfig->method('getPaymentConfig')->willReturn(['api' => 'order', 'due_days' => null]);
+        $oPaymentConfig->method('getPaymentConfig')->willReturn(['due_days' => null]);
 
         UtilsObject::setClassInstance(PaymentConfig::class, $oPaymentConfig);
 
@@ -65,7 +65,9 @@ class BanktransferTest extends UnitTestCase
         $oPayment = new \Mollie\Payment\Application\Model\Payment\Banktransfer();
         $result = $oPayment->getPaymentSpecificParameters($oOrder);
 
-        $this->assertCount(0, $result);
+        $this->assertCount(2, $result);
+        $this->assertEquals($expected, $result['billingEmail']);
+        $this->assertEquals('', $result['dueDate']);
     }
 
     public function testgetApiEndpoint()
@@ -83,7 +85,7 @@ class BanktransferTest extends UnitTestCase
         UtilsObject::setClassInstance(PaymentConfig::class, $oPaymentConfig);
 
         $oPayment = new \Mollie\Payment\Application\Model\Payment\Banktransfer();
-        $result = $oPayment->getApiEndpoint();
+        $result = $oPayment->getApiEndpoint(false, 'order'); // only used for old orders created with the Orders API
 
         $this->assertInstanceOf(\Mollie\Api\Endpoints\OrderEndpoint::class, $result);
 
@@ -121,11 +123,24 @@ class BanktransferTest extends UnitTestCase
 
         $oPayment = new \Mollie\Payment\Application\Model\Payment\Banktransfer();
 
-        $result = $oPayment->getApiRequestModel();
+        // Orders API is only used for old orders created with it
+        $oOldOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
+        $oOldOrder->method('__isset')->willReturn(true);
+        $oOldOrder->method('__get')->willReturnMap([
+            ['oxorder__mollieapi', new Field('order')],
+        ]);
+
+        $result = $oPayment->getApiRequestModel($oOldOrder);
         $this->assertInstanceOf(\Mollie\Payment\Application\Model\Request\Order::class, $result);
 
-        $result = $oPayment->getTransactionHandler();
+        $result = $oPayment->getTransactionHandler($oOldOrder);
         $this->assertInstanceOf(\Mollie\Payment\Application\Model\TransactionHandler\Order::class, $result);
+
+        $result = $oPayment->getApiRequestModel();
+        $this->assertInstanceOf(\Mollie\Payment\Application\Model\Request\Payment::class, $result);
+
+        $result = $oPayment->getTransactionHandler();
+        $this->assertInstanceOf(\Mollie\Payment\Application\Model\TransactionHandler\Payment::class, $result);
     }
 
     public function testGetApiRequestModelPayment()

@@ -2,10 +2,9 @@
 
 namespace Mollie\Payment\Application\Controller;
 
-use Mollie\Payment\Application\Model\TransactionHandler;
+use Mollie\Payment\Application\Helper\PaymentFinishLink;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Order;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 
 class MollieFinishPayment extends FrontendController
@@ -16,16 +15,23 @@ class MollieFinishPayment extends FrontendController
     protected $_sThisTemplate = 'molliewebhook.tpl';
 
     /**
-     * Returns order or false if no id given or order not eligible
+     * Returns order or false if no id given, token is invalid or order not eligible
      *
      * @return bool|object
      */
     protected function getOrder()
     {
-        $sOrderId = Registry::getRequest()->getRequestParameter('id');
+        $oRequest = Registry::getRequest();
+
+        $sOrderId = $oRequest->getRequestParameter('id');
         if ($sOrderId) {
             $oOrder = oxNew(Order::class);
-            if ($oOrder->load($sOrderId) && $oOrder->mollieIsEligibleForPaymentFinish()) {
+            if (!$oOrder->load($sOrderId) || $oOrder->mollieIsPaymentFinishTokenValid($oRequest->getRequestParameter(PaymentFinishLink::PARAM_TOKEN)) === false) {
+                Registry::getUtilsView()->addErrorToDisplay('MOLLIE_ERROR_PAYMENT_LINK_INVALID');
+                return false;
+            }
+
+            if ($oOrder->mollieIsEligibleForPaymentFinish()) {
                 return $oOrder;
             }
         }

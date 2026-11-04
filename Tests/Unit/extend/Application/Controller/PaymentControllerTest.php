@@ -43,7 +43,7 @@ class PaymentControllerTest extends UnitTestCase
         $oOxidPayment->load($this->getActiveOxidPayment());
 
         $oMolliePaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
-        $oMolliePaymentModel->method('isMolliePaymentActive')->willReturn(false);
+        $oMolliePaymentModel->method('isMethodAvailable')->willReturn(false);
 
         $oMolliePayment = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
         $oMolliePayment->method('getId')->willReturn('molliecreditcard');

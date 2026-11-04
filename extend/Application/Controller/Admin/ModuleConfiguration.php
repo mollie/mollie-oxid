@@ -139,6 +139,9 @@ class ModuleConfiguration extends ModuleConfiguration_parent
     {
         if (!empty($_FILES)) {
             foreach ($_FILES as $sConfVar => $aFileInfo) {
+                if (Payment::getInstance()->isAlternativeLogoConfVar($sConfVar) === false) {
+                    continue; // only the alternative logo fields of the payment methods are handled here
+                }
                 if (!empty($aFileInfo['name']) && $aFileInfo['error'] == 0) {
                     try {
                         $this->mollieCleanUploadFileName($sConfVar);

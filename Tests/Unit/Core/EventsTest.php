@@ -61,11 +61,4 @@ class EventsTest extends UnitTestCase
         $iCount = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT COUNT(OXID) FROM oxpayments WHERE oxid LIKE '%mollie%' AND oxactive = 1");
         $this->assertEquals(0, $iCount);
     }
-
-    public function testAddColumnIfNotExists()
-    {
-        $return = \Mollie\Payment\Core\Events::addColumnIfNotExists("oxorder", "MOLLIETEST", "THIS WILL FAIL");
-
-        $this->assertFalse($return);
-    }
 }

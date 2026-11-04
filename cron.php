@@ -9,7 +9,8 @@ function canRunCronjob() {
     }
 
     $sSecureKey = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter("secureKey");
-    if (!empty($sSecureKey) && $sSecureKey == \OxidEsales\Eshop\Core\Registry::getConfig()->getShopConfVar('sMollieCronSecureKey')) {
+    $sConfiguredSecureKey = \OxidEsales\Eshop\Core\Registry::getConfig()->getShopConfVar('sMollieCronSecureKey');
+    if (!empty($sSecureKey) && is_string($sSecureKey) && !empty($sConfiguredSecureKey) && hash_equals((string)$sConfiguredSecureKey, $sSecureKey)) {
         // is called via webserver and secureKey param is given and matches configured secure key
         return true;
     }

@@ -42,6 +42,38 @@ class RequestLogTest extends UnitTestCase
 
     }
 
+    public function testLogRequestRemovesSessionParameters()
+    {
+        $sOrderId = "sessionParamId";
+        $sReturnUrl = 'https://shop.test/index.php?cl=order&fnc=handleMollieReturn&paymentid=molliecreditcard&force_sid=abc123def&stoken=ST0K3N&ord_agb=1&rtoken=RT0K3N';
+
+        $aRequest = [
+            'redirectUrl' => $sReturnUrl,
+            'metadata' => [
+                'order_id' => $sOrderId,
+                'store_id' => '1',
+            ],
+        ];
+        $oResponse = new \stdClass();
+        $oResponse->resource = 'payment';
+        $oResponse->status = 'open';
+        $oResponse->redirectUrl = $sReturnUrl;
+
+        $oRequestLog = new RequestLog();
+        $oRequestLog->logRequest($aRequest, $oResponse);
+
+        $aRow = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC)->getRow("SELECT request, response FROM ".RequestLog::$sTableName." WHERE orderid = ?", array($sOrderId));
+        $aRow = array_change_key_case($aRow, CASE_LOWER);
+
+        $sExpectedUrl = 'https://shop.test/index.php?cl=order&fnc=handleMollieReturn&paymentid=molliecreditcard&force_sid=&stoken=&ord_agb=1&rtoken=';
+        $aLoggedRequest = $oRequestLog->decodeData($aRow['request']);
+        $aLoggedResponse = $oRequestLog->decodeData($aRow['response']);
+
+        $this->assertEquals($sExpectedUrl, $aLoggedRequest['redirectUrl']);
+        $this->assertEquals($sExpectedUrl, $aLoggedResponse['redirectUrl']);
+        $this->assertEquals($sOrderId, $aLoggedRequest['metadata']['order_id']);
+    }
+
     public function testGetLogEntryForOrder()
     {
         $oRequestLog = new RequestLog();

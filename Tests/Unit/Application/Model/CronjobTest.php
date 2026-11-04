@@ -9,6 +9,11 @@ use Mollie\Payment\Application\Model\Cronjob;
 
 class CronjobTest extends UnitTestCase
 {
+    /**
+     * @var int
+     */
+    protected $iShopId = 1;
+
     public function tearDown(): void
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute('TRUNCATE TABLE `'.Cronjob::$sTableName.'`');
@@ -21,7 +26,7 @@ class CronjobTest extends UnitTestCase
         $sTestId = "UnitTestCronjob";
 
         $oCronjob = Cronjob::getInstance();
-        $oCronjob->addNewCronjob($sTestId, 5);
+        $oCronjob->addNewCronjob($sTestId, 5, $this->iShopId);
 
         $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT oxid FROM ".Cronjob::$sTableName." WHERE oxid = ?", array($sTestId));
 
@@ -33,13 +38,13 @@ class CronjobTest extends UnitTestCase
         $sCronjobId = "testCronjob";
 
         $oCronjob = Cronjob::getInstance();
-        $result = $oCronjob->isCronjobAlreadyExisting($sCronjobId);
+        $result = $oCronjob->isCronjobAlreadyExisting($sCronjobId, $this->iShopId);
 
         $this->assertFalse($result);
 
-        $oCronjob->addNewCronjob($sCronjobId, 5);
+        $oCronjob->addNewCronjob($sCronjobId, 5, $this->iShopId);
 
-        $result = $oCronjob->isCronjobAlreadyExisting($sCronjobId);
+        $result = $oCronjob->isCronjobAlreadyExisting($sCronjobId, $this->iShopId);
 
         $this->assertTrue($result);
     }
@@ -49,8 +54,8 @@ class CronjobTest extends UnitTestCase
         $sCronjobId = "finishedCronjob";
 
         $oCronjob = Cronjob::getInstance();
-        $oCronjob->addNewCronjob($sCronjobId, 5);
-        $oCronjob->markCronjobAsFinished($sCronjobId);
+        $oCronjob->addNewCronjob($sCronjobId, 5, $this->iShopId);
+        $oCronjob->markCronjobAsFinished($sCronjobId, $this->iShopId);
 
         $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne("SELECT oxid FROM ".Cronjob::$sTableName." WHERE LAST_RUN != '0000-00-00 00:00:00'");
 
@@ -62,9 +67,9 @@ class CronjobTest extends UnitTestCase
         $sCronjobId = "cronjobDataId";
 
         $oCronjob = Cronjob::getInstance();
-        $oCronjob->addNewCronjob($sCronjobId, 5);
-        $result = $oCronjob->getCronjobData($sCronjobId);
+        $oCronjob->addNewCronjob($sCronjobId, 5, $this->iShopId);
+        $result = $oCronjob->getCronjobData($sCronjobId, $this->iShopId);
 
-        $this->assertCount(3, $result);
+        $this->assertCount(4, $result);
     }
 }

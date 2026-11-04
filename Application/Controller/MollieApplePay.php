@@ -11,6 +11,8 @@ use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Payment\Application\Helper\DeliverySet;
@@ -90,6 +92,14 @@ class MollieApplePay extends FrontendController
      */
     protected function createOrder()
     {
+        if (UserHelper::getInstance()->isLoginNeededForApplePayEmail() === true) {
+            return array(
+                'code' => 'shippingContactInvalid',
+                'contactField' => 'emailAddress',
+                'message' => Registry::getLang()->translateString('MOLLIE_APPLE_PAY_LOGIN_NEEDED'),
+            );
+        }
+
         Registry::getSession()->deleteVariable('sess_challenge'); // Reset whatever order process was active before
 
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
@@ -215,10 +225,27 @@ class MollieApplePay extends FrontendController
                 $aResponse['error'] = $mReturn;
             }
         } catch(\Exception $oExc) {
-            $aResponse['errormessage'] = $oExc->getMessage();
+            $aResponse['errormessage'] = $this->mollieGetErrorMessage($oExc);
         }
         $aResponse['success'] = $blSuccess;
         return Registry::getUtils()->showMessageAndExit(json_encode($aResponse));
+    }
+
+    /**
+     * Returns the error message for the response
+     * Article related messages of the shop are translated, all other errors are written to the log and a general message is returned
+     *
+     * @param  \Exception $oExc
+     * @return string
+     */
+    protected function mollieGetErrorMessage(\Exception $oExc)
+    {
+        if ($oExc instanceof OutOfStockException || $oExc instanceof ArticleInputException || $oExc instanceof NoArticleException) {
+            return Registry::getLang()->translateString($oExc->getMessage());
+        }
+
+        Logger::logMessage('Apple Pay: '.get_class($oExc).': '.$oExc->getMessage());
+        return Registry::getLang()->translateString('MOLLIE_ERROR_SOMETHING_WENT_WRONG');
     }
 
     /**
@@ -244,7 +271,7 @@ class MollieApplePay extends FrontendController
             $aResponse['errormessage'] = Registry::getLang()->translateString($oExc->getMessage());
             $aResponse['showexception'] = true;
         } catch(\Exception $oExc) {
-            $aResponse['errormessage'] = $oExc->getMessage();
+            $aResponse['errormessage'] = $this->mollieGetErrorMessage($oExc);
         }
         $aResponse['success'] = $blSuccess;
         return Registry::getUtils()->showMessageAndExit(json_encode($aResponse));
