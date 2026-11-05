@@ -102,9 +102,10 @@ class User
     /**
      * Generates a new dummy-user
      *
+     * @param  bool $blSaveUser false = user is only needed temporarily (i.e. for determining the delivery methods)
      * @return \OxidEsales\Eshop\Application\Model\User
      */
-    protected function getApplePayDummyUser()
+    protected function getApplePayDummyUser($blSaveUser = true)
     {
         $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
 
@@ -122,7 +123,9 @@ class User
         if (!empty($sApplePayEmail)) {
             $oUser->oxuser__oxusername = new Field($sApplePayEmail);
             $this->updateUserFromApplePayData($oUser);
-            $oUser->save();
+            if ($blSaveUser === true && empty($this->getUserIdByEmail($sApplePayEmail))) {
+                $oUser->save();
+            }
         }
 
         $oUser->mollieSetAutoGroups();
@@ -152,7 +155,9 @@ class User
 
         $oUser->oxuser__oxusername = new Field($oMollieSessionAddress->email);
         $this->updateUserFromMollieSessionData($oUser, $oMollieSessionAddress);
-        $oUser->save();
+        if (empty($this->getUserIdByEmail($oMollieSessionAddress->email))) {
+            $oUser->save();
+        }
 
         $oUser->mollieSetAutoGroups();
 
@@ -349,12 +354,24 @@ class User
     }
 
     /**
-     * Tries to gather the user id by email and loads the user
+     * Checks if the user is a guest account (no password, no admin rights)
+     * Same rule as in OXID core User::checkIfEmailExists() for guest orders
+     *
+     * @param  \OxidEsales\Eshop\Application\Model\User $oUser
+     * @return bool
+     */
+    protected function isGuestAccount($oUser)
+    {
+        return empty($oUser->getFieldData('oxpassword')) && $oUser->getFieldData('oxrights') == 'user';
+    }
+
+    /**
+     * Loads the user with the given email
      *
      * @param  string $sApplePayEmail
      * @return \OxidEsales\Eshop\Application\Model\User|false
      */
-    protected function getExistingUser($sApplePayEmail)
+    protected function loadUserByEmail($sApplePayEmail)
     {
         $sUserId = $this->getUserIdByEmail($sApplePayEmail);
         if (!empty($sUserId)) {
@@ -367,9 +384,67 @@ class User
     }
 
     /**
+     * Tries to load an existing guest account by email
+     * Customer accounts are only used when the customer is logged in
+     *
+     * @param  string $sApplePayEmail
+     * @return \OxidEsales\Eshop\Application\Model\User|false
+     */
+    protected function getExistingUser($sApplePayEmail)
+    {
+        $oUser = $this->loadUserByEmail($sApplePayEmail);
+        if ($oUser !== false && $this->isGuestAccount($oUser) === true) {
+            return $oUser;
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if no user is logged in and the ApplePay email belongs to a customer account
+     * In that case the customer has to log in first
+     *
+     * @return bool
+     */
+    public function isLoginNeededForApplePayEmail()
+    {
+        if (Registry::getConfig()->getActiveView()->getUser()) {
+            return false;
+        }
+
+        $sApplePayEmail = $this->getApplePayEmailAddress();
+        if ($sApplePayEmail === false) {
+            return false;
+        }
+
+        $oUser = $this->loadUserByEmail($sApplePayEmail);
+        return $oUser !== false && $this->isGuestAccount($oUser) === false;
+    }
+
+    /**
+     * Returns true if no user is logged in and the email of the Mollie session address belongs to a customer account
+     * In that case the customer has to log in first
+     *
+     * @param  \stdClass $oMollieSessionAddress
+     * @return bool
+     */
+    public function isLoginNeededForMollieSessionEmail($oMollieSessionAddress)
+    {
+        if (Registry::getConfig()->getActiveView()->getUser()) {
+            return false;
+        }
+
+        if (empty($oMollieSessionAddress->email)) {
+            return false;
+        }
+
+        $oUser = $this->loadUserByEmail($oMollieSessionAddress->email);
+        return $oUser !== false && $this->isGuestAccount($oUser) === false;
+    }
+
+    /**
      * Returns user for apple pay payment
      * 1. Trys to use currently active shop user
-     * 2. Trys to load existing user by ApplePay email
+     * 2. Trys to load existing guest account by ApplePay email
      * 3. Creates dummy user by given ApplePay information
      *
      * @param  bool $blIsDeliveryMethodCall
@@ -379,6 +454,7 @@ class User
     {
         $oUser = Registry::getConfig()->getActiveView()->getUser();
         if (!$oUser) {
+            $oUser = false;
             $sApplePayEmail = $this->getApplePayEmailAddress();
             if ($sApplePayEmail !== false) {
                 $oUser = $this->getExistingUser($sApplePayEmail);
@@ -386,9 +462,8 @@ class User
         }
 
         if ($oUser === false) {
-            if (!$oUser || Registry::getRequest()->getRequestEscapedParameter('countryCode')) {
-                $oUser = $this->getApplePayDummyUser();
-            }
+            // The user is only saved when the order is created, not when the delivery methods are determined
+            $oUser = $this->getApplePayDummyUser($blIsDeliveryMethodCall === false);
         } else {
             if ($blIsDeliveryMethodCall === true) {
                 $this->setInitialDeliveryData(
@@ -405,6 +480,9 @@ class User
 
     /**
      * Generates a user or loads an existing user from Mollie session shipping address
+     * 1. Uses currently active shop user
+     * 2. Tries to load existing guest account by email of the Mollie session address
+     * 3. Creates dummy user from the Mollie session address
      *
      * @param  \stdClass $oMollieSessionAddress
      * @return false|\OxidEsales\Eshop\Application\Model\User
@@ -412,13 +490,16 @@ class User
     public function getMollieSessionUser($oMollieSessionAddress)
     {
         $oUser = Registry::getConfig()->getActiveView()->getUser();
-        if (!$oUser && !empty($oMollieSessionAddress->email)) {
-            $oUser = $this->getExistingUser($oMollieSessionAddress->email);
+        if (!$oUser) {
+            $oUser = false;
+            if (!empty($oMollieSessionAddress->email)) {
+                $oUser = $this->getExistingUser($oMollieSessionAddress->email);
+            }
         }
 
-        if ($oUser === false) { // no user logged in, no user existing in shop
+        if ($oUser === false) { // no user logged in, no guest account existing in shop
             $oUser = $this->getMollieSessionDummyUser($oMollieSessionAddress);
-        } else { // user logged in or existing in shop
+        } else { // user logged in or guest account existing in shop
             $this->updateUserFromMollieSessionData($oUser, $oMollieSessionAddress);
         }
         $this->setShippingAddressFromMollieSession($oUser, $oMollieSessionAddress);

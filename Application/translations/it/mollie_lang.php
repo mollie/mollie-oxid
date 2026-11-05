@@ -28,7 +28,10 @@ $aLang = [
     'MOLLIE_ERROR_SOMETHING_WENT_WRONG'         => 'Si è verificato un errore sconosciuto',
     'MOLLIE_ERROR_ORDER_CANCELED'               => 'Il pagamento è stato annullato, si prega di riprovare',
     'MOLLIE_ERROR_ORDER_FAILED'                 => 'Pagamento non riuscito, si prega di riprovare',
+    'MOLLIE_ERROR_ORDER_NOT_COMPLETED'          => 'Il pagamento non è stato completato, si prega di riprovare',
+    'MOLLIE_ERROR_PAYMENT_LINK_INVALID'         => 'Il link di pagamento non è valido. Contatti il negozio per ricevere un nuovo link.',
     'MOLLIE_BILLING_APPLE_PAY_NOT_AVAILABLE'    => 'Apple Pay non è disponibile per questo indirizzo di fatturazione',
+    'MOLLIE_APPLE_PAY_LOGIN_NEEDED'             => 'Esiste già un account cliente per questo indirizzo e-mail. Effettui prima l\'accesso al negozio.',
     'MOLLIE_SECOND_CHANCE_MAIL_SUBJECT'         => 'Completamento del vostro ordine alle',
     'MOLLIE_NOT_AVAILABLE_BASKETSUMLIMIT'       => 'Il metodo di pagamento non è disponibile per l’attuale valore dell’ordine.',
     'MOLLIE_NOT_AVAILABLE_COUNTRY'              => 'Il metodo di pagamento non è disponibile per il paese di fatturazione selezionato.',
@@ -45,4 +48,5 @@ $aLang = [
     'MOLLIE_PAYPAL_EXPRESS_NO_SESSION_INFO'         => 'Si è verificato un errore. Non è stato possibile recuperare le informazioni sulla transazione PayPal Express, si prega di riprovare.',
     'MOLLIE_PAYPAL_EXPRESS_ADDRESS_DATA_INCOMPLETE' => "Si è verificato un errore. L’indirizzo fornito da PayPal è incompleto. Si prega di correggere il proprio indirizzo su PayPal o di scegliere un altro metodo di pagamento.",
     'MOLLIE_PAYPAL_DELIVERY_COUNTRY_INACTIVE'       => 'Purtroppo al momento non possiamo effettuare consegne nel paese di destinazione selezionato.',
+    'MOLLIE_PAYPAL_EXPRESS_LOGIN_NEEDED'            => 'Esiste già un account cliente per questo indirizzo e-mail. Effettui prima l\'accesso al negozio.',
 ];

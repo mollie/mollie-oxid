@@ -28,7 +28,10 @@ $aLang = [
     'MOLLIE_ERROR_SOMETHING_WENT_WRONG'         => 'Er is een onbekende fout opgetreden',
     'MOLLIE_ERROR_ORDER_CANCELED'               => 'De betaling is geannuleerd, probeer het opnieuw',
     'MOLLIE_ERROR_ORDER_FAILED'                 => 'Betaling mislukt, probeer het opnieuw',
+    'MOLLIE_ERROR_ORDER_NOT_COMPLETED'          => 'De betaling is niet voltooid, probeer het opnieuw',
+    'MOLLIE_ERROR_PAYMENT_LINK_INVALID'         => 'De betaallink is ongeldig. Neem contact op met de winkel om een nieuwe link te ontvangen.',
     'MOLLIE_BILLING_APPLE_PAY_NOT_AVAILABLE'    => 'Apple Pay is niet beschikbaar voor dit factuuradres',
+    'MOLLIE_APPLE_PAY_LOGIN_NEEDED'             => 'Voor dit e-mailadres bestaat al een klantaccount. Log eerst in bij de winkel.',
     'MOLLIE_SECOND_CHANCE_MAIL_SUBJECT'         => 'Completion of your order at',
     'MOLLIE_NOT_AVAILABLE_BASKETSUMLIMIT'       => 'De betaalmethode is niet beschikbaar voor de huidige bestelwaarde.',
     'MOLLIE_NOT_AVAILABLE_COUNTRY'              => 'De betaalmethode is niet beschikbaar voor het geselecteerde facturatieland.',
@@ -45,4 +48,5 @@ $aLang = [
     'MOLLIE_PAYPAL_EXPRESS_NO_SESSION_INFO'         => 'Er is een fout opgetreden. De informatie van de PayPal Express-transactie kon niet worden opgehaald, probeer het alstublieft opnieuw.',
     'MOLLIE_PAYPAL_EXPRESS_ADDRESS_DATA_INCOMPLETE' => 'Er is een fout opgetreden. Het door PayPal opgegeven adres is onvolledig. Corrigeer uw adres in PayPal of kies een andere betaalmethode.',
     'MOLLIE_PAYPAL_DELIVERY_COUNTRY_INACTIVE'       => 'Helaas kunnen we momenteel niet leveren naar het door u geselecteerde afleverland.',
+    'MOLLIE_PAYPAL_EXPRESS_LOGIN_NEEDED'            => 'Voor dit e-mailadres bestaat al een klantaccount. Log eerst in bij de winkel.',
 ];

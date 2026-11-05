@@ -28,7 +28,10 @@ $aLang = [
     'MOLLIE_ERROR_SOMETHING_WENT_WRONG'         => 'Ein unbekannter Fehler ist aufgetreten',
     'MOLLIE_ERROR_ORDER_CANCELED'               => 'Die Bezahlung wurde storniert, bitte versuchen Sie es erneut',
     'MOLLIE_ERROR_ORDER_FAILED'                 => 'Die Bezahlung ist fehlgeschlagen, bitte versuchen Sie es erneut',
+    'MOLLIE_ERROR_ORDER_NOT_COMPLETED'          => 'Die Bezahlung wurde nicht abgeschlossen, bitte versuchen Sie es erneut',
+    'MOLLIE_ERROR_PAYMENT_LINK_INVALID'         => 'Der Zahlungslink ist ungültig. Bitte wenden Sie sich an den Shop, um einen neuen Link zu erhalten.',
     'MOLLIE_BILLING_APPLE_PAY_NOT_AVAILABLE'    => 'Apple Pay ist für diese Rechnungsadresse nicht verfügbar',
+    'MOLLIE_APPLE_PAY_LOGIN_NEEDED'             => 'Für diese E-Mail-Adresse besteht bereits ein Kundenkonto. Bitte melden Sie sich zuerst im Shop an.',
     'MOLLIE_SECOND_CHANCE_MAIL_SUBJECT'         => 'Abschluss Ihrer Bestellung bei',
     'MOLLIE_NOT_AVAILABLE_BASKETSUMLIMIT'       => 'Die Zahlart ist mit dem aktuellen Bestellwert nicht nutzbar.',
     'MOLLIE_NOT_AVAILABLE_COUNTRY'              => 'Die Zahlart ist f&uuml;r das gew&auml;hlte Rechnungsland nicht verf&uuml;gbar.',
@@ -45,4 +48,5 @@ $aLang = [
     'MOLLIE_PAYPAL_EXPRESS_NO_SESSION_INFO'         => 'Ein Fehler ist aufgetreten. Informationen zu PayPal Express Transaktion konnten nicht abgerufen werden, bitte versuchen Sie es erneut.',
     'MOLLIE_PAYPAL_EXPRESS_ADDRESS_DATA_INCOMPLETE' => 'Ein Fehler ist aufgetreten. Die von PayPal gelieferte Adresse ist nicht vollst&auml;ndig. Bitte korrigieren Sie Ihre Adresse in PayPal oder w&auml;hlen Sie eine andere Zahlart.',
     'MOLLIE_PAYPAL_DELIVERY_COUNTRY_INACTIVE'       => 'Ihr ausgew&auml;hltes Lieferland kann von uns aktuell leider nicht beliefert werden.',
+    'MOLLIE_PAYPAL_EXPRESS_LOGIN_NEEDED'            => 'Für diese E-Mail-Adresse besteht bereits ein Kundenkonto. Bitte melden Sie sich zuerst im Shop an.',
 ];

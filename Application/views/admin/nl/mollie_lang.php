@@ -152,6 +152,7 @@ $aLang = array(
     'MOLLIE_ORDER_API_LINK_2'                           => 'here',
     'MOLLIE_CONNECTION_DATA'                            => 'Bekijk je toegangsgegevens hier:',
     'MOLLIE_ORDER_PAYMENT_URL'                          => 'Link naar betaling afronden',
+    'MOLLIE_ORDER_PAYMENT_URL_LOCKED'                   => 'De betaallink is geblokkeerd na een ongeldige aanvraag. Met "Verzend een tweede kans e-mail" wordt een nieuwe link aangemaakt en naar de klant verstuurd.',
     'MOLLIE_SEND_SECOND_CHANCE_MAIL'                    => 'Verzend een tweede kans e-mail',
     'MOLLIE_SECOND_CHANCE_MAIL_ALREADY_SENT'            => 'Deze mail is al verstuurd.',
     'MOLLIE_SUBSEQUENT_ORDER_COMPLETION'                => 'Nagekomen voltooiing van de bestelling',

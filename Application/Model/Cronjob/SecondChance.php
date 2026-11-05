@@ -80,8 +80,11 @@ class SecondChance extends \Mollie\Payment\Application\Model\Cronjob\Base
             $oOrder = oxNew(Order::class);
             self::outputExtendedInfo("Check if order is eligible for a second chance email", $sUnfinishedOrderId);
             if ($oOrder->load($sUnfinishedOrderId) && $oOrder->mollieIsEligibleForPaymentFinish(true)) {
-                $oOrder->mollieSendSecondChanceEmail();
-                self::outputStandardInfo("Second chance email has been sent", $oOrder->getId());
+                if ($oOrder->mollieSendSecondChanceEmail() === true) {
+                    self::outputStandardInfo("Second chance email has been sent", $oOrder->getId());
+                } else {
+                    self::outputStandardInfo("Second chance email was not sent because the payment link is locked", $oOrder->getId());
+                }
             } else {
                 self::outputExtendedInfo("Order is not eligible for a second chance email", $sUnfinishedOrderId);
             }

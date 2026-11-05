@@ -3,6 +3,7 @@
 namespace Mollie\Payment\Application\Controller;
 
 use Mollie\Payment\Application\Helper\DeliverySet;
+use Mollie\Payment\Application\Helper\Logger;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Model\Payment\PayPalExpress;
 use Mollie\Payment\Application\Helper\PayPalExpress as PayPalExpressHelper;
@@ -86,7 +87,8 @@ class MolliePayPalExpress extends FrontendController
             Registry::getSession()->setVariable('mollie_ppe_sessionId', $oSession->id);
         } catch(\Exception $exc) {
             $oRequestLog->logExceptionResponse($aParams, $exc->getCode(), $exc->getMessage(), PayPalExpress::OXID, null, $this->getConfig()->getShopId());
-            $aResponse['error'] = $exc->getMessage();
+            Logger::logMessage('PayPal Express: '.get_class($exc).': '.$exc->getMessage());
+            $aResponse['error'] = Registry::getLang()->translateString('MOLLIE_ERROR_SOMETHING_WENT_WRONG');
         }
 
         Registry::getUtils()->showMessageAndExit(json_encode($aResponse));
@@ -281,6 +283,10 @@ class MolliePayPalExpress extends FrontendController
 
         if (empty($oSession->shippingAddress) || $this->isAddressDataComplete($oSession->shippingAddress) === false) {
             $this->handlePayPalExpressError(Registry::getLang()->translateString("MOLLIE_PAYPAL_EXPRESS_ADDRESS_DATA_INCOMPLETE")); // redirects to basket with error message, so execution ends here
+        }
+
+        if (UserHelper::getInstance()->isLoginNeededForMollieSessionEmail($oSession->shippingAddress) === true) {
+            $this->handlePayPalExpressError(Registry::getLang()->translateString("MOLLIE_PAYPAL_EXPRESS_LOGIN_NEEDED")); // redirects to basket with error message, so execution ends here
         }
 
         Registry::getSession()->setVariable('mollie_ppe_authenticationId', $oSession->authenticationId);
