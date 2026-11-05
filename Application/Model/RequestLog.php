@@ -43,7 +43,22 @@ class RequestLog extends BaseModel
      */
     protected function encodeData($oData)
     {
-        return json_encode($oData);
+        return $this->removeSessionParameters(json_encode($oData));
+    }
+
+    /**
+     * Removes the values of session related parameters from URLs (i.e. the redirectUrl)
+     * These values are only needed for the return to the shop and not for the log
+     *
+     * @param  string $sData
+     * @return string
+     */
+    public function removeSessionParameters($sData)
+    {
+        if (!is_string($sData)) {
+            return $sData;
+        }
+        return preg_replace('/([?&](?:force_sid|force_admin_sid|admin_sid|sid|rtoken|stoken)=)[^&"\\\\\s]*/i', '$1', $sData);
     }
 
     /**

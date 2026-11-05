@@ -1045,7 +1045,7 @@ class OrderRefund extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     {
         $oOrder = $this->getOrder();
         if ($oOrder && $oOrder->mollieIsMolliePaymentUsed()) {
-            $oOrder->mollieSendSecondChanceEmail();
+            $oOrder->mollieSendSecondChanceEmail(true); // admin always generates a new link
         }
     }
 }

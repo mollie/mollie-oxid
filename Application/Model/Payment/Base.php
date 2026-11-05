@@ -165,6 +165,13 @@ abstract class Base
     protected $blHasHardRestrictions = null;
 
     /**
+     * true = the payment is completed later, so the status can still be "open" when the customer returns to the shop
+     *
+     * @var bool
+     */
+    protected $blIsOpenStatusOnReturnAllowed = false;
+
+    /**
      * Return Oxid payment id
      *
      * @return string
@@ -273,6 +280,17 @@ abstract class Base
     public function isMethodDisplayableInPaymentList()
     {
         return $this->blShowInPaymentList;
+    }
+
+    /**
+     * Returns if the order can be finished while the payment still has the status "open"
+     * Only payment methods which are completed later (i.e. bank transfer) allow this
+     *
+     * @return bool
+     */
+    public function isOpenStatusOnReturnAllowed()
+    {
+        return $this->blIsOpenStatusOnReturnAllowed;
     }
 
     /**

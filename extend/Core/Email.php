@@ -112,7 +112,7 @@ class Email extends Email_parent
         $this->setViewData("shop", $shop);
         $this->setViewData("subject", "");
         $this->setViewData("enquiry", $sEnquiryText);
-        $this->setViewData("shopversion", \OxidEsales\Facts\Facts::getEdition()." ".ShopVersion::getVersion());
+        $this->setViewData("shopversion", Registry::getConfig()->getEdition()." ".ShopVersion::getVersion());
         $this->setViewData("moduleversion", $sModuleVersion);
         $this->setViewData("contact_name", $sName);
         $this->setViewData("contact_email", $sEmail);
