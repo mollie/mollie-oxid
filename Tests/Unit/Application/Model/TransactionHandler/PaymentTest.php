@@ -38,6 +38,7 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $oOrder->method('getId')->willReturn("testId");
         $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
+        $oOrder->method('mollieGetTransaction')->willReturn($oTransaction);
         $oOrder->method('mollieIsPaid')->willReturn(false);
         $oOrder->method('__get')->willReturnMap([
             ['oxorder__oxcurrency', new Field('EUR')],
@@ -46,7 +47,7 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         ]);
 
         $oPayment = new \Mollie\Payment\Application\Model\TransactionHandler\Payment();
-        $result = $oPayment->processTransaction($oOrder);
+        $result = $oPayment->processTransaction($oOrder, 'webhook');
 
         $this->assertTrue($result['success']);
     }
@@ -72,6 +73,7 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $oOrder->method('getId')->willReturn("testId");
         $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
+        $oOrder->method('mollieGetTransaction')->willReturn($oTransaction);
         $oOrder->method('__get')->willReturnMap([
             ['oxorder__oxcurrency', new Field('EUR')],
             ['oxorder__oxstorno', new Field(1)],
@@ -79,7 +81,7 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         ]);
 
         $oPayment = new \Mollie\Payment\Application\Model\TransactionHandler\Payment();
-        $result = $oPayment->processTransaction($oOrder);
+        $result = $oPayment->processTransaction($oOrder, 'webhook');
 
         $this->assertFalse($result['success']);
     }
@@ -109,6 +111,7 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $oOrder->method('getId')->willReturn("testId");
         $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
+        $oOrder->method('mollieGetTransaction')->willReturn($oTransaction);
         $oOrder->method('__get')->willReturnMap([
             ['oxorder__oxcurrency', new Field('EUR')],
             ['oxorder__oxstorno', new Field(1)],
@@ -116,7 +119,7 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         ]);
 
         $oPayment = new \Mollie\Payment\Application\Model\TransactionHandler\Payment();
-        $result = $oPayment->processTransaction($oOrder);
+        $result = $oPayment->processTransaction($oOrder, 'webhook');
 
         $this->assertTrue($result['success']);
     }
@@ -140,8 +143,74 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
         Registry::set(Config::class, $oConfig);
 
         $oPayment = new \Mollie\Payment\Application\Model\TransactionHandler\Payment();
-        $result = $oPayment->processTransaction($oOrder);
+        $result = $oPayment->processTransaction($oOrder, 'webhook');
 
         $this->assertFalse($result['success']);
+    }
+
+    /**
+     * @param  bool $blOpenStatusAllowed
+     * @return Order
+     */
+    protected function getOpenTransactionOrderMock($blOpenStatusAllowed)
+    {
+        $amount = new \stdClass();
+        $amount->currency = 'EUR';
+        $amount->value = 50;
+
+        $oTransaction = $this->getMockBuilder(\Mollie\Api\Resources\Payment::class)->disableOriginalConstructor()->getMock();
+        $oTransaction->method('isPaid')->willReturn(false);
+        $oTransaction->method('isAuthorized')->willReturn(false);
+        $oTransaction->method('hasRefunds')->willReturn(false);
+        $oTransaction->method('isOpen')->willReturn(true);
+        $oTransaction->method('isCanceled')->willReturn(false);
+        $oTransaction->method('isExpired')->willReturn(false);
+        $oTransaction->method('isPending')->willReturn(false);
+        $oTransaction->amount = $amount;
+        $oTransaction->method = 'creditcard';
+        $oTransaction->status = 'open';
+
+        $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
+        $oPaymentModel->method('isOpenStatusOnReturnAllowed')->willReturn($blOpenStatusAllowed);
+
+        $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
+        $oOrder->method('getId')->willReturn("testId");
+        $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
+        $oOrder->method('mollieGetTransaction')->willReturn($oTransaction);
+        $oOrder->method('__get')->willReturnMap([
+            ['oxorder__oxcurrency', new Field('EUR')],
+            ['oxorder__oxstorno', new Field(0)],
+            ['oxorder__oxtotalordersum', new Field(50)],
+            ['oxorder__oxtransid', new Field('tr_test')],
+        ]);
+
+        return $oOrder;
+    }
+
+    public function testHandleTransactionStatusOpenNotCompleted()
+    {
+        $oPayment = new \Mollie\Payment\Application\Model\TransactionHandler\Payment();
+        $result = $oPayment->processTransaction($this->getOpenTransactionOrderMock(false), 'success');
+
+        $this->assertFalse($result['success']);
+        $this->assertEquals('open', $result['status']);
+    }
+
+    public function testHandleTransactionStatusOpenCompletedLater()
+    {
+        $oPayment = new \Mollie\Payment\Application\Model\TransactionHandler\Payment();
+        $result = $oPayment->processTransaction($this->getOpenTransactionOrderMock(true), 'success');
+
+        $this->assertTrue($result['success']);
+        $this->assertEquals('open', $result['status']);
+    }
+
+    public function testIsOpenStatusOnReturnAllowed()
+    {
+        $this->assertTrue(oxNew(\Mollie\Payment\Application\Model\Payment\Banktransfer::class)->isOpenStatusOnReturnAllowed());
+        $this->assertTrue(oxNew(\Mollie\Payment\Application\Model\Payment\Wero::class)->isOpenStatusOnReturnAllowed());
+        $this->assertTrue(oxNew(\Mollie\Payment\Application\Model\Payment\PayByBank::class)->isOpenStatusOnReturnAllowed());
+        $this->assertFalse(oxNew(\Mollie\Payment\Application\Model\Payment\Creditcard::class)->isOpenStatusOnReturnAllowed());
+        $this->assertFalse(oxNew(\Mollie\Payment\Application\Model\Payment\PayPal::class)->isOpenStatusOnReturnAllowed());
     }
 }

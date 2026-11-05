@@ -221,7 +221,12 @@
         [{if $order->mollieIsEligibleForPaymentFinish()}]
             <fieldset>
                 <legend>[{oxmultilang ident="MOLLIE_SUBSEQUENT_ORDER_COMPLETION"}]</legend>
-                [{oxmultilang ident="MOLLIE_ORDER_PAYMENT_URL"}]: <a href="[{$order->mollieGetPaymentFinishUrl()}]" target="_blank" style="text-decoration: underline;">[{$order->mollieGetPaymentFinishUrl()}]</a><br><br>
+                [{assign var="sMollieFinishPaymentUrl" value=$order->mollieGetPaymentFinishUrl()}]
+                [{if $sMollieFinishPaymentUrl}]
+                    [{oxmultilang ident="MOLLIE_ORDER_PAYMENT_URL"}]: <a href="[{$sMollieFinishPaymentUrl}]" target="_blank" style="text-decoration: underline;">[{$sMollieFinishPaymentUrl}]</a><br><br>
+                [{else}]
+                    <span style="color: crimson;">[{oxmultilang ident="MOLLIE_ORDER_PAYMENT_URL_LOCKED"}]</span><br><br>
+                [{/if}]
                 <form action="[{$oViewConf->getSelfLink()}]" method="post">
                     [{$oViewConf->getHiddenSid()}]
                     <input type="hidden" name="cl" value="mollie_order_refund">

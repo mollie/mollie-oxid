@@ -785,7 +785,7 @@ class OrderCapture extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     {
         $oOrder = $this->getOrder();
         if ($oOrder && $oOrder->mollieIsMolliePaymentUsed()) {
-            $oOrder->mollieSendSecondChanceEmail();
+            $oOrder->mollieSendSecondChanceEmail(true); // admin always generates a new link
         }
     }
 }

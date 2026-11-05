@@ -56,7 +56,10 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $oOrderarticle = $this->getMockBuilder(OrderArticle::class)->disableOriginalConstructor()->getMock();
         $oOrderarticle->method('getArticle')->willReturn($oOrderarticle);
-        $oOrderarticle->method('__get')->willReturn(new Field('test'));
+        $oOrderarticle->method('__get')->willReturnCallback(function ($sName) {
+            // numeric values for amounts and prices, text for title and article number
+            return new Field(in_array($sName, ['oxorderarticles__oxtitle', 'oxorderarticles__oxartnum', 'oxorderarticles__oxartid']) ? 'test' : '5');
+        });
 
         $oOrderarticles = $this->getMockBuilder(\OxidEsales\Eshop\Core\Model\ListModel::class)->disableOriginalConstructor()->getMock();
         $oOrderarticles->method('getArray')->willReturn([$oOrderarticle]);

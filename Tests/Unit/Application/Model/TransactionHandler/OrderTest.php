@@ -40,6 +40,7 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $oOrder->method('getId')->willReturn("testId");
         $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
+        $oOrder->method('mollieGetTransaction')->willReturn($oTransaction);
         $oOrder->method('mollieIsPaid')->willReturn(false);
         $oOrder->method('__get')->willReturnMap([
             ['oxorder__oxcurrency', new Field('EUR')],
@@ -48,7 +49,7 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
         ]);
 
         $oPayment = new \Mollie\Payment\Application\Model\TransactionHandler\Order();
-        $result = $oPayment->processTransaction($oOrder);
+        $result = $oPayment->processTransaction($oOrder, 'webhook');
 
         $this->assertTrue($result['success']);
     }
@@ -75,13 +76,14 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $oOrder->method('getId')->willReturn("testId");
         $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
+        $oOrder->method('mollieGetTransaction')->willReturn($oTransaction);
         $oOrder->method('mollieIsPaid')->willReturn(false);
         $oOrder->method('__get')->willReturnMap([
             ['oxorder__oxcurrency', new Field('mismatch')],
         ]);
 
         $oPayment = new \Mollie\Payment\Application\Model\TransactionHandler\Order();
-        $result = $oPayment->processTransaction($oOrder);
+        $result = $oPayment->processTransaction($oOrder, 'webhook');
 
         $this->assertFalse($result['success']);
     }
@@ -106,13 +108,14 @@ class OrderTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
         $oOrder->method('getId')->willReturn("testId");
         $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
+        $oOrder->method('mollieGetTransaction')->willReturn($oTransaction);
         $oOrder->method('mollieIsPaid')->willReturn(false);
         $oOrder->method('__get')->willReturnMap([
             ['oxorder__oxcurrency', new Field('mismatch')],
         ]);
 
         $oPayment = new \Mollie\Payment\Application\Model\TransactionHandler\Order();
-        $result = $oPayment->processTransaction($oOrder);
+        $result = $oPayment->processTransaction($oOrder, 'webhook');
 
         $this->assertFalse($result['success']);
     }

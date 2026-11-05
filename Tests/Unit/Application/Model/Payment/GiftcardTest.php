@@ -74,10 +74,10 @@ class GiftcardTest extends UnitTestCase
 
         Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
 
-        $oModule = $this->getMockBuilder(\OxidEsales\EshopCommunity\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
+        $oModule = $this->getMockBuilder(\OxidEsales\Eshop\Core\Module\Module::class)->disableOriginalConstructor()->getMock();
         $oModule->method('getInfo')->willReturn('1.2.3');
 
-        UtilsObject::setClassInstance(\OxidEsales\EshopCommunity\Core\Module\Module::class, $oModule);
+        UtilsObject::setClassInstance(\OxidEsales\Eshop\Core\Module\Module::class, $oModule);
 
         $oPayment = new \Mollie\Payment\Application\Model\Payment\Giftcard();
         $result = $oPayment->getIssuers([], '');

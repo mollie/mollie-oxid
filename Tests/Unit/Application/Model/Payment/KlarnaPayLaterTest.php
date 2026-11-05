@@ -12,16 +12,21 @@ class KlarnaPayLaterTest extends UnitTestCase
 {
     public function testGetApiMethod()
     {
-        $expected = 'order';
-
         $oPaymentConfig = $this->getMockBuilder(PaymentConfig::class)->disableOriginalConstructor()->getMock();
-        #$oPaymentConfig->method('getPaymentConfig')->willReturn(['api' => 'payment']);
 
         UtilsObject::setClassInstance(PaymentConfig::class, $oPaymentConfig);
 
         $oPayment = new \Mollie\Payment\Application\Model\Payment\KlarnaPayLater();
-        $result = $oPayment->getApiMethod();
 
-        $this->assertEquals($expected, $result);
+        // New orders always use the Payments API
+        $this->assertEquals('payment', $oPayment->getApiMethod());
+
+        // Old orders keep the API they were created with
+        $oOldOrder = $this->getMockBuilder(\OxidEsales\Eshop\Application\Model\Order::class)->disableOriginalConstructor()->getMock();
+        $oOldOrder->method('__isset')->willReturn(true);
+        $oOldOrder->method('__get')->willReturnMap([
+            ['oxorder__mollieapi', new \OxidEsales\Eshop\Core\Field('order')],
+        ]);
+        $this->assertEquals('order', $oPayment->getApiMethod($oOldOrder));
     }
 }
