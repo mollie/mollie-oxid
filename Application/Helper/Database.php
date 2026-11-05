@@ -35,6 +35,10 @@ class Database
      */
     public function deleteMollieAltLogo($sDeleteConfVar)
     {
+        if (Payment::getInstance()->isAlternativeLogoConfVar($sDeleteConfVar) === false) {
+            return;
+        }
+
         $sQuery = "DELETE FROM oxconfig WHERE oxvarname = ? AND oxshopid = ? AND oxvartype = 'str'";
         DatabaseProvider::getDb()->Execute($sQuery, array($sDeleteConfVar, Registry::getConfig()->getShopId()));
     }

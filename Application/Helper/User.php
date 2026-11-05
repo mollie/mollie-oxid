@@ -102,9 +102,10 @@ class User
     /**
      * Generates a new dummy-user
      *
+     * @param  bool $blSaveUser false = user is only needed temporarily (i.e. for determining the delivery methods)
      * @return \OxidEsales\Eshop\Application\Model\User
      */
-    protected function getDummyUser()
+    protected function getDummyUser($blSaveUser = true)
     {
         $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
 
@@ -117,7 +118,9 @@ class User
         if (!empty($sApplePayEmail)) {
             $oUser->oxuser__oxusername = new Field($sApplePayEmail);
             $this->updateUserFromApplePayData($oUser);
-            $oUser->save();
+            if ($blSaveUser === true && empty($this->getUserIdByEmail($sApplePayEmail))) {
+                $oUser->save();
+            }
         }
 
         $oUser->mollieSetAutoGroups();
@@ -223,12 +226,24 @@ class User
     }
 
     /**
-     * Tries to gather the user id by email and loads the user
+     * Checks if the user is a guest account (no password, no admin rights)
+     * Same rule as in OXID core User::checkIfEmailExists() for guest orders
+     *
+     * @param  \OxidEsales\Eshop\Application\Model\User $oUser
+     * @return bool
+     */
+    protected function isGuestAccount($oUser)
+    {
+        return empty($oUser->getFieldData('oxpassword')) && $oUser->getFieldData('oxrights') == 'user';
+    }
+
+    /**
+     * Loads the user with the given email
      *
      * @param  string $sApplePayEmail
      * @return \OxidEsales\Eshop\Application\Model\User|false
      */
-    protected function getExistingUser($sApplePayEmail)
+    protected function loadUserByEmail($sApplePayEmail)
     {
         $sUserId = $this->getUserIdByEmail($sApplePayEmail);
         if (!empty($sUserId)) {
@@ -241,9 +256,46 @@ class User
     }
 
     /**
+     * Tries to load an existing guest account by email
+     * Customer accounts are only used when the customer is logged in
+     *
+     * @param  string $sApplePayEmail
+     * @return \OxidEsales\Eshop\Application\Model\User|false
+     */
+    protected function getExistingUser($sApplePayEmail)
+    {
+        $oUser = $this->loadUserByEmail($sApplePayEmail);
+        if ($oUser !== false && $this->isGuestAccount($oUser) === true) {
+            return $oUser;
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if no user is logged in and the ApplePay email belongs to a customer account
+     * In that case the customer has to log in first
+     *
+     * @return bool
+     */
+    public function isLoginNeededForApplePayEmail()
+    {
+        if (Registry::getConfig()->getActiveView()->getUser()) {
+            return false;
+        }
+
+        $sApplePayEmail = $this->getApplePayEmailAddress();
+        if ($sApplePayEmail === false) {
+            return false;
+        }
+
+        $oUser = $this->loadUserByEmail($sApplePayEmail);
+        return $oUser !== false && $this->isGuestAccount($oUser) === false;
+    }
+
+    /**
      * Returns user for apple pay payment
      * 1. Trys to use currently active shop user
-     * 2. Trys to load existing user by ApplePay email
+     * 2. Trys to load existing guest account by ApplePay email
      * 3. Creates dummy user by given ApplePay information
      *
      * @param  bool $blIsDeliveryMethodCall
@@ -253,6 +305,7 @@ class User
     {
         $oUser = Registry::getConfig()->getActiveView()->getUser();
         if (!$oUser) {
+            $oUser = false;
             $sApplePayEmail = $this->getApplePayEmailAddress();
             if ($sApplePayEmail !== false) {
                 $oUser = $this->getExistingUser($sApplePayEmail);
@@ -260,9 +313,8 @@ class User
         }
 
         if ($oUser === false) {
-            if (!$oUser || Registry::getRequest()->getRequestEscapedParameter('countryCode')) {
-                $oUser = $this->getDummyUser();
-            }
+            // The user is only saved when the order is created, not when the delivery methods are determined
+            $oUser = $this->getDummyUser($blIsDeliveryMethodCall === false);
         } else {
             if ($blIsDeliveryMethodCall === true) {
                 $this->setInitialDeliveryData($oUser);

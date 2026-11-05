@@ -47,7 +47,7 @@ class Payment extends Base
             $blSuccess = true;
         }
 
-        if ($oTransaction->isOpen()) {
+        if ($oTransaction->isOpen() && $oOrder->mollieGetPaymentModel()->isOpenStatusOnReturnAllowed() === true) {
             if ($oTransaction->method == 'banktransfer') {
                 $sBankTransferPending = $oOrder->mollieGetPaymentModel()->getConfigParam('pending_status');
                 if (!empty($sBankTransferPending)) {
