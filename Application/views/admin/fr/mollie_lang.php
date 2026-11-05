@@ -129,6 +129,7 @@ $aLang = array(
     'MOLLIE_ORDER_API_LINK_2'                           => 'ici',
     'MOLLIE_CONNECTION_DATA'                            => 'Accédez à vos données de connexion ici:',
     'MOLLIE_ORDER_PAYMENT_URL'                          => 'Lien vers la finalisation du paiement',
+    'MOLLIE_ORDER_PAYMENT_URL_LOCKED'                   => 'Le lien de paiement a été bloqué après une requête invalide. Utilisez "Envoyer un email de seconde chance" pour générer un nouveau lien et l\'envoyer au client.',
     'MOLLIE_SEND_SECOND_CHANCE_MAIL'                    => 'Envoyer un email de seconde chance',
     'MOLLIE_SECOND_CHANCE_MAIL_ALREADY_SENT'            => 'L\'email a déjà été envoyé.',
     'MOLLIE_SUBSEQUENT_ORDER_COMPLETION'                => 'Achèvement de la commande ultérieure',

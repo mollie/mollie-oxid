@@ -8,6 +8,7 @@ use Mollie\Api\Resources\Capture;
 use Mollie\Payment\Application\Helper\Api;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
+use Mollie\Payment\Application\Helper\PaymentFinishLink;
 use Mollie\Payment\Application\Model\Cronjob\FinishOrders;
 use Mollie\Payment\Application\Model\Payment\Base;
 use Mollie\Payment\Application\Model\RequestLog;
@@ -985,13 +986,97 @@ class Order extends Order_parent
         return $aOrderCaptures;
     }
     /**
-     * Returns finish payment url
+     * Returns finish payment url including the token of this order
+     * Creates the token if not existing yet. Returns false if the token was invalidated
      *
      * @return string|bool
      */
     public function mollieGetPaymentFinishUrl()
     {
-        return Registry::getConfig()->getSslShopUrl()."?cl=mollieFinishPayment&id=".$this->getId();
+        $sToken = (string)$this->oxorder__molliefinishpaymenttoken->value;
+        if ($sToken === PaymentFinishLink::TOKEN_INVALIDATED) {
+            return false;
+        }
+
+        if ($sToken === '') {
+            $sToken = $this->mollieRenewPaymentFinishToken();
+        }
+
+        return Registry::getConfig()->getSslShopUrl()."?cl=mollieFinishPayment&id=".$this->getId()."&".PaymentFinishLink::PARAM_TOKEN."=".$sToken;
+    }
+
+    /**
+     * Saves the given value as payment finish token
+     *
+     * @param  string $sValue
+     * @return void
+     */
+    protected function mollieSavePaymentFinishToken($sValue)
+    {
+        $sQuery = "UPDATE oxorder SET molliefinishpaymenttoken = ? WHERE oxid = ?";
+        DatabaseProvider::getDb()->Execute($sQuery, array($sValue, $this->getId()));
+
+        $this->oxorder__molliefinishpaymenttoken = new Field($sValue);
+    }
+
+    /**
+     * Generates and saves a new payment finish token, all previous links become invalid
+     *
+     * @return string
+     */
+    public function mollieRenewPaymentFinishToken()
+    {
+        $sToken = PaymentFinishLink::getInstance()->generateToken();
+        $this->mollieSavePaymentFinishToken($sToken);
+
+        return $sToken;
+    }
+
+    /**
+     * Invalidates the payment finish token, the link can only be renewed by sending a new second chance email in the admin
+     *
+     * @return void
+     */
+    public function mollieInvalidatePaymentFinishToken()
+    {
+        $this->mollieSavePaymentFinishToken(PaymentFinishLink::TOKEN_INVALIDATED);
+    }
+
+    /**
+     * Returns if the payment finish token was invalidated
+     *
+     * @return bool
+     */
+    public function mollieIsPaymentFinishTokenInvalidated()
+    {
+        return $this->oxorder__molliefinishpaymenttoken->value === PaymentFinishLink::TOKEN_INVALIDATED;
+    }
+
+    /**
+     * Checks the token given in the payment finish link
+     * A well-formed but non-matching token resets the token of this order, a new link can be generated in the admin.
+     * Missing or malformed tokens (i.e. links broken by an email client) are rejected without reset.
+     *
+     * @param  mixed $sToken
+     * @return bool
+     */
+    public function mollieIsPaymentFinishTokenValid($sToken)
+    {
+        $oHelper = PaymentFinishLink::getInstance();
+        if ($oHelper->isWellFormedToken($sToken) === false) {
+            return false;
+        }
+
+        $sStoredToken = (string)$this->oxorder__molliefinishpaymenttoken->value;
+        if ($oHelper->isWellFormedToken($sStoredToken) === false) { // no token generated yet or already invalidated
+            return false;
+        }
+
+        if (hash_equals($sStoredToken, $sToken) === false) {
+            $this->mollieInvalidatePaymentFinishToken();
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -1004,6 +1089,11 @@ class Order extends Order_parent
         if ($this->oxorder__oxtransstatus->value == "NOT_FINISHED") {
             // If order is paid, the webhook already put the order in the processing status
             if ($this->oxorder__oxfolder->value == Registry::getConfig()->getShopConfVar('sMollieStatusProcessing')) {
+                if ($this->oxorder__mollieapi->value == 'order' && $this->oxorder__oxpaid->value == '0000-00-00 00:00:00') {
+                    // Order API: authorized orders (i.e. Klarna) are put in the processing status by the webhook without being marked as paid
+                    $oTransaction = $this->mollieGetTransaction(false);
+                    return ($oTransaction && ($oTransaction->isAuthorized() === true || $oTransaction->isPaid() === true || $oTransaction->isShipping() === true || $oTransaction->isCompleted() === true));
+                }
                 return true;
             }
 
@@ -1078,14 +1168,25 @@ class Order extends Order_parent
     /**
      * Triggers sending Mollie second chance email
      *
-     * @return void
+     * @param  bool $blRenewLink true = generate a new link (invalidates previous links and lifts an invalidation), used in the admin
+     * @return bool
      */
-    public function mollieSendSecondChanceEmail()
+    public function mollieSendSecondChanceEmail($blRenewLink = false)
     {
+        if ($blRenewLink === true) {
+            $this->mollieRenewPaymentFinishToken();
+        }
+
+        $sFinishPaymentUrl = $this->mollieGetPaymentFinishUrl();
+        if ($sFinishPaymentUrl === false) { // link was invalidated, only a new email from the admin can renew it
+            return false;
+        }
+
         $oEmail = oxNew(Email::class);
-        $oEmail->mollieSendSecondChanceEmail($this, $this->mollieGetPaymentFinishUrl());
+        $oEmail->mollieSendSecondChanceEmail($this, $sFinishPaymentUrl);
 
         $this->mollieMarkAsSecondChanceMailSent();
+        return true;
     }
 
     /**
@@ -1120,13 +1221,13 @@ class Order extends Order_parent
         }
 
         $oBasket = $this->mollieRecreateBasket();
-        $oUser = $this->getUser();
-        if (!$oUser) {
-            $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-            $oUser->load($this->oxorder__oxuserid->value);
-            $this->setUser($oUser);
-            Registry::getSession()->setVariable('usr', $this->oxorder__oxuserid->value);
-        }
+
+        // Always use the user of the order. The user is only needed for the current request.
+        $oUser = $this->getOrderUser();
+        $this->setUser($oUser);
+
+        // Allows OrderController::handleMollieReturn to use the order user when the customer returns from Mollie
+        Registry::getSession()->setVariable(PaymentFinishLink::SESSION_VAR_REINIT_ORDER_ID, $this->getId());
 
         $this->blMollieReinitializePaymentMode = true;
 

@@ -5,6 +5,7 @@ namespace Mollie\Payment\extend\Application\Controller;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Payment\Application\Helper\Order as OrderHelper;
+use Mollie\Payment\Application\Helper\PaymentFinishLink;
 use Mollie\Payment\extend\Application\Model\Order as MollieOrder;
 
 class OrderController extends OrderController_parent
@@ -21,6 +22,7 @@ class OrderController extends OrderController_parent
         }
         Registry::getSession()->deleteVariable('mollieIsRedirected');
         Registry::getSession()->deleteVariable('mollieRedirectUrl');
+        Registry::getSession()->deleteVariable(PaymentFinishLink::SESSION_VAR_REINIT_ORDER_ID);
         return parent::render();
     }
 
@@ -74,11 +76,36 @@ class OrderController extends OrderController_parent
     }
 
     /**
+     * When the payment was restarted via the payment finish link (MollieFinishPayment) the user of the order is used for this request.
+     * The user is only taken from the order which was restarted in this session (see Order::mollieReinitializePayment)
+     *
+     * @return void
+     */
+    protected function mollieSetOrderUserForReinitializedPayment()
+    {
+        if (Registry::getRequest()->getRequestEscapedParameter(oxNew(Order::class)::MOLLIE_PAYMENT_REINIT_PARAM) != '1') {
+            return;
+        }
+
+        $sReinitOrderId = Registry::getSession()->getVariable(PaymentFinishLink::SESSION_VAR_REINIT_ORDER_ID);
+        if (empty($sReinitOrderId)) {
+            return;
+        }
+
+        $oOrder = $this->mollieGetOrder();
+        if ($oOrder !== false && $oOrder->getId() === $sReinitOrderId) {
+            $this->setUser($oOrder->getOrderUser());
+        }
+    }
+
+    /**
      *
      * @return string
      */
     public function handleMollieReturn()
     {
+        $this->mollieSetOrderUserForReinitializedPayment();
+
         $oPayment = $this->getPayment();
         if ($oPayment && $oPayment->isMolliePaymentMethod()) {
             Registry::getSession()->deleteVariable('mollieIsRedirected');
@@ -104,6 +131,8 @@ class OrderController extends OrderController_parent
                     $sErrorIdent = 'MOLLIE_ERROR_ORDER_CANCELED';
                 } elseif ($aResult['status'] == 'failed') {
                     $sErrorIdent = 'MOLLIE_ERROR_ORDER_FAILED';
+                } elseif ($aResult['status'] == 'open' || $aResult['status'] == 'created') {
+                    $sErrorIdent = 'MOLLIE_ERROR_ORDER_NOT_COMPLETED';
                 }
                 return $this->redirectWithError($sErrorIdent);
             }
@@ -115,11 +144,6 @@ class OrderController extends OrderController_parent
 
             // else - continue to parent::execute since success must be true
         }
-        $sReturn = parent::execute();
-        if (Registry::getRequest()->getRequestEscapedParameter(oxNew(Order::class)::MOLLIE_PAYMENT_REINIT_PARAM) == '1') {
-            Registry::getSession()->deleteVariable('usr'); // logout user since the payment link should not be seen as a successful login
-        }
-
-        return $sReturn;
+        return parent::execute();
     }
 }

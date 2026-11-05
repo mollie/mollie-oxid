@@ -4,6 +4,7 @@ namespace Mollie\Payment\extend\Application\Controller\Admin;
 
 use Mollie\Payment\Application\Helper\Database;
 use Mollie\Payment\Application\Helper\Payment;
+use Mollie\Payment\Application\Model\RequestLog;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -12,6 +13,29 @@ class ModuleMain extends ModuleMain_parent
     protected $_sMollieNewestVersion = null;
 
     protected $_blMailHasBeenSent = false;
+
+    /**
+     * Fields with customer data which are replaced in the log file attached to the support email
+     *
+     * @var array
+     */
+    protected $aMollieSupportLogMaskedFields = [
+        'givenName',
+        'familyName',
+        'email',
+        'billingEmail',
+        'streetAndNumber',
+        'streetAdditional',
+        'organizationName',
+        'phone',
+        'consumerDateOfBirth',
+        'consumerName',
+        'consumerAccount',
+        'cardHolder',
+        'cardNumber',
+        'cardToken',
+        'applePayPaymentToken',
+    ];
 
     /**
      * Collects currently newest release version number from github
@@ -106,11 +130,11 @@ class ModuleMain extends ModuleMain_parent
      */
     protected function getLogRepresentation($aRow)
     {
-        if (!empty($aRow['REQUEST'])) {
-            $aRow['REQUEST'] = json_decode($aRow['REQUEST'], true);
-        }
-        if (!empty($aRow['RESPONSE'])) {
-            $aRow['RESPONSE'] = json_decode($aRow['RESPONSE'], true);
+        $oRequestLog = oxNew(RequestLog::class);
+        foreach (['REQUEST', 'RESPONSE'] as $sField) {
+            if (!empty($aRow[$sField])) {
+                $aRow[$sField] = $this->mollieMaskLogData(json_decode($oRequestLog->removeSessionParameters($aRow[$sField]), true));
+            }
         }
         $sArrayPrint = print_r($aRow, true);
         $sArrayPrint .= "###########################################################################################################################################################################\n";
@@ -118,7 +142,31 @@ class ModuleMain extends ModuleMain_parent
     }
 
     /**
+     * Replaces customer data in the given log data, the technical data stays unchanged
+     *
+     * @param  mixed $mData
+     * @return mixed
+     */
+    protected function mollieMaskLogData($mData)
+    {
+        if (!is_array($mData)) {
+            return $mData;
+        }
+        foreach ($mData as $sKey => $mValue) {
+            if (in_array($sKey, $this->aMollieSupportLogMaskedFields, true) && !is_array($mValue)) {
+                if ($mValue !== null && $mValue !== '') {
+                    $mData[$sKey] = '***';
+                }
+            } else {
+                $mData[$sKey] = $this->mollieMaskLogData($mValue);
+            }
+        }
+        return $mData;
+    }
+
+    /**
      * Generates log file and returns its path or false if no matching log entries are in the database
+     * The file is created in the temp directory of the system and has to be deleted after usage
      *
      * @return string|false
      * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
@@ -129,8 +177,15 @@ class ModuleMain extends ModuleMain_parent
         $sQuery = "SELECT * FROM mollierequestlog WHERE timestamp > DATE_SUB(CURDATE(), INTERVAL 7 DAY) LIMIT 700";
         $aResult = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sQuery);
         if (!empty($aResult)) {
-            $sPath = dirname(__FILE__).DIRECTORY_SEPARATOR."mollie_logfile_".time().".log";
+            $sPath = tempnam(sys_get_temp_dir(), 'mollie_log_');
+            if ($sPath === false) {
+                return false;
+            }
             $oFile = fopen($sPath, "w");
+            if ($oFile === false) {
+                $this->mollieDeleteLogAttachmentFile($sPath);
+                return false;
+            }
             foreach ($aResult as $aRow) {
                 fwrite($oFile, $this->getLogRepresentation($aRow));
             }
@@ -138,6 +193,19 @@ class ModuleMain extends ModuleMain_parent
             return $sPath;
         }
         return false;
+    }
+
+    /**
+     * Deletes the log file generated for the support email
+     *
+     * @param  string|false $sPath
+     * @return void
+     */
+    protected function mollieDeleteLogAttachmentFile($sPath)
+    {
+        if ($sPath !== false && file_exists($sPath)) {
+            unlink($sPath);
+        }
     }
 
     /**
@@ -149,13 +217,14 @@ class ModuleMain extends ModuleMain_parent
     {
         $aSupport = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("support");
         if (!empty($aSupport)) {
-            $sMollieLogFilePath = $this->createLogAttachmentFile();
+            $sMollieLogFilePath = false;
+            try {
+                $sMollieLogFilePath = $this->createLogAttachmentFile();
 
-            $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
-            $oEmail->mollieSendSupportEmail($aSupport['name'], $aSupport['email'], $aSupport['subject'], $aSupport['enquiry'], $this->mollieGetUsedVersionNumber(), $sMollieLogFilePath);
-
-            if ($sMollieLogFilePath !== false) {
-                unlink($sMollieLogFilePath);
+                $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+                $oEmail->mollieSendSupportEmail($aSupport['name'], $aSupport['email'], $aSupport['subject'], $aSupport['enquiry'], $this->mollieGetUsedVersionNumber(), $sMollieLogFilePath);
+            } finally {
+                $this->mollieDeleteLogAttachmentFile($sMollieLogFilePath);
             }
 
             $this->_blMailHasBeenSent = true;

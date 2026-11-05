@@ -7,6 +7,11 @@ use OxidEsales\Eshop\Application\Model\Order;
 class Banktransfer extends Base
 {
     /**
+     * @var bool
+     */
+    protected $blIsOpenStatusOnReturnAllowed = true;
+
+    /**
      * Payment id in the oxid shop
      *
      * @var string

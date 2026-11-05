@@ -7,6 +7,7 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Core\Registry;
 use Mollie\Payment\Application\Helper\Order as OrderHelper;
+use Mollie\Payment\Application\Helper\PaymentFinishLink;
 
 class PaymentController extends PaymentController_parent
 {
@@ -22,6 +23,7 @@ class PaymentController extends PaymentController_parent
         }
         Registry::getSession()->deleteVariable('mollieIsRedirected');
         Registry::getSession()->deleteVariable('mollieRedirectUrl');
+        Registry::getSession()->deleteVariable(PaymentFinishLink::SESSION_VAR_REINIT_ORDER_ID);
         parent::init();
     }
 

@@ -97,6 +97,26 @@ class Payment
     }
 
     /**
+     * Checks if the given config var name is the alternative logo setting of a Mollie payment method
+     * Format: sMollie<paymentId>AltLogo
+     *
+     * @param  string $sConfVar
+     * @return bool
+     */
+    public function isAlternativeLogoConfVar($sConfVar)
+    {
+        if (!is_string($sConfVar) || $sConfVar === '') {
+            return false;
+        }
+        foreach (array_keys($this->aPaymentMethods) as $sPaymentId) {
+            if ($sConfVar === 'sMollie'.$sPaymentId.'AltLogo') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Determine if given paymentId is a Mollie payment method
      *
      * @param string $sPaymentId
