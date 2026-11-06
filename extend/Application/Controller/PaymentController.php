@@ -107,7 +107,12 @@ class PaymentController extends PaymentController_parent
      */
     protected function mollieHasPayPalExpressAddressBeenChanged()
     {
-        if ($this->getUser()->mollieGetEncodedDeliveryAddress() != Registry::getSession()->getVariable('mollie_ppe_addresshash')) {
+        $oUser = $this->getUser();
+        if (!$oUser) { // no user logged in, e.g. when the payment page is opened in a new session
+            return true;
+        }
+
+        if ($oUser->mollieGetEncodedDeliveryAddress() != Registry::getSession()->getVariable('mollie_ppe_addresshash')) {
             return true;
         }
 
