@@ -43,7 +43,7 @@ class Klarna extends Base
      * @var array|false
      */
     protected $aBillingCountryRestrictedTo = [
-        'AT',' BE',' DK',' FI',' FR',' DE',' IT',' IE',' NL',' NO',' PT',' ES',' SE',' CH',' GB',' GR',' PL',' SK',' CZ',' RO',' HU'
+        'AT','BE','DK','FI','FR','DE','IT','IE','NL','NO','PT','ES','SE','CH','GB','GR','PL','SK','CZ','RO','HU'
     ];
 
     /**
