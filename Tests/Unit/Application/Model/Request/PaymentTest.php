@@ -6,9 +6,12 @@ use Mollie\Api\Endpoints\PaymentEndpoint;
 use Mollie\Payment\Application\Model\Payment\Creditcard;
 use Mollie\Payment\Application\Model\Request\Payment;
 use OxidEsales\Eshop\Application\Model\Country;
+use OxidEsales\Eshop\Application\Model\DeliverySet;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\State;
+use OxidEsales\Eshop\Application\Model\UserPayment;
 use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\UtilsObject;
 
 class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
@@ -167,6 +170,60 @@ class PaymentTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $this->expectException(\Mollie\Api\Exceptions\ApiException::class);
         $result = $oRequest->sendRequest($oOrder, 50, "http://someurl.com");
+    }
+
+    public function testGetBasketItemsWithProportionalVatOfAdditionalCosts()
+    {
+        $oDelSet = oxNew(DeliverySet::class);
+        $oDelSet->oxdeliveryset__oxtitle = new Field('Standard');
+
+        $oUserPayment = oxNew(UserPayment::class);
+        $oUserPayment->oxpayments__oxdesc = new Field('Creditcard');
+
+        $oWrappingPrice = oxNew(Price::class);
+        $oWrappingPrice->setBruttoPriceMode();
+        $oWrappingPrice->setPrice(3.00, 18.951612903226);
+
+        $aOrderFields = [
+            'oxorder__oxcurrency' => 'EUR',
+            'oxorder__oxdeltype' => 'oxidstandard',
+            'oxorder__oxpaymenttype' => 'molliecreditcard',
+            'oxorder__oxdelcost' => '5.95',
+            'oxorder__oxdelvat' => '15.384615384615',
+            'oxorder__oxpaycost' => '2.5',
+            'oxorder__oxpayvat' => '15.384615384615',
+            'oxorder__oxwrapcost' => '3',
+            'oxorder__oxwrapvat' => '18.951612903226',
+        ];
+
+        $oOrder = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
+        $oOrder->method('getOrderArticles')->willReturn($this->getEmptyOrderArticleList());
+        $oOrder->method('getDelSet')->willReturn($oDelSet);
+        $oOrder->method('getPaymentType')->willReturn($oUserPayment);
+        $oOrder->method('getOrderWrappingPrice')->willReturn($oWrappingPrice);
+        $oOrder->method('__get')->willReturnCallback(function ($sName) use ($aOrderFields) {
+            if (isset($aOrderFields[$sName])) {
+                return new Field($aOrderFields[$sName]);
+            }
+            return new Field('0');
+        });
+
+        $oRequest = new Payment();
+        $aItems = $oRequest->getBasketItems($oOrder, true);
+
+        $this->assertCount(3, $aItems);
+
+        $this->assertSame('shipping_fee', $aItems[0]['type']);
+        $this->assertSame(15.38, $aItems[0]['vatRate']);
+        $this->assertSame('0.79', $aItems[0]['vatAmount']['value']);
+
+        $this->assertSame('molliecreditcard', $aItems[1]['sku']);
+        $this->assertSame(15.38, $aItems[1]['vatRate']);
+        $this->assertSame('0.33', $aItems[1]['vatAmount']['value']);
+
+        $this->assertSame('wrapping', $aItems[2]['sku']);
+        $this->assertSame(18.95, $aItems[2]['vatRate']);
+        $this->assertSame('0.48', $aItems[2]['vatAmount']['value']);
     }
 
     /**
