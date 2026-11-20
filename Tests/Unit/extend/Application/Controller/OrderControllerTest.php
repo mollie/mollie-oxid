@@ -6,6 +6,7 @@ namespace Mollie\Payment\Tests\Unit\extend\Application\Controller;
 
 use Mollie\Payment\Application\Helper\PaymentFinishLink;
 use Mollie\Payment\Application\Model\Payment\Creditcard;
+use Mollie\Payment\Application\Model\Payment\Ideal;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
@@ -74,6 +75,43 @@ class OrderControllerTest extends UnitTestCase
 
         $oOrderController = new \Mollie\Payment\extend\Application\Controller\OrderController();
         $oOrderController->setUser($oUser);
+        $oOrderController->setSession($oSession);
+
+        $result = $oOrderController->handleMollieReturn();
+        $this->assertEquals("thankyou", $result);
+    }
+
+    public function testHandleMollieReturnOrderAlreadyFinalized()
+    {
+        UtilsObject::setClassInstance(\OxidEsales\Eshop\Application\Model\Payment::class, $this->getPaymentMock());
+
+        $oSession = $this->getMockBuilder(\OxidEsales\Eshop\Core\Session::class)->disableOriginalConstructor()->getMock();
+        $oSession->method('getVariable')->willReturn('12345');
+        $oSession->method('checkSessionChallenge')->willReturn(true);
+        $oSession->method('getBasket')->willReturn($this->getBasketMock());
+
+        Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+
+        $oTransactionHandler = $this->getMockBuilder(\Mollie\Payment\Application\Model\TransactionHandler\Payment::class)->disableOriginalConstructor()->getMock();
+        $oTransactionHandler->method('processTransaction')->willReturn(['success' => true]);
+
+        $oIdeal = $this->getMockBuilder(Ideal::class)->disableOriginalConstructor()->getMock();
+        $oIdeal->method('getTransactionHandler')->willReturn($oTransactionHandler);
+
+        // order was already finalized by a previous call of the return url
+        $order = $this->getMockBuilder(Order::class)->disableOriginalConstructor()->getMock();
+        $order->method('isLoaded')->willReturn(true);
+        $order->method('__get')->with('oxorder__oxtransid')->willReturn(new \OxidEsales\Eshop\Core\Field("12345"));
+        $order->method('getFieldData')->willReturnMap([
+            ['oxorder__oxpaymenttype', 'mollieideal'],
+            ['oxorder__oxtransstatus', 'OK'],
+        ]);
+        $order->method('mollieGetPaymentModel')->willReturn($oIdeal);
+        $order->expects($this->never())->method('finalizeOrder');
+
+        UtilsObject::setClassInstance(Order::class, $order);
+
+        $oOrderController = new \Mollie\Payment\extend\Application\Controller\OrderController();
         $oOrderController->setSession($oSession);
 
         $result = $oOrderController->handleMollieReturn();
