@@ -9,6 +9,7 @@ use Mollie\Payment\Application\Helper\Api;
 use Mollie\Payment\Application\Helper\Payment;
 use Mollie\Payment\Application\Helper\Payment as PaymentHelper;
 use Mollie\Payment\Application\Helper\PaymentFinishLink;
+use Mollie\Payment\Application\Model\Cronjob\FinishOrders;
 use Mollie\Payment\Application\Model\Payment\Base;
 use Mollie\Payment\Application\Helper\PayPalExpress;
 use Mollie\Payment\Application\Model\RequestLog;
@@ -609,9 +610,30 @@ class Order extends Order_parent
      */
     protected function _sendOrderByEmail($oUser = null, $oBasket = null, $oPayment = null)
     {
+        if ($this->blMollieFinalizeReturnMode === true && $this->blMollieFinishOrderReturnMode === false) {
+            // The basket in the session may differ from the order when the customer changed it while paying (i.e. in another browser tab)
+            $oBasket = $this->mollieRecreateBasketForEmail();
+        }
         $blParentReturn = parent::_sendOrderByEmail($oUser, $oBasket, $oPayment);
         $this->mollieHandleOrderFinished();
         return $blParentReturn;
+    }
+
+    /**
+     * Recreates the basket from the order articles to send the order email with the ordered articles
+     *
+     * @return Basket
+     */
+    protected function mollieRecreateBasketForEmail()
+    {
+        FinishOrders::mollieSetFinishingOrder(true);
+        $oBasket = $this->mollieRecreateBasket();
+        foreach ($oBasket->getContents() as $item) {
+            $item->mollieUnsetArticle();
+        }
+        FinishOrders::mollieSetFinishingOrder(false);
+
+        return $oBasket;
     }
 
     /**
