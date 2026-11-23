@@ -4,10 +4,6 @@ namespace Mollie\Payment\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
-use Mollie\Payment\Application\Model\Payment\Creditcard;
-use Mollie\Payment\Application\Model\PaymentConfig;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 use Mollie\Payment\Application\Model\BaseMigration;
 
 class Version20250527120000 extends BaseMigration
@@ -52,10 +48,13 @@ class Version20250527120000 extends BaseMigration
         }
     }
 
+    // Migrations can also be executed without shop context (vendor/bin/oe-eshop-db_migrate), so the OXID framework
+    // (oxNew, DatabaseProvider, ...) can't be used here, only the Doctrine connection of the migration
+
     protected function hasMolliePaymentConfig($sPaymentId)
     {
         $sQuery = "SELECT 1 FROM molliepaymentconfig WHERE oxid = ?";
-        $dbValue =  \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQuery, array($sPaymentId));
+        $dbValue = $this->connection->fetchOne($sQuery, [$sPaymentId]);
         if ($dbValue == '1') {
             return true;
         }
@@ -64,15 +63,20 @@ class Version20250527120000 extends BaseMigration
 
     protected function renameCaptureMethodConfig()
     {
-        $oPaymentConfig = oxNew(PaymentConfig::class);
-        $aCreditcardConfig = $oPaymentConfig->getPaymentConfig('molliecreditcard');
+        $sQuery = "SELECT CONFIG FROM molliepaymentconfig WHERE OXID = 'molliecreditcard'";
+        $sConfig = $this->connection->fetchOne($sQuery);
+        if ($sConfig === false) {
+            return;
+        }
+
+        $aCreditcardConfig = json_decode($sConfig, true);
         if (!empty($aCreditcardConfig['creditcard_capture_method'])) {
             $aCreditcardConfig['capture_method'] = $aCreditcardConfig['creditcard_capture_method'];
             unset($aCreditcardConfig['creditcard_capture_method']);
 
             $aCreditcardConfig['capture_method'] = str_replace("creditcard_", "", $aCreditcardConfig['capture_method']);
 
-            $oPaymentConfig->savePaymentConfig('molliecreditcard', $aCreditcardConfig);
+            $this->addSql("UPDATE molliepaymentconfig SET CONFIG = ? WHERE OXID = 'molliecreditcard'", [json_encode($aCreditcardConfig)]);
         }
     }
 }
