@@ -728,7 +728,7 @@ class OrderTest extends UnitTestCase
 
         UtilsObject::setClassInstance(Payment::class, $oPaymentHelper);
 
-        $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
+        $oOrder = $this->getOrderMockWithOrderUser(true);
         $oOrder->oxorder__oxpaymenttype = new Field('molliecreditcard');
         $oOrder->oxorder__oxpaid = new Field('0000-00-00 00:00:00');
         $oOrder->oxorder__oxtransstatus = new Field('NOT_FINISHED');
@@ -758,7 +758,7 @@ class OrderTest extends UnitTestCase
 
         UtilsObject::setClassInstance(Payment::class, $oPaymentHelper);
 
-        $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
+        $oOrder = $this->getOrderMockWithOrderUser(true);
         $oOrder->oxorder__oxpaymenttype = new Field('molliecreditcard');
         $oOrder->oxorder__oxpaid = new Field('0000-00-00 00:00:00');
         $oOrder->oxorder__oxtransstatus = new Field('NOT_FINISHED');
@@ -777,6 +777,44 @@ class OrderTest extends UnitTestCase
         $result = $oOrder->mollieIsEligibleForPaymentFinish();
 
         $this->assertFalse($result);
+    }
+
+    public function testMollieIsEligibleForPaymentFinishFalseUserDeleted()
+    {
+        Payment::destroyInstance();
+
+        $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
+        $oPaymentHelper->expects($this->never())->method('getMolliePaymentModel');
+        $oPaymentHelper->method('isMolliePaymentMethod')->willReturn(true);
+
+        UtilsObject::setClassInstance(Payment::class, $oPaymentHelper);
+
+        $oOrder = $this->getOrderMockWithOrderUser(false);
+        $oOrder->oxorder__oxpaymenttype = new Field('molliecreditcard');
+        $oOrder->oxorder__oxpaid = new Field('0000-00-00 00:00:00');
+        $oOrder->oxorder__oxtransstatus = new Field('NOT_FINISHED');
+        $result = $oOrder->mollieIsEligibleForPaymentFinish();
+
+        $this->assertFalse($result);
+
+        UtilsObject::resetClassInstances();
+        Payment::destroyInstance();
+    }
+
+    /**
+     * Returns an order whose user still exists or was deleted
+     *
+     * @param  bool $blUserExists
+     * @return \Mollie\Payment\extend\Application\Model\Order
+     */
+    protected function getOrderMockWithOrderUser($blUserExists)
+    {
+        $oUser = $this->getMockBuilder(User::class)->disableOriginalConstructor()->getMock();
+        $oUser->method('isLoaded')->willReturn($blUserExists);
+
+        $oOrder = $this->getMockBuilder(\Mollie\Payment\extend\Application\Model\Order::class)->setMethods(['getOrderUser'])->getMock();
+        $oOrder->method('getOrderUser')->willReturn($oUser);
+        return $oOrder;
     }
 
     public function testMollieSendSecondChanceEmail()
