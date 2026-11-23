@@ -379,9 +379,10 @@ class OrderTest extends UnitTestCase
         $oOrder->oxorder__oxtransstatus = new Field('NOT_FINISHED');
         $oOrder->save();
         $oOrder->setNonPublicVar('mollieRecalculateOrder', true);
+        $oOrder->setNonPublicVar('mollieTransStatusBeforeRecalculation', 'NOT_FINISHED');
         $oOrder->_setOrderStatus($expected);
 
-        $this->assertNotEquals($expected, $oOrder->oxorder__oxtransstatus->value);
+        $this->assertEquals('NOT_FINISHED', $oOrder->oxorder__oxtransstatus->value);
 
         $oOrder->setNonPublicVar('mollieRecalculateOrder', false);
         $oOrder->_setOrderStatus($expected);
@@ -396,9 +397,13 @@ class OrderTest extends UnitTestCase
         $oOrder->oxorder__oxtransstatus = new Field('OK');
         $oOrder->save();
         $oOrder->setNonPublicVar('mollieRecalculateOrder', true);
+        $oOrder->setNonPublicVar('mollieTransStatusBeforeRecalculation', 'OK');
 
-        // order of the calls in finalizeOrder
+        // steps of finalizeOrder during a recalculation: _loadFromBasket sets the status to ERROR in the order object,
+        // then the status is set to NOT_FINISHED, the order is saved and the status is set to OK
+        $oOrder->oxorder__oxtransstatus = new Field('ERROR');
         $oOrder->_setOrderStatus('NOT_FINISHED');
+        $oOrder->save();
         $oOrder->_setOrderStatus('OK');
 
         $this->assertEquals('OK', $oOrder->oxorder__oxtransstatus->value);
