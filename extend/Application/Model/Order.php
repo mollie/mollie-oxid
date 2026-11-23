@@ -474,14 +474,15 @@ class Order extends Order_parent
 
     /**
      * Extension: Changing the order in the backend results in da finalizeOrder call with recaltulateOrder = true
-     * This sets oxtransstatus to OK, which should not happen for Mollie orders when they were not finished
-     * This prevents this behaviour
+     * This sets oxtransstatus to NOT_FINISHED and then to OK, which should not happen for Mollie orders,
+     * since the status of Mollie orders is only changed by the payment process.
+     * This prevents this behaviour, so the status stays as it was before the recalculation
      *
      * @param string $sStatus order transaction status
      */
     protected function _setOrderStatus($sStatus)
     {
-        if ($this->mollieRecalculateOrder === true && $this->oxorder__oxtransstatus->value == "NOT_FINISHED" && $this->mollieIsMolliePaymentUsed()) {
+        if ($this->mollieRecalculateOrder === true && $this->mollieIsMolliePaymentUsed()) {
             return;
         }
         parent::_setOrderStatus($sStatus);

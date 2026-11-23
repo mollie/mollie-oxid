@@ -11,6 +11,7 @@ use OxidEsales\Eshop\Application\Model\OrderArticle;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\UserPayment;
 use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -386,6 +387,35 @@ class OrderTest extends UnitTestCase
         $oOrder->_setOrderStatus($expected);
 
         $this->assertEquals($expected, $oOrder->oxorder__oxtransstatus->value);
+    }
+
+    public function testSetOrderStatusRecalculateFinishedOrder()
+    {
+        $oOrder = oxNew($this->getProxyClassName(\Mollie\Payment\extend\Application\Model\Order::class));
+        $oOrder->oxorder__oxpaymenttype = new Field('molliecreditcard');
+        $oOrder->oxorder__oxtransstatus = new Field('OK');
+        $oOrder->save();
+        $oOrder->setNonPublicVar('mollieRecalculateOrder', true);
+
+        // order of the calls in finalizeOrder
+        $oOrder->_setOrderStatus('NOT_FINISHED');
+        $oOrder->_setOrderStatus('OK');
+
+        $this->assertEquals('OK', $oOrder->oxorder__oxtransstatus->value);
+        $this->assertEquals('OK', DatabaseProvider::getDb()->getOne("SELECT oxtransstatus FROM oxorder WHERE oxid = ?", [$oOrder->getId()]));
+    }
+
+    public function testSetOrderStatusRecalculateNoMollieOrder()
+    {
+        $oOrder = oxNew($this->getProxyClassName(\Mollie\Payment\extend\Application\Model\Order::class));
+        $oOrder->oxorder__oxpaymenttype = new Field('oxidinvoice');
+        $oOrder->oxorder__oxtransstatus = new Field('NOT_FINISHED');
+        $oOrder->save();
+        $oOrder->setNonPublicVar('mollieRecalculateOrder', true);
+
+        $oOrder->_setOrderStatus('OK');
+
+        $this->assertEquals('OK', $oOrder->oxorder__oxtransstatus->value);
     }
 
     public function testValidateStock()
