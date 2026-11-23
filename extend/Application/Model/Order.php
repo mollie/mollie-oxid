@@ -73,6 +73,13 @@ class Order extends Order_parent
     protected $mollieRecalculateOrder = null;
 
     /**
+     * Transaction status of the order before a recalculation
+     *
+     * @var string|null
+     */
+    protected $mollieTransStatusBeforeRecalculation = null;
+
+    /**
      * Property to store the Mollie transaction in the order object
      *
      * @var object
@@ -475,14 +482,15 @@ class Order extends Order_parent
      * Extension: Changing the order in the backend results in da finalizeOrder call with recaltulateOrder = true
      * This sets oxtransstatus to NOT_FINISHED and then to OK, which should not happen for Mollie orders,
      * since the status of Mollie orders is only changed by the payment process.
-     * This prevents this behaviour, so the status stays as it was before the recalculation
+     * This prevents this behaviour, so the status stays as it was before the recalculation.
+     * The status is set anyway, since _loadFromBasket set it to ERROR in the order object in the meantime
      *
      * @param string $sStatus order transaction status
      */
     protected function _setOrderStatus($sStatus)
     {
         if ($this->mollieRecalculateOrder === true && $this->mollieIsMolliePaymentUsed()) {
-            return;
+            $sStatus = $this->mollieTransStatusBeforeRecalculation;
         }
         parent::_setOrderStatus($sStatus);
     }
@@ -572,6 +580,9 @@ class Order extends Order_parent
         }
 
         $this->mollieRecalculateOrder = $blRecalculatingOrder;
+        if ($blRecalculatingOrder === true) {
+            $this->mollieTransStatusBeforeRecalculation = $this->oxorder__oxtransstatus->value;
+        }
 
         $this->mollieSetOrderIsLocked(1, $blRecalculatingOrder);
         if ($this->mollieIsReturnAfterPayment() === true) {
