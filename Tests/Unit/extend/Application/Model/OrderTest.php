@@ -920,6 +920,78 @@ class OrderTest extends UnitTestCase
         Registry::set(Session::class, null);
     }
 
+    public function testSendOrderByEmailUsesOrderBasketInReturnMode()
+    {
+        $oSessionBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
+        $oOrderBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
+
+        $oOrder = $this->getOrderMockForOrderEmail();
+        $oOrder->expects($this->once())->method('mollieRecreateBasketForEmail')->willReturn($oOrderBasket);
+
+        $result = $this->callSendOrderByEmail($oOrder, true, $oSessionBasket);
+
+        $this->assertEquals(Order::ORDER_STATE_OK, $result);
+        $this->assertSame($oOrderBasket, $oOrder->getBasket());
+
+        UtilsObject::resetClassInstances();
+    }
+
+    public function testSendOrderByEmailUsesGivenBasketWithoutReturnMode()
+    {
+        $oSessionBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
+
+        $oOrder = $this->getOrderMockForOrderEmail();
+        $oOrder->expects($this->never())->method('mollieRecreateBasketForEmail');
+
+        $result = $this->callSendOrderByEmail($oOrder, false, $oSessionBasket);
+
+        $this->assertEquals(Order::ORDER_STATE_OK, $result);
+        $this->assertSame($oSessionBasket, $oOrder->getBasket());
+
+        UtilsObject::resetClassInstances();
+    }
+
+    /**
+     * Returns an order mock with a Mollie payment which sends the order email directly in finalizeOrder
+     *
+     * @return \Mollie\Payment\extend\Application\Model\Order
+     */
+    protected function getOrderMockForOrderEmail()
+    {
+        $oEmail = $this->getMockBuilder(Email::class)->disableOriginalConstructor()->getMock();
+        $oEmail->method('sendOrderEMailToUser')->willReturn(true);
+        UtilsObject::setClassInstance(Email::class, $oEmail);
+
+        $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
+        $oPaymentModel->method('isOrderEmailOnWebhookNeeded')->willReturn(false);
+
+        $oOrder = $this->getMockBuilder(\Mollie\Payment\extend\Application\Model\Order::class)
+            ->setMethods(['mollieIsMolliePaymentUsed', 'mollieGetPaymentModel', 'mollieRecreateBasketForEmail', 'mollieSetOrderEmailSendDate', 'mollieHandleOrderFinished'])
+            ->getMock();
+        $oOrder->method('mollieIsMolliePaymentUsed')->willReturn(true);
+        $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
+        return $oOrder;
+    }
+
+    /**
+     * Calls the protected method _sendOrderByEmail as it is called by finalizeOrder
+     *
+     * @param  \Mollie\Payment\extend\Application\Model\Order $oOrder
+     * @param  bool                                           $blReturnMode true = customer returned from Mollie
+     * @param  Basket                                         $oBasket      basket given by finalizeOrder
+     * @return int
+     */
+    protected function callSendOrderByEmail($oOrder, $blReturnMode, $oBasket)
+    {
+        $oProperty = new \ReflectionProperty(\Mollie\Payment\extend\Application\Model\Order::class, 'blMollieFinalizeReturnMode');
+        $oProperty->setAccessible(true);
+        $oProperty->setValue($oOrder, $blReturnMode);
+
+        $oMethod = new \ReflectionMethod(\Mollie\Payment\extend\Application\Model\Order::class, '_sendOrderByEmail');
+        $oMethod->setAccessible(true);
+        return $oMethod->invoke($oOrder, null, $oBasket, null);
+    }
+
     public function testMollieLoadOrderByTransactionId()
     {
         \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("REPLACE INTO oxorder (OXID, OXTRANSID) VALUE ('webhookTest', 'testTransId')");
