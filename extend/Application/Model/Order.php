@@ -1102,6 +1102,11 @@ class Order extends Order_parent
             return false;
         }
 
+        // The user of the order is needed to finish the order, i.e. it can't be finished when the user was deleted
+        if ($this->getOrderUser()->isLoaded() === false) {
+            return false;
+        }
+
         $aStatus = $this->mollieGetPaymentModel()->getTransactionHandler($this)->processTransaction($this, 'success');
 
         $aStatusBlacklist = ['paid'];
