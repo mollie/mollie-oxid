@@ -617,6 +617,10 @@ class Order extends Order_parent
         if ($oPaymentModel->isOrderEmailOnWebhookNeeded() === true) { // Email will be sent when webhook for this order arrives
             $blParentReturn = self::ORDER_STATE_OK;
         } else {
+            if ($this->blMollieFinalizeReturnMode === true && $this->blMollieFinishOrderReturnMode === false) {
+                // The basket in the session may differ from the order when the customer changed it while paying (i.e. in another browser tab)
+                $oBasket = $this->mollieRecreateBasketForEmail();
+            }
             $blParentReturn = parent::_sendOrderByEmail($oUser, $oBasket, $oPayment);
             $this->mollieSetOrderEmailSendDate();
         }
@@ -629,12 +633,7 @@ class Order extends Order_parent
      */
     public function mollieSendOrderByEmail()
     {
-        FinishOrders::mollieSetFinishingOrder(true);
-        $oBasket = $this->mollieRecreateBasket();
-        foreach ($oBasket->getContents() as $item) {
-            $item->mollieUnsetArticle();
-        }
-        FinishOrders::mollieSetFinishingOrder(false);
+        $oBasket = $this->mollieRecreateBasketForEmail();
 
         $oUser = $this->getUser();
         if (!$oUser) {
@@ -647,6 +646,23 @@ class Order extends Order_parent
 
         parent::_sendOrderByEmail($oUser, $oBasket, $oPayment);
         $this->mollieSetOrderEmailSendDate();
+    }
+
+    /**
+     * Recreates the basket from the order articles to send the order email with the ordered articles
+     *
+     * @return Basket
+     */
+    protected function mollieRecreateBasketForEmail()
+    {
+        FinishOrders::mollieSetFinishingOrder(true);
+        $oBasket = $this->mollieRecreateBasket();
+        foreach ($oBasket->getContents() as $item) {
+            $item->mollieUnsetArticle();
+        }
+        FinishOrders::mollieSetFinishingOrder(false);
+
+        return $oBasket;
     }
 
     /**
