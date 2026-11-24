@@ -11,6 +11,7 @@ use OxidEsales\Eshop\Application\Model\OrderArticle;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\UserPayment;
 use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -338,6 +339,7 @@ class OrderTest extends UnitTestCase
 
         $this->assertTrue($result);
         $this->assertEquals('test', $oOrder->oxorder__oxordernr->value);
+        $this->assertEquals('test', $oOrder->oxorder__oxordernr->getRawValue()); // value used when saving the order
     }
 
     public function testSetFolder()
@@ -377,14 +379,48 @@ class OrderTest extends UnitTestCase
         $oOrder->oxorder__oxtransstatus = new Field('NOT_FINISHED');
         $oOrder->save();
         $oOrder->setNonPublicVar('mollieRecalculateOrder', true);
+        $oOrder->setNonPublicVar('mollieTransStatusBeforeRecalculation', 'NOT_FINISHED');
         $oOrder->_setOrderStatus($expected);
 
-        $this->assertNotEquals($expected, $oOrder->oxorder__oxtransstatus->value);
+        $this->assertEquals('NOT_FINISHED', $oOrder->oxorder__oxtransstatus->value);
 
         $oOrder->setNonPublicVar('mollieRecalculateOrder', false);
         $oOrder->_setOrderStatus($expected);
 
         $this->assertEquals($expected, $oOrder->oxorder__oxtransstatus->value);
+    }
+
+    public function testSetOrderStatusRecalculateFinishedOrder()
+    {
+        $oOrder = oxNew($this->getProxyClassName(\Mollie\Payment\extend\Application\Model\Order::class));
+        $oOrder->oxorder__oxpaymenttype = new Field('molliecreditcard');
+        $oOrder->oxorder__oxtransstatus = new Field('OK');
+        $oOrder->save();
+        $oOrder->setNonPublicVar('mollieRecalculateOrder', true);
+        $oOrder->setNonPublicVar('mollieTransStatusBeforeRecalculation', 'OK');
+
+        // steps of finalizeOrder during a recalculation: _loadFromBasket sets the status to ERROR in the order object,
+        // then the status is set to NOT_FINISHED, the order is saved and the status is set to OK
+        $oOrder->oxorder__oxtransstatus = new Field('ERROR');
+        $oOrder->_setOrderStatus('NOT_FINISHED');
+        $oOrder->save();
+        $oOrder->_setOrderStatus('OK');
+
+        $this->assertEquals('OK', $oOrder->oxorder__oxtransstatus->value);
+        $this->assertEquals('OK', DatabaseProvider::getDb()->getOne("SELECT oxtransstatus FROM oxorder WHERE oxid = ?", [$oOrder->getId()]));
+    }
+
+    public function testSetOrderStatusRecalculateNoMollieOrder()
+    {
+        $oOrder = oxNew($this->getProxyClassName(\Mollie\Payment\extend\Application\Model\Order::class));
+        $oOrder->oxorder__oxpaymenttype = new Field('oxidinvoice');
+        $oOrder->oxorder__oxtransstatus = new Field('NOT_FINISHED');
+        $oOrder->save();
+        $oOrder->setNonPublicVar('mollieRecalculateOrder', true);
+
+        $oOrder->_setOrderStatus('OK');
+
+        $this->assertEquals('OK', $oOrder->oxorder__oxtransstatus->value);
     }
 
     public function testValidateStock()
@@ -727,7 +763,7 @@ class OrderTest extends UnitTestCase
 
         UtilsObject::setClassInstance(Payment::class, $oPaymentHelper);
 
-        $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
+        $oOrder = $this->getOrderMockWithOrderUser(true);
         $oOrder->oxorder__oxpaymenttype = new Field('molliecreditcard');
         $oOrder->oxorder__oxpaid = new Field('0000-00-00 00:00:00');
         $oOrder->oxorder__oxtransstatus = new Field('NOT_FINISHED');
@@ -757,7 +793,7 @@ class OrderTest extends UnitTestCase
 
         UtilsObject::setClassInstance(Payment::class, $oPaymentHelper);
 
-        $oOrder = new \Mollie\Payment\extend\Application\Model\Order();
+        $oOrder = $this->getOrderMockWithOrderUser(true);
         $oOrder->oxorder__oxpaymenttype = new Field('molliecreditcard');
         $oOrder->oxorder__oxpaid = new Field('0000-00-00 00:00:00');
         $oOrder->oxorder__oxtransstatus = new Field('NOT_FINISHED');
@@ -776,6 +812,44 @@ class OrderTest extends UnitTestCase
         $result = $oOrder->mollieIsEligibleForPaymentFinish();
 
         $this->assertFalse($result);
+    }
+
+    public function testMollieIsEligibleForPaymentFinishFalseUserDeleted()
+    {
+        Payment::destroyInstance();
+
+        $oPaymentHelper = $this->getMockBuilder(Payment::class)->disableOriginalConstructor()->getMock();
+        $oPaymentHelper->expects($this->never())->method('getMolliePaymentModel');
+        $oPaymentHelper->method('isMolliePaymentMethod')->willReturn(true);
+
+        UtilsObject::setClassInstance(Payment::class, $oPaymentHelper);
+
+        $oOrder = $this->getOrderMockWithOrderUser(false);
+        $oOrder->oxorder__oxpaymenttype = new Field('molliecreditcard');
+        $oOrder->oxorder__oxpaid = new Field('0000-00-00 00:00:00');
+        $oOrder->oxorder__oxtransstatus = new Field('NOT_FINISHED');
+        $result = $oOrder->mollieIsEligibleForPaymentFinish();
+
+        $this->assertFalse($result);
+
+        UtilsObject::resetClassInstances();
+        Payment::destroyInstance();
+    }
+
+    /**
+     * Returns an order whose user still exists or was deleted
+     *
+     * @param  bool $blUserExists
+     * @return \Mollie\Payment\extend\Application\Model\Order
+     */
+    protected function getOrderMockWithOrderUser($blUserExists)
+    {
+        $oUser = $this->getMockBuilder(User::class)->disableOriginalConstructor()->getMock();
+        $oUser->method('isLoaded')->willReturn($blUserExists);
+
+        $oOrder = $this->getMockBuilder(\Mollie\Payment\extend\Application\Model\Order::class)->setMethods(['getOrderUser'])->getMock();
+        $oOrder->method('getOrderUser')->willReturn($oUser);
+        return $oOrder;
     }
 
     public function testMollieSendSecondChanceEmail()
@@ -879,6 +953,78 @@ class OrderTest extends UnitTestCase
 
         $oOrder->setUser(null);
         Registry::set(Session::class, null);
+    }
+
+    public function testSendOrderByEmailUsesOrderBasketInReturnMode()
+    {
+        $oSessionBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
+        $oOrderBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
+
+        $oOrder = $this->getOrderMockForOrderEmail();
+        $oOrder->expects($this->once())->method('mollieRecreateBasketForEmail')->willReturn($oOrderBasket);
+
+        $result = $this->callSendOrderByEmail($oOrder, true, $oSessionBasket);
+
+        $this->assertEquals(Order::ORDER_STATE_OK, $result);
+        $this->assertSame($oOrderBasket, $oOrder->getBasket());
+
+        UtilsObject::resetClassInstances();
+    }
+
+    public function testSendOrderByEmailUsesGivenBasketWithoutReturnMode()
+    {
+        $oSessionBasket = $this->getMockBuilder(Basket::class)->disableOriginalConstructor()->getMock();
+
+        $oOrder = $this->getOrderMockForOrderEmail();
+        $oOrder->expects($this->never())->method('mollieRecreateBasketForEmail');
+
+        $result = $this->callSendOrderByEmail($oOrder, false, $oSessionBasket);
+
+        $this->assertEquals(Order::ORDER_STATE_OK, $result);
+        $this->assertSame($oSessionBasket, $oOrder->getBasket());
+
+        UtilsObject::resetClassInstances();
+    }
+
+    /**
+     * Returns an order mock with a Mollie payment which sends the order email directly in finalizeOrder
+     *
+     * @return \Mollie\Payment\extend\Application\Model\Order
+     */
+    protected function getOrderMockForOrderEmail()
+    {
+        $oEmail = $this->getMockBuilder(Email::class)->disableOriginalConstructor()->getMock();
+        $oEmail->method('sendOrderEMailToUser')->willReturn(true);
+        UtilsObject::setClassInstance(Email::class, $oEmail);
+
+        $oPaymentModel = $this->getMockBuilder(Creditcard::class)->disableOriginalConstructor()->getMock();
+        $oPaymentModel->method('isOrderEmailOnWebhookNeeded')->willReturn(false);
+
+        $oOrder = $this->getMockBuilder(\Mollie\Payment\extend\Application\Model\Order::class)
+            ->setMethods(['mollieIsMolliePaymentUsed', 'mollieGetPaymentModel', 'mollieRecreateBasketForEmail', 'mollieSetOrderEmailSendDate', 'mollieHandleOrderFinished'])
+            ->getMock();
+        $oOrder->method('mollieIsMolliePaymentUsed')->willReturn(true);
+        $oOrder->method('mollieGetPaymentModel')->willReturn($oPaymentModel);
+        return $oOrder;
+    }
+
+    /**
+     * Calls the protected method _sendOrderByEmail as it is called by finalizeOrder
+     *
+     * @param  \Mollie\Payment\extend\Application\Model\Order $oOrder
+     * @param  bool                                           $blReturnMode true = customer returned from Mollie
+     * @param  Basket                                         $oBasket      basket given by finalizeOrder
+     * @return int
+     */
+    protected function callSendOrderByEmail($oOrder, $blReturnMode, $oBasket)
+    {
+        $oProperty = new \ReflectionProperty(\Mollie\Payment\extend\Application\Model\Order::class, 'blMollieFinalizeReturnMode');
+        $oProperty->setAccessible(true);
+        $oProperty->setValue($oOrder, $blReturnMode);
+
+        $oMethod = new \ReflectionMethod(\Mollie\Payment\extend\Application\Model\Order::class, '_sendOrderByEmail');
+        $oMethod->setAccessible(true);
+        return $oMethod->invoke($oOrder, null, $oBasket, null);
     }
 
     public function testMollieLoadOrderByTransactionId()
