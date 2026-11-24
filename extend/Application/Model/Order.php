@@ -72,6 +72,13 @@ class Order extends Order_parent
     protected $mollieRecalculateOrder = null;
 
     /**
+     * Transaction status of the order before a recalculation
+     *
+     * @var string|null
+     */
+    protected $mollieTransStatusBeforeRecalculation = null;
+
+    /**
      * Property to store the Mollie transaction in the order object
      *
      * @var object
@@ -433,7 +440,7 @@ class Order extends Order_parent
             // Finalize order would set a new incremented order-nr if already filled
             // Doing this to prevent this, oxordernr will be filled again in _setNumber
             $this->mollieTmpOrderNr = $this->oxorder__oxordernr->value;
-            $this->oxorder__oxordernr->value = "";
+            $this->oxorder__oxordernr = new Field("", Field::T_RAW);
         }
         return true;
     }
@@ -449,7 +456,7 @@ class Order extends Order_parent
             return parent::_setNumber();
         }
 
-        $this->oxorder__oxordernr->value = $this->mollieTmpOrderNr;
+        $this->oxorder__oxordernr = new Field($this->mollieTmpOrderNr, Field::T_RAW);
 
         return true;
     }
@@ -472,15 +479,17 @@ class Order extends Order_parent
 
     /**
      * Extension: Changing the order in the backend results in da finalizeOrder call with recaltulateOrder = true
-     * This sets oxtransstatus to OK, which should not happen for Mollie orders when they were not finished
-     * This prevents this behaviour
+     * This sets oxtransstatus to NOT_FINISHED and then to OK, which should not happen for Mollie orders,
+     * since the status of Mollie orders is only changed by the payment process.
+     * This prevents this behaviour, so the status stays as it was before the recalculation.
+     * The status is set anyway, since _loadFromBasket set it to ERROR in the order object in the meantime
      *
      * @param string $sStatus order transaction status
      */
     protected function _setOrderStatus($sStatus)
     {
-        if ($this->mollieRecalculateOrder === true && $this->oxorder__oxtransstatus->value == "NOT_FINISHED" && $this->mollieIsMolliePaymentUsed()) {
-            return;
+        if ($this->mollieRecalculateOrder === true && $this->mollieIsMolliePaymentUsed()) {
+            $sStatus = $this->mollieTransStatusBeforeRecalculation;
         }
         parent::_setOrderStatus($sStatus);
     }
@@ -570,6 +579,9 @@ class Order extends Order_parent
         }
 
         $this->mollieRecalculateOrder = $blRecalculatingOrder;
+        if ($blRecalculatingOrder === true) {
+            $this->mollieTransStatusBeforeRecalculation = $this->oxorder__oxtransstatus->value;
+        }
 
         $this->mollieSetOrderIsLocked(1, $blRecalculatingOrder);
         if ($this->mollieIsReturnAfterPayment() === true) {
@@ -617,6 +629,10 @@ class Order extends Order_parent
         if ($oPaymentModel->isOrderEmailOnWebhookNeeded() === true) { // Email will be sent when webhook for this order arrives
             $blParentReturn = self::ORDER_STATE_OK;
         } else {
+            if ($this->blMollieFinalizeReturnMode === true && $this->blMollieFinishOrderReturnMode === false) {
+                // The basket in the session may differ from the order when the customer changed it while paying (i.e. in another browser tab)
+                $oBasket = $this->mollieRecreateBasketForEmail();
+            }
             $blParentReturn = parent::_sendOrderByEmail($oUser, $oBasket, $oPayment);
             $this->mollieSetOrderEmailSendDate();
         }
@@ -629,12 +645,7 @@ class Order extends Order_parent
      */
     public function mollieSendOrderByEmail()
     {
-        FinishOrders::mollieSetFinishingOrder(true);
-        $oBasket = $this->mollieRecreateBasket();
-        foreach ($oBasket->getContents() as $item) {
-            $item->mollieUnsetArticle();
-        }
-        FinishOrders::mollieSetFinishingOrder(false);
+        $oBasket = $this->mollieRecreateBasketForEmail();
 
         $oUser = $this->getUser();
         if (!$oUser) {
@@ -647,6 +658,23 @@ class Order extends Order_parent
 
         parent::_sendOrderByEmail($oUser, $oBasket, $oPayment);
         $this->mollieSetOrderEmailSendDate();
+    }
+
+    /**
+     * Recreates the basket from the order articles to send the order email with the ordered articles
+     *
+     * @return Basket
+     */
+    protected function mollieRecreateBasketForEmail()
+    {
+        FinishOrders::mollieSetFinishingOrder(true);
+        $oBasket = $this->mollieRecreateBasket();
+        foreach ($oBasket->getContents() as $item) {
+            $item->mollieUnsetArticle();
+        }
+        FinishOrders::mollieSetFinishingOrder(false);
+
+        return $oBasket;
     }
 
     /**
@@ -1150,6 +1178,11 @@ class Order extends Order_parent
     public function mollieIsEligibleForPaymentFinish($blSecondChanceEmail = false)
     {
         if (!$this->mollieIsMolliePaymentUsed() || $this->oxorder__oxpaid->value != '0000-00-00 00:00:00' || $this->oxorder__oxtransstatus->value != 'NOT_FINISHED') {
+            return false;
+        }
+
+        // The user of the order is needed to finish the order, i.e. it can't be finished when the user was deleted
+        if ($this->getOrderUser()->isLoaded() === false) {
             return false;
         }
 

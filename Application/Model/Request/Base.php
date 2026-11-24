@@ -390,7 +390,13 @@ abstract class Base
             $aItems = $this->getFixedItemArray($oOrder, $aItems, $dMismatchSum, $sNameField);
         }
 
+        // Mollie accepts vat rates with a maximum of 2 decimals, but with the OXID setting "VAT calculation of additional services: Calculate VAT proportionately"
+        // the vat rate of shipping, payment, wrapping and gift card costs can have more decimals (i.e. 15.384615384615)
+        // The vat amount is then calculated with the rounded vat rate, since Mollie checks if vat rate and vat amount match
         if ($oOrder->oxorder__oxdelcost->value != 0) {
+            $dDelVat = round($oOrder->oxorder__oxdelvat->value, 2);
+            $dDelVatValue = $this->getVatValue($oOrder->oxorder__oxdelcost->value, $dDelVat);
+
             $aItems[] = [
                 $sNameField => Registry::getLang()->translateString('MOLLIE_SHIPPINGCOST').': '.$oOrder->getDelSet()->oxdeliveryset__oxtitle->value,
                 'sku' => $oOrder->oxorder__oxdeltype->value,
@@ -399,12 +405,15 @@ abstract class Base
                 'unitPrice' => $this->getAmountArray($oOrder->oxorder__oxdelcost->value, $sCurrency),
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrder->oxorder__oxdelcost->value, $sCurrency),
-                'vatRate' => $oOrder->oxorder__oxdelvat->value,
-                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxdelcost->value, $oOrder->getOrderDeliveryPrice()->getVatValue(), $oOrder->oxorder__oxdelvat->value), $sCurrency),
+                'vatRate' => $dDelVat,
+                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxdelcost->value, $dDelVatValue, $dDelVat), $sCurrency),
             ];
         }
 
         if ($oOrder->oxorder__oxpaycost->value != 0) {
+            $dPayVat = round($oOrder->oxorder__oxpayvat->value, 2);
+            $dPayVatValue = $this->getVatValue($oOrder->oxorder__oxpaycost->value, $dPayVat);
+
             $aItems[] = [
                 $sNameField => Registry::getLang()->translateString('MOLLIE_PAYMENTTYPESURCHARGE').': '.$oOrder->getPaymentType()->oxpayments__oxdesc->value,
                 'sku' => $oOrder->oxorder__oxpaymenttype->value,
@@ -413,14 +422,14 @@ abstract class Base
                 'unitPrice' => $this->getAmountArray($oOrder->oxorder__oxpaycost->value, $sCurrency),
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrder->oxorder__oxpaycost->value, $sCurrency),
-                'vatRate' => $oOrder->oxorder__oxpayvat->value,
-                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxpaycost->value, $oOrder->getOrderPaymentPrice()->getVatValue(), $oOrder->oxorder__oxpayvat->value), $sCurrency),
+                'vatRate' => $dPayVat,
+                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxpaycost->value, $dPayVatValue, $dPayVat), $sCurrency),
             ];
         }
 
         if ($oOrder->oxorder__oxwrapcost->value != 0) {
-            $iFixedVat = round($oOrder->oxorder__oxwrapvat->value, 0);  // should be $oOrder->oxorder__oxwrapvat->value but seems to be buggy i.e. "18.951612903226"
-            $dWrapVatValue = $this->getVatValue($oOrder->getOrderWrappingPrice()->getBruttoPrice(), $iFixedVat);
+            $dWrapVat = round($oOrder->oxorder__oxwrapvat->value, 2);
+            $dWrapVatValue = $this->getVatValue($oOrder->getOrderWrappingPrice()->getBruttoPrice(), $dWrapVat);
 
             $aItems[] = [
                 $sNameField => Registry::getLang()->translateString('MOLLIE_WRAPPING'),
@@ -430,12 +439,15 @@ abstract class Base
                 'unitPrice' => $this->getAmountArray($oOrder->oxorder__oxwrapcost->value, $sCurrency),
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrder->oxorder__oxwrapcost->value, $sCurrency),
-                'vatRate' => $iFixedVat,
-                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxwrapcost->value, $dWrapVatValue, $iFixedVat), $sCurrency),
+                'vatRate' => $dWrapVat,
+                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxwrapcost->value, $dWrapVatValue, $dWrapVat), $sCurrency),
             ];
         }
 
         if ($oOrder->oxorder__oxgiftcardcost->value != 0) {
+            $dGiftCardVat = round($oOrder->oxorder__oxgiftcardvat->value, 2);
+            $dGiftCardVatValue = $this->getVatValue($oOrder->oxorder__oxgiftcardcost->value, $dGiftCardVat);
+
             $aItems[] = [
                 $sNameField => Registry::getLang()->translateString('MOLLIE_GIFTCARD').': '.$oOrder->getGiftCard()->oxwrapping__oxname->value,
                 'sku' => 'giftcard',
@@ -444,8 +456,8 @@ abstract class Base
                 'unitPrice' => $this->getAmountArray($oOrder->oxorder__oxgiftcardcost->value, $sCurrency),
                 'discountAmount' => $this->getAmountArray(0, $sCurrency),
                 'totalAmount' => $this->getAmountArray($oOrder->oxorder__oxgiftcardcost->value, $sCurrency),
-                'vatRate' => $oOrder->oxorder__oxgiftcardvat->value,
-                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxgiftcardcost->value, $oOrder->getOrderGiftCardPrice()->getVatValue(), $oOrder->oxorder__oxgiftcardvat->value), $sCurrency),
+                'vatRate' => $dGiftCardVat,
+                'vatAmount' => $this->getAmountArray($this->getRealVatValue($oOrder->oxorder__oxgiftcardcost->value, $dGiftCardVatValue, $dGiftCardVat), $sCurrency),
             ];
         }
 
