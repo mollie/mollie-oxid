@@ -46,17 +46,16 @@ class OrderController extends OrderController_parent
     }
 
     /**
-     * Mollie sometimes sends multiple calls to the shop when payment was done with Apple Pay in credit card form.
+     * The return url is sometimes called multiple times at the same time, i.e. when payment was done with Apple Pay
+     * in credit card form or with iDeal when the banking app opens the return url additionally to the browser.
      * This function recognizes these situations to prevent double processing
      *
      * @param  Order $oOrder
      * @return bool
      */
-    protected function mollieIsCreditCardApplePayDoubleCall(Order $oOrder)
+    protected function mollieIsOrderAlreadyFinalized(Order $oOrder)
     {
-        if ($oOrder->getFieldData("oxorder__oxpaymenttype") == "molliecreditcard" &&
-            $oOrder->getFieldData("oxorder__oxtransstatus") == "OK"
-        ) {
+        if ($oOrder->getFieldData("oxorder__oxtransstatus") == "OK") {
             return true;
         }
         return false;
@@ -152,7 +151,7 @@ class OrderController extends OrderController_parent
                 return $this->redirectWithError($sErrorIdent);
             }
 
-            if ($this->mollieIsCreditCardApplePayDoubleCall($oOrder) === true) {
+            if ($this->mollieIsOrderAlreadyFinalized($oOrder) === true) {
                 // Order already finalized, return OK to prevent double processing
                 return $this->_getNextStep(Order::ORDER_STATE_OK);
             }
