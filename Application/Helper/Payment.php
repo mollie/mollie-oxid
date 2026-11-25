@@ -186,19 +186,17 @@ class Payment
      */
     public function getMolliePaymentInfo($dAmount = false, $sCurrency = false, $sBillingCountryCode = false)
     {
-        $sCacheKey = $dAmount.$sCurrency.$sBillingCountryCode;
-        if (empty($sCacheKey)) {
-            $sCacheKey = 'none';
+        $aParams = ['resource' => 'orders', 'includeWallets' => 'applepay'];
+        if ($dAmount !== false && $sCurrency !== false) {
+            $aParams['amount[value]'] = Api::getInstance()->formatPrice($dAmount);
+            $aParams['amount[currency]'] = $sCurrency;
         }
+        if ($sBillingCountryCode !== false) {
+            $aParams['billingCountry'] = $sBillingCountryCode;
+        }
+        // The amount is only sent together with a currency, so the key has to be built from the actual request
+        $sCacheKey = md5(http_build_query($aParams));
         if (empty($this->aPaymentInfo[$sCacheKey])) {
-            $aParams = ['resource' => 'orders', 'includeWallets' => 'applepay'];
-            if ($dAmount !== false && $sCurrency !== false) {
-                $aParams['amount[value]'] = Api::getInstance()->formatPrice($dAmount);
-                $aParams['amount[currency]'] = $sCurrency;
-            }
-            if ($sBillingCountryCode !== false) {
-                $aParams['billingCountry'] = $sBillingCountryCode;
-            }
             $aPaymentInfo = [];
             try {
                 $aMollieInfo = $this->loadMollieApi()->methods->all($aParams);
